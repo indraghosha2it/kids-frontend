@@ -1,280 +1,381 @@
 'use client';
 
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Sparkles, Star, Rocket, Gift, Heart, ArrowRight } from 'lucide-react';
 
-export default function HeroSection() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+const HeroSection = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [autoplay, setAutoplay] = useState(true);
 
-  // Product showcase images
-  const productImages = [
+  // Slides data
+  const slides = [
     {
-      url: "https://i.ibb.co.com/C3m0HNW2/mediterranean-aesthetics-bag-still-life.jpg",
-      name: "Premium Jute Bags",
-      category: "Shopping & Tote"
+      id: 1,
+      title: "Summer Toy Sale!",
+      subtitle: "Up to 50% OFF",
+      description: "Get ready for endless fun with our amazing summer collection",
+      buttonText: "Shop Now",
+      buttonLink: "/products",
+      image: "https://images.unsplash.com/photo-1566576912321-d58c333a7d1b?w=800&h=600&fit=crop",
+      bgColor: "from-[#FFD93D] to-[#FF7B54]",
+      icon: <Rocket className="w-8 h-8 text-white" />,
+      badge: "HOT DEAL"
     },
     {
-      url: "https://i.ibb.co.com/rhs0mbn/Home-pages.jpg",
-      name: "Raw Jute Fiber",
-      category: "Industrial Grade"
+      id: 2,
+      title: "New Arrivals",
+      subtitle: "Latest Toys Just Landed",
+      description: "Discover the trendiest toys of the season",
+      buttonText: "Explore Now",
+      buttonLink: "/products?sort=new",
+      image: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&h=600&fit=crop",
+      bgColor: "from-[#4F9DFF] to-[#6EE7B7]",
+      icon: <Star className="w-8 h-8 text-white" />,
+      badge: "NEW"
     },
     {
-      url: "https://i.ibb.co.com/LhvmZfgc/91-CPUL-e-ES.jpg",
-      name: "Jute Rugs & Mats",
-      category: "Home Decor"
-    },
-    {
-      url: "https://i.ibb.co.com/Hs6Ch96/thread-fabric-high-angle.jpg",
-      name: "Jute Yarn & Twine",
-      category: "Eco-Friendly"
-    },
+      id: 3,
+      title: "Educational Toys",
+      subtitle: "Learn While Playing",
+      description: "STEM kits, puzzles, and more for smart kids",
+      buttonText: "View Collection",
+      buttonLink: "/products?category=educational",
+      image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=800&h=600&fit=crop",
+      bgColor: "from-[#FF7B54] to-[#F472B6]",
+      icon: <Gift className="w-8 h-8 text-white" />,
+      badge: "POPULAR"
+    }
   ];
 
-  // Scroll to CTA section function
-const scrollToQuoteSection = () => {
-  const quoteSection = document.getElementById('request-quote');
-  if (quoteSection) {
-    quoteSection.scrollIntoView({ 
-      behavior: 'smooth',
-      block: 'start'
-    });
-  }
-};
+  // Featured toys
+  const featuredToys = [
+    {
+      id: 1,
+      name: "Space Rocket",
+      price: "1,299",
+      originalPrice: "1,999",
+      discount: "35%",
+      image: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=300&h=300&fit=crop",
+      badge: "Bestseller",
+      badgeColor: "#FFD93D"
+    },
+    {
+      id: 2,
+      name: "Building Blocks",
+      price: "899",
+      originalPrice: "1,499",
+      discount: "40%",
+      image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=300&h=300&fit=crop",
+      badge: "Trending",
+      badgeColor: "#4F9DFF"
+    },
+    {
+      id: 3,
+      name: "Puzzle Game",
+      price: "599",
+      originalPrice: "999",
+      discount: "30%",
+      image: "https://images.unsplash.com/photo-1566576912321-d58c333a7d1b?w=300&h=300&fit=crop",
+      badge: "Hot Sale",
+      badgeColor: "#FF7B54"
+    },
+    {
+      id: 4,
+      name: "Doll House",
+      price: "2,499",
+      originalPrice: "3,499",
+      discount: "28%",
+      image: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=300&h=300&fit=crop",
+      badge: "Limited",
+      badgeColor: "#F472B6"
+    }
+  ];
 
+  // Seasonal promotions
+  const seasonalPromos = [
+    { icon: "🎄", title: "Christmas Special", text: "Up to 60% OFF", color: "from-red-500 to-orange-500" },
+    { icon: "🎃", title: "Halloween Sale", text: "Spooky Discounts", color: "from-orange-600 to-purple-600" },
+    { icon: "🎁", title: "Birthday Deals", text: "Extra 10% OFF", color: "from-pink-500 to-red-500" },
+    { icon: "🌟", title: "Weekly Flash", text: "Limited Time", color: "from-blue-500 to-cyan-500" }
+  ];
+
+  // Autoplay slides
   useEffect(() => {
-    setIsVisible(true);
-    
-    // Rotate images every 4 seconds
+    if (!autoplay) return;
     const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
-    }, 4000);
-    
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [autoplay, slides.length]);
+
+  const nextSlide = () => {
+    setAutoplay(false);
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setTimeout(() => setAutoplay(true), 5000);
+  };
+
+  const prevSlide = () => {
+    setAutoplay(false);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setTimeout(() => setAutoplay(true), 5000);
+  };
 
   return (
-    <section className="relative mt-16 min-h-[70vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Background Image - Natural Jute Texture */}
-      <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('https://i.ibb.co.com/nqZZx5Pn/asian-market-bamboo-wicker-baskets.jpg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Simple Dark Overlay */}
-        <div className="absolute inset-0 bg-black/60" />
+    <div className="w-full overflow-hidden">
+      {/* Main Hero Banner */}
+      <div className="relative h-[500px] md:h-[550px] lg:h-[600px] overflow-hidden">
+        {/* Slides */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0"
+          >
+            {/* Background Image with Gradient Overlay */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${slides[currentSlide].image})` }}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-r ${slides[currentSlide].bgColor} opacity-85`}></div>
+            </div>
+
+            {/* Content */}
+            <div className="relative h-full flex items-center">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-2xl">
+                  {/* Badge */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <span className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-1.5 text-white text-sm font-bold mb-4">
+                      {slides[currentSlide].icon}
+                      {slides[currentSlide].badge}
+                    </span>
+                  </motion.div>
+
+                  {/* Title */}
+                  <motion.h1
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3"
+                    style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}
+                  >
+                    {slides[currentSlide].title}
+                  </motion.h1>
+
+                  {/* Subtitle */}
+                  <motion.h2
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-2xl md:text-3xl lg:text-4xl font-bold text-white/90 mb-4"
+                  >
+                    {slides[currentSlide].subtitle}
+                  </motion.h2>
+
+                  {/* Description */}
+                  <motion.p
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-white/80 text-base md:text-lg mb-8 max-w-lg"
+                  >
+                    {slides[currentSlide].description}
+                  </motion.p>
+
+                  {/* Button */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <Link
+                      href={slides[currentSlide].buttonLink}
+                      className="inline-flex items-center gap-2 bg-white text-[#FF7B54] px-6 py-3 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-300 shadow-lg"
+                      style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}
+                    >
+                      {slides[currentSlide].buttonText}
+                      <ArrowRight className="w-5 h-5" />
+                    </Link>
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Navigation Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all z-10"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all z-10"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        {/* Dots */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {slides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                setAutoplay(false);
+                setCurrentSlide(idx);
+                setTimeout(() => setAutoplay(true), 5000);
+              }}
+              className={`transition-all duration-300 rounded-full ${
+                currentSlide === idx
+                  ? 'w-8 h-2 bg-white'
+                  : 'w-2 h-2 bg-white/50 hover:bg-white/80'
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
-        <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-8 lg:gap-12">
-          
-          {/* LEFT SIDE - Content */}
-          <div className="flex-1 text-center lg:text-left">
-            {/* Trust Badge */}
-            <div 
-              className={`inline-flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-3 py-1 mb-3 border border-white/20 transition-all duration-700 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3A7D44] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3A7D44]"></span>
-              </span>
-              <span className="text-[#F5E6D3] text-xs font-medium tracking-wide">
-                🌾 Made in Bangladesh | Trusted Global Supplier
-              </span>
-            </div>
-
-            {/* Main Headline - Smaller on mobile */}
-         <h1 
-  className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 md:mb-3 leading-tight transition-all duration-700 delay-100 font-serif ${
-    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-  }`}
-  style={{ fontFamily: 'Playfair Display, Georgia, Times New Roman, serif' }}
->
-  Premium Jute Products
-  <br />
-  <span className="relative inline-block mt-0.5">
-    Supplier from Bangladesh
-    <svg 
-      className="absolute -bottom-1 left-0 w-full h-1.5 md:h-2 text-[#3A7D44]" 
-      viewBox="0 0 400 20" 
-      fill="currentColor"
-      preserveAspectRatio="none"
-    >
-      <path d="M0,10 C50,20 100,0 150,10 C200,20 250,0 300,10 C350,20 400,10 400,10 L400,20 L0,20 Z" />
-    </svg>
-  </span>
-  <span className="text-white"> to the World</span>
-</h1>
-
-            {/* Subtext with bullet points - Smaller on mobile */}
-            <div 
-              className={`flex flex-wrap justify-center lg:justify-start gap-1.5 md:gap-2 mb-3 md:mb-4 transition-all duration-700 delay-200 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              <div className="flex items-center gap-1 px-2 md:px-2.5 py-0.5 md:py-1 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                <span className="text-xs md:text-sm">📦</span>
-                <span className="text-[#F5E6D3] font-medium text-[10px] md:text-xs">Bulk Orders</span>
-              </div>
-              <div className="flex items-center gap-1 px-2 md:px-2.5 py-0.5 md:py-1 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                <span className="text-xs md:text-sm">⚙️</span>
-                <span className="text-[#F5E6D3] font-medium text-[10px] md:text-xs">Custom Manufacturing</span>
-              </div>
-              <div className="flex items-center gap-1 px-2 md:px-2.5 py-0.5 md:py-1 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                <span className="text-xs md:text-sm">🚢</span>
-                <span className="text-[#F5E6D3] font-medium text-[10px] md:text-xs">Global Export</span>
-              </div>
-            </div>
-
-            {/* CTA Buttons - Side by side on mobile */}
-            <div 
-              className={`flex flex-row justify-center lg:justify-start gap-2 md:gap-3 transition-all duration-700 delay-400 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              {/* Request a Quote Button - Primary */}
-           <button
-  onClick={scrollToQuoteSection}
-  className="group relative inline-flex items-center justify-center px-3 md:px-5 py-1.5 md:py-2 text-xs md:text-sm font-semibold rounded-lg overflow-hidden transition-all duration-300 transform hover:scale-105 focus:ring-2 focus:ring-[#3A7D44] focus:ring-offset-2"
->
-  <span className="absolute inset-0 bg-gradient-to-r from-[#3A7D44] to-[#2D5E35]"></span>
-  <span className="absolute inset-0 bg-gradient-to-r from-[#2D5E35] to-[#3A7D44] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-  <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></span>
-  <span className="relative flex items-center gap-1 md:gap-2 text-white">
-    <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-    Request a Quote
-  </span>
-</button>
-
-              {/* View Products Button - Secondary */}
-              <Link
-                href="/products"
-                className="group inline-flex items-center justify-center px-3 md:px-5 py-1.5 md:py-2 text-xs md:text-sm font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 border-2 border-[#F5E6D3] bg-transparent hover:bg-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3] focus:ring-offset-2"
+      {/* Seasonal Promotions Banner */}
+      <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] py-3 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+            {seasonalPromos.map((promo, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 cursor-pointer"
               >
-                <span className="relative flex items-center gap-1 md:gap-2 text-[#F5E6D3] group-hover:text-[#6B4F3A] transition-colors duration-300">
-                  <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                  View Products
-                </span>
-              </Link>
-            </div>
-
-            {/* Product Image - Moves here on mobile (after buttons) */}
-            <div className="block lg:hidden mt-6 max-w-[280px] mx-auto">
-              <div className="relative">
-                <div className="relative overflow-hidden rounded-xl">
-                  <img
-                    src={productImages[currentImageIndex].url}
-                    alt={productImages[currentImageIndex].name}
-                    className="w-full h-auto object-cover transition-transform duration-1000 hover:scale-110"
-                    style={{ aspectRatio: '1/1' }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                    <h3 className="text-xs font-bold text-white">{productImages[currentImageIndex].name}</h3>
-                    <p className="text-[8px] text-gray-200">{productImages[currentImageIndex].category}</p>
-                  </div>
+                <span className="text-xl">{promo.icon}</span>
+                <div>
+                  <p className="text-white font-bold text-xs md:text-sm">{promo.title}</p>
+                  <p className="text-white/80 text-xs">{promo.text}</p>
                 </div>
-                <div className="absolute -top-2 -right-2 bg-[#3A7D44] text-white px-1.5 py-0.5 rounded-full text-[8px] font-semibold shadow-lg">
-                  🌿 Eco-Friendly
-                </div>
-                <div className="absolute -bottom-2 -left-2 bg-[#F5E6D3] text-[#6B4F3A] px-1.5 py-0.5 rounded-full text-[8px] font-semibold shadow-lg">
-                  🇧🇩 Made in BD
-                </div>
-              </div>
-              {/* Slide Indicators for mobile */}
-              <div className="flex justify-center gap-1.5 mt-3">
-                {productImages.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`h-1 rounded-full transition-all duration-300 ${
-                      currentImageIndex === index 
-                        ? 'w-6 bg-[#3A7D44]' 
-                        : 'w-1.5 bg-white/50 hover:bg-white/80'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Trust Indicators - Stats (after image on mobile) */}
-            <div 
-              className={`mt-4 md:mt-5 pt-3 md:pt-4 border-t border-white/15 flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 md:gap-6 transition-all duration-700 delay-500 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              <div className="text-center lg:text-left">
-                <div className="text-base sm:text-lg md:text-xl font-bold text-[#F5E6D3]">30+</div>
-                <div className="text-[9px] md:text-[11px] text-[#E8D5C0]">Countries</div>
-              </div>
-              <div className="text-center lg:text-left">
-                <div className="text-base sm:text-lg md:text-xl font-bold text-[#F5E6D3]">500+</div>
-                <div className="text-[9px] md:text-[11px] text-[#E8D5C0]">Clients</div>
-              </div>
-              <div className="text-center lg:text-left">
-                <div className="text-base sm:text-lg md:text-xl font-bold text-[#F5E6D3]">100%</div>
-                <div className="text-[9px] md:text-[11px] text-[#E8D5C0]">Eco-Friendly</div>
-              </div>
-              <div className="text-center lg:text-left">
-                <div className="text-base sm:text-lg md:text-xl font-bold text-[#F5E6D3]">24/7</div>
-                <div className="text-[9px] md:text-[11px] text-[#E8D5C0]">Support</div>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT SIDE - Product Image Showcase (Desktop only) */}
-          <div className="hidden lg:block flex-1 max-w-md mx-auto lg:max-w-sm">
-            <div 
-              className={`relative transition-all duration-700 delay-200 ${
-                isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
-              }`}
-            >
-              <div className="relative bg-white/10 backdrop-blur-sm rounded-xl p-1.5 border border-white/20 shadow-xl">
-                <div className="relative overflow-hidden rounded-lg aspect-square">
-                  <img
-                    src={productImages[currentImageIndex].url}
-                    alt={productImages[currentImageIndex].name}
-                    className="w-full h-full object-cover transition-transform duration-1000 hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
-                    <h3 className="text-sm font-bold text-white">{productImages[currentImageIndex].name}</h3>
-                    <p className="text-[10px] text-gray-200">{productImages[currentImageIndex].category}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute -top-2 -right-2 bg-[#3A7D44] text-white px-2 py-0.5 rounded-full text-[10px] font-semibold shadow-lg">
-                🌿 Eco-Friendly
-              </div>
-              <div className="absolute -bottom-2 -left-2 bg-[#F5E6D3] text-[#6B4F3A] px-2 py-0.5 rounded-full text-[10px] font-semibold shadow-lg">
-                🇧🇩 Made in BD
-              </div>
-            </div>
-            <div className="flex justify-center gap-2 mt-4">
-              {productImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    currentImageIndex === index 
-                      ? 'w-8 bg-[#3A7D44]' 
-                      : 'w-2 bg-white/50 hover:bg-white/80'
-                  }`}
-                />
-              ))}
-            </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>
-    </section>
+
+      {/* Featured Toys Section */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FFD93D] to-[#FF7B54] rounded-full px-4 py-1.5 mb-3"
+          >
+            <Sparkles className="w-4 h-4 text-white" />
+            <span className="text-white text-sm font-bold">✨ Featured Toys ✨</span>
+            <Sparkles className="w-4 h-4 text-white" />
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-2xl md:text-3xl font-bold text-gray-800"
+            style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}
+          >
+            Best Sellers & Trending
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-gray-500 mt-2"
+          >
+            Most loved toys by kids and parents
+          </motion.p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featuredToys.map((toy, idx) => (
+            <motion.div
+              key={toy.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              whileHover={{ y: -8, transition: { duration: 0.2 } }}
+              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group cursor-pointer"
+            >
+              {/* Image Container */}
+              <div className="relative overflow-hidden h-48">
+                <img
+                  src={toy.image}
+                  alt={toy.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                {/* Badge */}
+                <div
+                  className="absolute top-3 left-3 px-2 py-1 rounded-full text-white text-xs font-bold"
+                  style={{ backgroundColor: toy.badgeColor }}
+                >
+                  {toy.badge}
+                </div>
+                {/* Discount Badge */}
+                <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  -{toy.discount}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="font-bold text-gray-800 text-lg mb-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+                  {toy.name}
+                </h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl font-bold text-[#FF7B54]">BDT {toy.price}</span>
+                  <span className="text-sm text-gray-400 line-through">BDT {toy.originalPrice}</span>
+                </div>
+                <div className="flex items-center gap-1 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-[#FFD93D] text-[#FFD93D]" />
+                  ))}
+                  <span className="text-xs text-gray-500 ml-1">(128 reviews)</span>
+                </div>
+                <Link
+                  href={`/product/${toy.id}`}
+                  className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] text-white py-2 rounded-full font-semibold text-sm hover:opacity-90 transition-all"
+                >
+                  <Heart className="w-4 h-4" />
+                  Quick View
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* View All Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mt-8"
+        >
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-all"
+          >
+            View All Toys
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
+      </div>
+    </div>
   );
-}
+};
+
+export default HeroSection;

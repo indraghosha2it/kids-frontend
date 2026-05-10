@@ -22,23 +22,23 @@ export default function HomePage() {
   return (
      <>
      <Navbar />
-      <HeroBanner />
+      {/* <HeroBanner /> */}
 
       {/* <ScrollingLogos /> */}
-      <Categories />
+      {/* <Categories />
       <FeaturedProducts />
       <WhyChooseUs />
-      <ManufacturingSupplyChain />
+      <ManufacturingSupplyChain /> */}
       
       
      
-           <AlibabaTrustSection /> 
+           {/* <AlibabaTrustSection />  */}
            {/* <StatsSection/> */}
-      <TrustCertifications />
+      {/* <TrustCertifications />
             <ReviewsSection />
               <CTASection />
-           <Footer />
-<WhatsAppButton />
+           <Footer /> */}
+{/* <WhatsAppButton /> */}
     </>
   )
 }

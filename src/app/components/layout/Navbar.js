@@ -1,3 +1,4 @@
+
 // 'use client';
 
 // import Link from 'next/link';
@@ -9,14 +10,16 @@
 //   Settings, 
 //   User, 
 //   LayoutDashboard, 
-//   Users,
+//   ShoppingCart,
 //   Search,
 //   X,
-//   Package,
-//   FileText,
-//   Tag,
-//   Loader2,
-//   UserPlus
+//   Gift,
+//   Flame,
+//   Home,
+//   Info,
+//   Phone,
+//   Menu,
+//   UserCircle,
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 
@@ -30,27 +33,36 @@
 //   const [showResults, setShowResults] = useState(false);
 //   const [user, setUser] = useState(null);
 //   const [cartCount, setCartCount] = useState(0);
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [profileImageError, setProfileImageError] = useState(false);
-//   // Add auth loading state
 //   const [authLoading, setAuthLoading] = useState(true);
+//   const [scrolled, setScrolled] = useState(false);
+//   const [profileImageError, setProfileImageError] = useState(false);
+  
 //   const searchRef = useRef(null);
 //   const pathname = usePathname();
 //   const router = useRouter();
 
-//   // Close search results when clicking outside
+//   // Handle scroll effect for navbar
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       setScrolled(window.scrollY > 20);
+//     };
+//     window.addEventListener('scroll', handleScroll);
+//     return () => window.removeEventListener('scroll', handleScroll);
+//   }, []);
+
+//   // Close search on click outside
 //   useEffect(() => {
 //     const handleClickOutside = (event) => {
 //       if (searchRef.current && !searchRef.current.contains(event.target)) {
 //         setShowResults(false);
+//         setSearchOpen(false);
 //       }
 //     };
-
 //     document.addEventListener('mousedown', handleClickOutside);
 //     return () => document.removeEventListener('mousedown', handleClickOutside);
 //   }, []);
 
-//   // Function to check and update user state
+//   // Check user state
 //   const checkUserState = () => {
 //     if (typeof window !== 'undefined') {
 //       const userData = localStorage.getItem('user');
@@ -58,7 +70,6 @@
 //         try {
 //           const parsedUser = JSON.parse(userData);
 //           setUser(parsedUser);
-//           // Reset profile image error when user changes
 //           setProfileImageError(false);
 //         } catch (error) {
 //           console.error('Error parsing user data:', error);
@@ -67,7 +78,6 @@
 //       } else {
 //         setUser(null);
 //       }
-//       // Set auth loading to false after checking
 //       setAuthLoading(false);
 //     }
 //   };
@@ -75,66 +85,74 @@
 //   // Fetch cart count
 //   const fetchCartCount = async () => {
 //     const token = localStorage.getItem('token');
-    
 //     if (!token) {
 //       setCartCount(0);
 //       return;
 //     }
     
 //     try {
-//       const controller = new AbortController();
-//       const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
 //       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
-//         headers: {
-//           'Authorization': `Bearer ${token}`,
-//           'Content-Type': 'application/json'
-//         },
-//         signal: controller.signal,
-//         mode: 'cors',
-//         cache: 'no-cache'
-//       }).finally(() => clearTimeout(timeoutId));
-      
-//       if (response.status === 401) {
-//         localStorage.removeItem('token');
-//         localStorage.removeItem('user');
-//         setUser(null);
-//         setCartCount(0);
-//         window.dispatchEvent(new Event('auth-change'));
-//         return;
-//       }
-      
-//       if (!response.ok) {
-//         setCartCount(0);
-//         return;
-//       }
-      
-//       const data = await response.json();
-      
-//       if (data.success) {
-//         const itemCount = data.data?.items?.length || 0;
-//         setCartCount(itemCount);
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       if (response.ok) {
+//         const data = await response.json();
+//         setCartCount(data.data?.items?.length || 0);
 //       } else {
 //         setCartCount(0);
 //       }
 //     } catch (error) {
-//       console.warn('Cart fetch failed:', error.message);
 //       setCartCount(0);
 //     }
 //   };
 
-//   // Search function
+//   useEffect(() => {
+//     checkUserState();
+//     fetchCartCount();
+
+//     const handleAuthChange = () => {
+//       checkUserState();
+//       fetchCartCount();
+//     };
+
+//     window.addEventListener('auth-change', handleAuthChange);
+//     window.addEventListener('focus', handleAuthChange);
+//     window.addEventListener('cart-update', fetchCartCount);
+
+//     return () => {
+//       window.removeEventListener('auth-change', handleAuthChange);
+//       window.removeEventListener('focus', handleAuthChange);
+//       window.removeEventListener('cart-update', fetchCartCount);
+//     };
+//   }, []);
+
+//   useEffect(() => {
+//     fetchCartCount();
+//   }, [pathname]);
+
+//   // Navigation items with kids font styling
+//   const navItems = [
+//     { name: 'Home', href: '/', icon: Home },
+//     { name: 'Toys', href: '/products', icon: Gift, highlight: true },
+//     { name: 'Flash Sale', href: '/flash-sale', icon: Flame, badge: 'HOT' },
+//     { name: 'About', href: '/about', icon: Info },
+//     { name: 'Contact', href: '/contact', icon: Phone },
+//   ];
+
+//   const isActive = (path) => {
+//     if (path === '/') return pathname === '/';
+//     return pathname.startsWith(path);
+//   };
+
+//   // Search functionality
 //   const performSearch = async (query) => {
 //     if (!query.trim()) {
 //       setSearchResults([]);
 //       return;
 //     }
-
 //     setSearchLoading(true);
 //     try {
 //       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
 //       const data = await response.json();
-      
 //       if (data.success) {
 //         setSearchResults(data.data);
 //         setShowResults(true);
@@ -146,17 +164,14 @@
 //     }
 //   };
 
-//   // Debounce search
 //   useEffect(() => {
 //     const timer = setTimeout(() => {
-//       if (searchQuery) {
-//         performSearch(searchQuery);
-//       } else {
+//       if (searchQuery) performSearch(searchQuery);
+//       else {
 //         setSearchResults([]);
 //         setShowResults(false);
 //       }
 //     }, 300);
-
 //     return () => clearTimeout(timer);
 //   }, [searchQuery]);
 
@@ -170,712 +185,468 @@
 //     }
 //   };
 
-//   const handleResultClick = (result) => {
-//     let url = '';
-//     switch (result.type) {
-//       case 'product':
-//         url = `/productDetails?id=${result._id}`;
-//         break;
-//       case 'blog':
-//         url = `/blog/${result._id}`;
-//         break;
-//       case 'category':
-//         url = `/products?category=${result._id}`;
-//         break;
-//       default:
-//         url = `/search?q=${encodeURIComponent(result.title || result.name)}`;
-//     }
-//     router.push(url);
-//     setSearchOpen(false);
-//     setSearchQuery('');
-//     setShowResults(false);
-//   };
-
-//   const handleViewAllResults = () => {
-//     if (searchQuery.trim()) {
-//       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-//       setSearchOpen(false);
-//       setSearchQuery('');
-//       setShowResults(false);
-//     }
-//   };
-
-//   // Test API connection on mount
-//   useEffect(() => {
-//     const testConnection = async () => {
-//       try {
-//         const response = await fetch('http://localhost:5000/api/health');
-//         const data = await response.json();
-//         console.log('✅ Backend connection test:', data);
-//       } catch (error) {
-//         console.error('❌ Backend connection failed:', error);
-//       }
-//     };
-    
-//     testConnection();
-//   }, []);
-
-//   // Initial check
-//   useEffect(() => {
-//     checkUserState();
-//     fetchCartCount();
-
-//     const handleStorageChange = (e) => {
-//       if (e.key === 'user' || e.key === 'token') {
-//         checkUserState();
-//         fetchCartCount();
-//       }
-//     };
-
-//     window.addEventListener('storage', handleStorageChange);
-
-//     const handleAuthChange = () => {
-//       checkUserState();
-//       fetchCartCount();
-//     };
-
-//     window.addEventListener('auth-change', handleAuthChange);
-
-//     const handleCartUpdate = () => {
-//       fetchCartCount();
-//     };
-
-//     window.addEventListener('cart-update', handleCartUpdate);
-
-//     return () => {
-//       window.removeEventListener('storage', handleStorageChange);
-//       window.removeEventListener('auth-change', handleAuthChange);
-//       window.removeEventListener('cart-update', handleCartUpdate);
-//     };
-//   }, []);
-
-//   // Listen for route changes - but don't reset auth state
-//   useEffect(() => {
-//     // Only fetch cart count, don't reset auth state
-//     fetchCartCount();
-//   }, [pathname]);
-
-//   const navItems = [
-//     { name: 'Home', href: '/' },
-//     { name: 'Products', href: '/products' },
-//     { name: 'About', href: '/about' },
-//     { name: 'Contact', href: '/contact' },
-//     { name: 'Blog', href: '/blog' },
-//   ];
-
-//   const isActive = (path) => {
-//     if (path === '/') {
-//       return pathname === '/';
-//     }
-    
-//     // Check if current path starts with the nav path
-//     // This makes /blog active for /blog/123, /blog/456, etc.
-//     // and /products active for /products/anything
-//     return pathname.startsWith(path);
-//   };
-
 //   const logout = () => {
 //     localStorage.removeItem('token');
 //     localStorage.removeItem('user');
-//     localStorage.removeItem('rememberedEmail');
 //     setUser(null);
 //     setCartCount(0);
 //     setUserMenuOpen(false);
-//     setProfileImageError(false);
-    
 //     window.dispatchEvent(new Event('auth-change'));
-    
-//     toast.success('Logged out successfully');
+//     toast.success('🎉 Logged out successfully! See you soon!');
 //     router.push('/');
 //   };
 
 //   const getDashboardLink = () => {
 //     if (!user) return '/';
 //     switch (user.role) {
-//       case 'admin':
-//         return '/admin/dashboard';
-//       case 'moderator':
-//         return '/moderator/dashboard';
-//       case 'customer':
-//         return '/customer/dashboard';
-//       default:
-//         return '/';
-//     }
-//   };
-
-//   const getSettingsLink = () => {
-//     if (!user) return '/';
-//     switch (user.role) {
-//       case 'admin':
-//         return '/admin/settings';
-//       case 'moderator':
-//         return '/moderator/settings';
-//       case 'customer':
-//         return '/customer/settings';
-//       default:
-//         return '/';
-//     }
-//   };
-
-//   const getRoleDisplay = () => {
-//     if (!user) return '';
-//     switch (user.role) {
-//       case 'admin':
-//         return 'Administrator';
-//       case 'moderator':
-//         return 'Moderator';
-//       case 'customer':
-//         return 'Customer';
-//       default:
-//         return user.role;
+//       case 'admin': return '/admin/dashboard';
+//       case 'moderator': return '/moderator/dashboard';
+//       default: return '/customer/dashboard';
 //     }
 //   };
 
 //   const getDisplayName = () => {
 //     if (!user) return '';
-//     return user.companyName || user.contactPerson || user.email?.split('@')[0] || 'User';
+//     return user.companyName || user.contactPerson || user.email?.split('@')[0] || 'Toy Lover';
 //   };
 
 //   const getInitials = () => {
-//     if (!user) return 'U';
-//     const name = user.companyName || user.contactPerson || user.email;
-//     return name?.charAt(0).toUpperCase() || 'U';
+//     if (!user) return '🎈';
+//     const name = getDisplayName();
+//     return name.charAt(0).toUpperCase();
 //   };
 
-//   // Get profile picture URL from user object
 //   const getProfilePicture = () => {
-//     if (!user) return null;
-//     return user.profilePicture || user.photoURL || null;
+//     return user?.profilePicture || user?.photoURL || null;
 //   };
 
-//   const getResultIcon = (type) => {
-//     switch (type) {
-//       case 'product':
-//         return <Package className="w-4 h-4 text-[#3bc24f]" />;
-//       case 'blog':
-//         return <FileText className="w-4 h-4 text-[#3bc24f]" />;
-//       case 'category':
-//         return <Tag className="w-4 h-4 text-[#3bc24f]" />;
-//       default:
-//         return <Search className="w-4 h-4 text-[#3bc24f]" />;
-//     }
-//   };
-
-//   // Handle image error
-//   const handleImageError = () => {
-//     setProfileImageError(true);
-//   };
-
-//   // Show nothing while auth is loading to prevent flashing
 //   if (authLoading) {
 //     return (
-//       <div className="navbar fixed top-0 z-50 w-full shadow-md" style={{ backgroundColor: '#6B4F3A' }}>
-//         <div className="navbar-start">
-//           <Link href="/" className="flex items-center gap-2">
-//             <div className="relative w-36 h-[54px] overflow-hidden flex items-center">
-//               <img 
-//                 src="https://i.ibb.co.com/YBG2DF6f/Chat-GPT-Image-Feb-26-2026-09-57-28-AM-removebg-preview.png"
-//                 alt="Jute Craftify Logo"
-//                 className="w-full h-full object-contain scale-125"
-//               />
-//             </div>
-//           </Link>
-//         </div>
-//         <div className="navbar-center hidden lg:flex">
-//           <ul className="menu menu-horizontal px-1" style={{ color: '#F5E6D3' }}>
-//             {navItems.map((item) => (
-//               <li key={item.name}>
-//                 <Link 
-//                   href={item.href}
-//                   style={{
-//                     color: '#F5E6D3',
-//                   }}
-//                   className="hover:text-[#3bc24f] transition-colors duration-200"
-//                 >
-//                   {item.name}
-//                 </Link>
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-//         <div className="navbar-end gap-2">
-//           {/* Placeholder for right side to maintain layout */}
-//           <div className="w-8 h-8"></div>
+//       <div className="fixed top-0 z-50 w-full bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]">
+//         <div className="container mx-auto px-4 py-2">
+//           <div className="flex items-center justify-between">
+//             <div className="w-12 h-12 bg-white/20 rounded-xl animate-pulse"></div>
+//           </div>
 //         </div>
 //       </div>
 //     );
 //   }
 
 //   return (
-//     <div className="navbar fixed top-0 z-50 w-full shadow-md" style={{ backgroundColor: '#6B4F3A' }}>
-//       {/* Mobile Menu */}
-//       <div className="navbar-start">
-//         <div className="dropdown">
-//           <label tabIndex={0} className="btn btn-ghost lg:hidden" style={{ color: '#F5E6D3' }}>
-//             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
-//             </svg>
-//           </label>
-//           <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow rounded-box w-52" style={{ backgroundColor: '#6B4F3A', color: '#F5E6D3', border: '1px solid #8B6B4F' }}>
-//             {navItems.map((item) => (
-//               <li key={item.name} className="w-full">
-//                 <Link 
-//                   href={item.href}
-//                   style={{
-//                     color: '#F5E6D3',
-//                     backgroundColor: isActive(item.href) ? '#3bc24f' : 'transparent',
-//                   }}
-//                   className={`hover:bg-[#3bc24f] hover:text-white block w-full rounded-md ${isActive(item.href) ? 'text-white pointer-events-none' : ''}`}
-//                 >
-//                   {item.name}
-//                 </Link>
-//               </li>
-//             ))}
+//     <>
+//       {/* Navbar - Fixed height, no extra space from search */}
+//       <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
+//         scrolled 
+//           ? 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] shadow-md' 
+//           : 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]'
+//       }`}>
+        
+//         <div className="container mx-auto px-4 lg:px-8">
+//           <div className="flex items-center justify-between h-14 lg:h-16">
             
-//             {/* Mobile Search */}
-//             <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-//               <form onSubmit={(e) => {
-//                 e.preventDefault();
-//                 const formData = new FormData(e.target);
-//                 const query = formData.get('mobileSearch');
-//                 if (query) {
-//                   router.push(`/search?q=${encodeURIComponent(query)}`);
-//                   setIsMenuOpen(false);
-//                 }
-//               }} className="px-2 py-1">
+//             {/* Logo Only - No Text, No Background */}
+//             <Link href="/" className="group flex items-center">
+//               <div className="relative w-12 h-12 lg:w-20 lg:h-14 overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:rotate-6">
+//                 <img 
+//                   src="https://i.ibb.co.com/DPz8BcQm/favicon-ico.png"
+//                   alt="ToyMart Logo"
+//                   className="w-full h-full object-contain"
+//                 />
+//               </div>
+//             </Link>
+
+//             {/* Desktop Navigation - Kids Font */}
+//             <div className="hidden lg:flex items-center gap-1">
+//               {navItems.map((item) => (
+//                 <Link
+//                   key={item.name}
+//                   href={item.href}
+//                   className={`relative px-4 py-1.5 rounded-full font-bold transition-all duration-300 group ${
+//                     isActive(item.href)
+//                       ? 'text-[#4F9DFF] bg-white shadow-md'
+//                       : 'text-white hover:text-[#FFD93D] hover:bg-white/20'
+//                   }`}
+//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', 'Poppins', cursive" }}
+//                 >
+//                   <div className="flex items-center gap-2 text-sm">
+//                     <item.icon className="w-4 h-4" />
+//                     <span>{item.name}</span>
+//                     {item.badge && (
+//                       <span className="absolute -top-2 -right-2 bg-[#FFD93D] text-[#FF7B54] text-xs font-black px-1.5 py-0.5 rounded-full animate-bounce">
+//                         {item.badge}
+//                       </span>
+//                     )}
+//                   </div>
+//                 </Link>
+//               ))}
+//             </div>
+
+//             {/* Right Actions */}
+//             <div className="flex items-center gap-2 lg:gap-2">
+              
+//               {/* Search Button */}
+//               <button
+//                 onClick={() => setSearchOpen(!searchOpen)}
+//                 className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300"
+//               >
+//                 <Search className="w-4 h-4 text-white" />
+//               </button>
+
+//               {/* Cart */}
+//               <Link 
+//                 href="/inquiry-cart" 
+//                 className="relative p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 group"
+//               >
+//                 <ShoppingCart className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+//                 {cartCount > 0 && (
+//                   <span className="absolute -top-1 -right-1 bg-[#FFD93D] text-[#FF7B54] text-xs font-black rounded-full w-4 h-4 flex items-center justify-center animate-bounce">
+//                     {cartCount > 9 ? '9+' : cartCount}
+//                   </span>
+//                 )}
+//               </Link>
+
+//               {/* User Menu / Auth Buttons */}
+//               {user ? (
+//                 <div className="relative">
+//                   <button
+//                     onClick={() => setUserMenuOpen(!userMenuOpen)}
+//                     className="flex items-center gap-1 px-2 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300"
+//                   >
+//                     {getProfilePicture() && !profileImageError ? (
+//                       <img 
+//                         src={getProfilePicture()} 
+//                         alt={getDisplayName()}
+//                         className="w-7 h-7 rounded-full object-cover border-2 border-[#FFD93D]"
+//                         onError={() => setProfileImageError(true)}
+//                       />
+//                     ) : (
+//                       <div className="w-7 h-7 rounded-full bg-[#FFD93D] flex items-center justify-center text-[#FF7B54] font-black text-xs">
+//                         {getInitials()}
+//                       </div>
+//                     )}
+//                     <span className="hidden lg:inline text-white font-bold text-xs max-w-[80px] truncate">
+//                       {getDisplayName()}
+//                     </span>
+//                     <ChevronDown className={`w-3 h-3 text-white transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+//                   </button>
+
+//                   {/* User Dropdown */}
+//                   {userMenuOpen && (
+//                     <>
+//                       <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+//                       <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100">
+//                         <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] px-4 py-3">
+//                           <div className="flex items-center gap-2">
+//                             {getProfilePicture() && !profileImageError ? (
+//                               <img 
+//                                 src={getProfilePicture()} 
+//                                 alt={getDisplayName()}
+//                                 className="w-10 h-10 rounded-full object-cover border-2 border-white"
+//                               />
+//                             ) : (
+//                               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white text-lg font-bold">
+//                                 {getInitials()}
+//                               </div>
+//                             )}
+//                             <div className="flex-1">
+//                               <p className="text-white font-bold text-sm truncate">{getDisplayName()}</p>
+//                               <p className="text-white/80 text-xs truncate">{user.email}</p>
+//                             </div>
+//                           </div>
+//                         </div>
+                        
+//                         <div className="p-1">
+//                           <Link
+//                             href={getDashboardLink()}
+//                             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gradient-to-r hover:from-[#4F9DFF]/10 hover:to-[#FF7B54]/10 transition-all text-sm"
+//                             onClick={() => setUserMenuOpen(false)}
+//                           >
+//                             <LayoutDashboard className="w-4 h-4 text-[#4F9DFF]" />
+//                             <span>Dashboard</span>
+//                           </Link>
+
+//                           <button
+//                             onClick={() => {
+//                               setUserMenuOpen(false);
+//                               logout();
+//                             }}
+//                             className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-all w-full text-sm"
+//                           >
+//                             <LogOut className="w-4 h-4" />
+//                             <span>Logout</span>
+//                           </button>
+//                         </div>
+//                       </div>
+//                     </>
+//                   )}
+//                 </div>
+//               ) : (
+//                 <div className="hidden lg:flex items-center gap-1">
+//                   <Link
+//                     href="/login"
+//                     className="px-3 py-1.5 rounded-full font-bold text-white hover:text-[#FFD93D] transition-all text-sm"
+//                     style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
+//                   >
+//                     Sign In
+//                   </Link>
+//                   <Link
+//                     href="/register"
+//                     className="px-4 py-1.5 rounded-full font-bold bg-white text-[#4F9DFF] shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm"
+//                     style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
+//                   >
+//                     Register
+//                   </Link>
+//                 </div>
+//               )}
+
+//               {/* Mobile Menu Button */}
+//               <button
+//                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+//                 className="lg:hidden p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all"
+//               >
+//                 <Menu className="w-5 h-5 text-white" />
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       </nav>
+
+//       {/* Search Overlay - Absolute positioned, doesn't affect layout */}
+//       {searchOpen && (
+//         <div className="fixed top-14 lg:top-16 left-0 right-0 z-50 animate-slideDown" ref={searchRef}>
+//           <div className="bg-white shadow-xl p-4">
+//             <div className="container mx-auto px-4 lg:px-8">
+//               <form onSubmit={handleSearchSubmit} className="max-w-2xl mx-auto">
 //                 <div className="relative">
 //                   <input
 //                     type="text"
-//                     name="mobileSearch"
-//                     placeholder="Search products..."
-//                     className="w-full px-3 py-1.5 text-sm bg-[#F5E6D3] text-[#6B4F3A] rounded-lg border border-[#8B6B4F] focus:outline-none focus:border-[#3bc24f] focus:ring-1 focus:ring-[#3bc24f] placeholder:text-[#8B6B4F]"
+//                     value={searchQuery}
+//                     onChange={(e) => setSearchQuery(e.target.value)}
+//                     placeholder="🔍 Search for toys, gifts, and more..."
+//                     className="w-full px-5 py-3 pr-12 text-gray-700 bg-gray-50 rounded-full border-2 border-[#FFD93D] focus:outline-none focus:border-[#4F9DFF] focus:ring-2 focus:ring-[#4F9DFF]/20 text-base"
+//                     style={{ fontFamily: "'Comic Neue', 'Poppins', sans-serif" }}
+//                     autoFocus
 //                   />
-//                   <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2">
-//                     <Search className="w-4 h-4 text-[#6B4F3A]" />
+//                   <button
+//                     type="button"
+//                     onClick={() => setSearchOpen(false)}
+//                     className="absolute right-14 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-all"
+//                   >
+//                     <X className="w-4 h-4 text-gray-400" />
 //                   </button>
+//                   {searchLoading ? (
+//                     <div className="absolute right-4 top-1/2 -translate-y-1/2">
+//                       <div className="w-5 h-5 border-2 border-[#4F9DFF] border-t-transparent rounded-full animate-spin"></div>
+//                     </div>
+//                   ) : (
+//                     <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2">
+//                       <Search className="w-5 h-5 text-gray-400 hover:text-[#4F9DFF]" />
+//                     </button>
+//                   )}
 //                 </div>
 //               </form>
-//             </li>
-            
-//             {/* Mobile menu user section */}
-//             {user ? (
-//               <>
-//                 <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-//                   <div className="flex flex-col px-2 py-1 text-sm text-[#F5E6D3] w-full items-start">
-//                     <div className="flex items-center gap-2 w-full">
-//                       {/* Profile image in mobile menu */}
-//                       {getProfilePicture() && !profileImageError ? (
-//                         <img 
-//                           src={getProfilePicture()} 
-//                           alt={getDisplayName()}
-//                           className="w-6 h-6 rounded-full object-cover border border-[#3bc24f]"
-//                           onError={handleImageError}
-//                         />
-//                       ) : (
-//                         <div className="w-6 h-6 rounded-full bg-[#3bc24f] flex items-center justify-center text-white text-xs font-semibold">
-//                           {getInitials()}
-//                         </div>
-//                       )}
-//                       <div className="font-semibold truncate text-left">{getDisplayName()}</div>
-//                     </div>
-//                     <div className="text-xs opacity-80 truncate text-left w-full mt-1">{user.email}</div>
-//                     <div className="text-xs mt-1.5 text-left w-full">
-//                       <span className="inline-block bg-[#3bc24f] text-white px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
-//                         {getRoleDisplay()}
-//                       </span>
-//                     </div>
-//                   </div>
-//                 </li>
-//                 <li className="w-full">
-//                   <Link 
-//                     href={getDashboardLink()} 
-//                     className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md"
-//                     onClick={() => setIsMenuOpen(false)}
-//                   >
-//                     <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-//                     <span>Dashboard</span>
-//                   </Link>
-//                 </li>
-//                 <li className="w-full">
-//                   <Link 
-//                     href={getSettingsLink()} 
-//                     className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md"
-//                     onClick={() => setIsMenuOpen(false)}
-//                   >
-//                     <Settings className="h-4 w-4 flex-shrink-0" />
-//                     <span>Settings</span>
-//                   </Link>
-//                 </li>
-//                 <li className="w-full">
-//                   <button
-//                     onClick={() => {
-//                       setIsMenuOpen(false);
-//                       logout();
-//                     }}
-//                     className="flex items-center gap-2 text-red-300 hover:bg-red-500 hover:text-white w-full text-left px-2 py-2 justify-start rounded-md"
-//                   >
-//                     <LogOut className="h-4 w-4 flex-shrink-0" />
-//                     <span>Logout</span>
-//                   </button>
-//                 </li>
-//               </>
-//             ) : (
-//               <>
-//                 <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-//                   <Link href="/login" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md">
-//                     <User className="h-4 w-4 flex-shrink-0" />
-//                     <span>Sign In</span>
-//                   </Link>
-//                 </li>
-//                 <li className="w-full">
-//                   <Link href="/register" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md">
-//                     <Users className="h-4 w-4 flex-shrink-0" />
-//                     <span>Register</span>
-//                   </Link>
-//                 </li>
-//               </>
-//             )}
-            
-//             <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-//               <Link href="/inquiry-cart" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md">
-//                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-//                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-//                 </svg>
-//                 Inquiry Cart
-//                 {cartCount > 0 && (
-//                   <span className="badge badge-sm ml-2" style={{ backgroundColor: '#3bc24f', color: 'white', border: 'none' }}>
-//                     {cartCount}
-//                   </span>
-//                 )}
-//               </Link>
-//             </li>
-//           </ul>
-//         </div>
-        
-//         {/* Logo/Brand */}
-//         <Link 
-//           href="/" 
-//           className="flex items-center gap-2"
-//         >
-//           <div className="relative w-36 h-[54px] overflow-hidden flex items-center">
-//             <img 
-//               src="https://i.ibb.co.com/YBG2DF6f/Chat-GPT-Image-Feb-26-2026-09-57-28-AM-removebg-preview.png"
-//               alt="Jute Craftify Logo"
-//               className="w-full h-full object-contain scale-125"
-//             />
-//           </div>
-//         </Link>
-//       </div>
 
-//       {/* Desktop Menu - Center */}
-//       <div className="navbar-center hidden lg:flex">
-//         <ul className="menu menu-horizontal px-1">
-//           {navItems.map((item) => (
-//             <li key={item.name}>
-//               <Link 
-//                 href={item.href}
-//                 style={{
-//                   color: isActive(item.href) ? '#3bc24f' : '#F5E6D3',
-//                   fontWeight: isActive(item.href) ? '600' : '500',
-//                   borderBottom: isActive(item.href) ? '2px solid #3bc24f' : 'none',
-//                 }}
-//                 className={`hover:text-[#3bc24f] transition-all duration-200 pb-1`}
-//               >
-//                 {item.name}
-//               </Link>
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-
-//       {/* Right side - Actions */}
-//       <div className="navbar-end gap-2">
-//         {/* Desktop Search */}
-//         <div className="hidden lg:block relative" ref={searchRef}>
-//           {searchOpen ? (
-//             <form 
-//               onSubmit={(e) => {
-//                 e.preventDefault();
-//                 e.stopPropagation();
-//                 if (searchQuery.trim()) {
-//                   router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-//                   setSearchOpen(false);
-//                   setSearchQuery('');
-//                   setShowResults(false);
-//                 }
-//               }} 
-//               className="relative flex items-center"
-//             >
-//               <div className="relative">
-//                 <input
-//                   type="text"
-//                   value={searchQuery}
-//                   onChange={(e) => setSearchQuery(e.target.value)}
-//                   placeholder="Search products..."
-//                   className="w-80 px-4 py-2 pr-10 text-sm bg-[#F5E6D3] text-[#6B4F3A] rounded-lg border border-[#8B6B4F] focus:outline-none focus:border-[#3bc24f] focus:ring-1 focus:ring-[#3bc24f] placeholder:text-[#8B6B4F]"
-//                   autoFocus
-//                   onKeyDown={(e) => {
-//                     if (e.key === 'Enter') {
-//                       e.preventDefault();
-//                       if (searchQuery.trim()) {
-//                         router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+//               {/* Search Results */}
+//               {showResults && searchResults.length > 0 && (
+//                 <div className="max-w-2xl mx-auto mt-3 bg-gray-50 rounded-xl shadow-lg max-h-80 overflow-y-auto">
+//                   {searchResults.slice(0, 5).map((result) => (
+//                     <button
+//                       key={result._id}
+//                       onClick={() => {
+//                         router.push(`/product/${result._id}`);
 //                         setSearchOpen(false);
 //                         setSearchQuery('');
-//                         setShowResults(false);
-//                       }
-//                     }
-//                   }}
-//                 />
-//                 {searchLoading ? (
-//                   <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3bc24f] animate-spin" />
-//                 ) : (
-//                   <button 
-//                     type="submit" 
-//                     className="absolute right-3 top-1/2 -translate-y-1/2"
-//                   >
-//                     <Search className="w-4 h-4 text-[#8B6B4F] hover:text-[#3bc24f]" />
-//                   </button>
-//                 )}
-//               </div>
-//               <button
-//                 type="button"
-//                 onClick={() => {
-//                   setSearchOpen(false);
-//                   setSearchQuery('');
-//                   setShowResults(false);
-//                 }}
-//                 className="ml-2 p-1.5 hover:bg-[#8B6B4F] rounded-full transition-colors"
-//                 title="Close search"
-//               >
-//                 <X className="w-4 h-4 text-[#F5E6D3]" />
-//               </button>
-
-//               {/* Search Results Dropdown */}
-//               {showResults && searchResults.length > 0 && (
-//                 <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-[#E8D5C0] max-h-96 overflow-y-auto z-50 w-full">
-//                   {searchResults.map((result, index) => (
-//                     <button
-//                       key={`${result.type}-${result._id}`}
-//                       onClick={() => handleResultClick(result)}
-//                       className="w-full px-4 py-3 text-left hover:bg-[#F5E6D3] border-b border-[#E8D5C0] last:border-0 flex items-start gap-3 transition-colors"
+//                       }}
+//                       className="w-full px-4 py-3 text-left hover:bg-white transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
 //                     >
-//                       <div className="mt-1">{getResultIcon(result.type)}</div>
-//                       <div className="flex-1">
-//                         <p className="text-sm font-medium text-[#6B4F3A]">
-//                           {result.title || result.name}
-//                         </p>
-//                         <p className="text-xs text-[#8B6B4F] mt-0.5 capitalize">
-//                           {result.type}
-//                         </p>
+//                       {result.image && (
+//                         <img src={result.image} alt={result.title} className="w-10 h-10 rounded-lg object-cover" />
+//                       )}
+//                       <div>
+//                         <p className="font-medium text-gray-800 text-sm">{result.title}</p>
+//                         <p className="text-xs text-[#FF7B54] font-semibold">BDT {result.price}</p>
 //                       </div>
 //                     </button>
 //                   ))}
-//                   <button
-//                     onClick={handleViewAllResults}
-//                     className="w-full px-4 py-3 text-center text-sm text-[#3bc24f] hover:bg-[#F5E6D3] font-medium border-t border-[#E8D5C0] transition-colors"
-//                   >
-//                     View all results for "{searchQuery}"
-//                   </button>
+//                   {searchResults.length > 5 && (
+//                     <button
+//                       onClick={handleSearchSubmit}
+//                       className="w-full px-4 py-2 text-center text-sm text-[#4F9DFF] hover:bg-white font-medium"
+//                     >
+//                       View all {searchResults.length} results
+//                     </button>
+//                   )}
 //                 </div>
 //               )}
-//             </form>
-//           ) : (
-//             <button
-//               onClick={() => setSearchOpen(true)}
-//               className="p-2 hover:bg-[#8B6B4F] rounded-lg transition-colors"
-//               title="Open search"
-//             >
-//               <Search className="w-5 h-5 text-[#F5E6D3] hover:text-[#3bc24f]" />
-//             </button>
-//           )}
+//             </div>
+//           </div>
 //         </div>
+//       )}
 
-//         {/* Inquiry Cart - Desktop */}
-//         <Link 
-//           href="/inquiry-cart" 
-//           className="btn btn-ghost btn-circle hidden lg:flex relative"
-//           style={{ color: '#F5E6D3' }}
-//           onMouseEnter={(e) => {
-//             e.currentTarget.style.backgroundColor = '#3bc24f';
-//             e.currentTarget.style.color = 'white';
-//           }}
-//           onMouseLeave={(e) => {
-//             e.currentTarget.style.backgroundColor = 'transparent';
-//             e.currentTarget.style.color = '#F5E6D3';
-//           }}
-//         >
-//           <div className="indicator">
-//             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-//             </svg>
-//             {cartCount > 0 && (
-//               <span className="badge badge-sm indicator-item" style={{ backgroundColor: '#3bc24f', color: 'white', border: 'none' }}>
-//                 {cartCount}
-//               </span>
-//             )}
-//           </div>
-//         </Link>
-
-//         {/* User Menu or Auth Buttons */}
-//         {user ? (
-//           <div className="relative">
-//             <button
-//               onClick={() => setUserMenuOpen(!userMenuOpen)}
-//               className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#8B6B4F] transition-colors"
-//               style={{ color: '#F5E6D3' }}
-//             >
-//               {/* Profile Image - Show if available */}
-//               {getProfilePicture() && !profileImageError ? (
+//       {/* Mobile Sidebar Menu */}
+//       <div className={`fixed inset-0 z-50 lg:hidden transition-all duration-500 ${isMenuOpen ? 'visible' : 'invisible'}`}>
+//         <div className={`absolute inset-0 bg-black/60 transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setIsMenuOpen(false)} />
+        
+//         <div className={`absolute right-0 top-0 h-full w-80 bg-gradient-to-b from-[#4F9DFF] to-[#FF7B54] shadow-2xl transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+//           <div className="p-5">
+//             {/* Logo in sidebar */}
+//             <div className="flex items-center justify-between mb-6">
+//               <div className="w-14 h-14 transition-all duration-300 hover:scale-110">
 //                 <img 
-//                   src={getProfilePicture()} 
-//                   alt={getDisplayName()}
-//                   className="w-8 h-8 rounded-full object-cover border-2 border-[#3bc24f]"
-//                   onError={handleImageError}
+//                   src="https://i.ibb.co.com/DPz8BcQm/favicon-ico.png"
+//                   alt="ToyMart Logo"
+//                   className="w-full h-full object-contain"
 //                 />
-//               ) : (
-//                 <div className="w-8 h-8 rounded-full bg-[#3bc24f] flex items-center justify-center text-white font-semibold">
-//                   {getInitials()}
-//                 </div>
-//               )}
-//               <span className="hidden lg:inline max-w-[100px] truncate font-medium">
-//                 {getDisplayName()}
-//               </span>
-//               <ChevronDown className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
-//             </button>
+//               </div>
+//               <button 
+//                 onClick={() => setIsMenuOpen(false)} 
+//                 className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all"
+//               >
+//                 <X className="w-4 h-4 text-white" />
+//               </button>
+//             </div>
 
-//             {/* Dropdown Menu */}
-//             {userMenuOpen && (
-//               <>
-//                 <div 
-//                   className="fixed inset-0 z-40"
-//                   onClick={() => setUserMenuOpen(false)}
-//                 />
-//                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-[#E8D5C0] py-2 z-50">
-//                   {/* User Info */}
-//                   <div className="px-4 py-3 border-b border-[#E8D5C0]">
-//                     <div className="flex items-center gap-3">
-//                       {/* Profile image in dropdown */}
-//                       {getProfilePicture() && !profileImageError ? (
-//                         <img 
-//                           src={getProfilePicture()} 
-//                           alt={getDisplayName()}
-//                           className="w-10 h-10 rounded-full object-cover border-2 border-[#3bc24f]"
-//                           onError={handleImageError}
-//                         />
-//                       ) : (
-//                         <div className="w-10 h-10 rounded-full bg-[#3bc24f] flex items-center justify-center text-white font-semibold text-lg">
-//                           {getInitials()}
-//                         </div>
-//                       )}
-//                       <div className="flex-1 min-w-0">
-//                         <p className="text-sm font-semibold text-[#6B4F3A] truncate">{getDisplayName()}</p>
-//                         <p className="text-xs text-[#8B6B4F] truncate mt-0.5">{user.email}</p>
-//                       </div>
+//             {/* Mobile User Info */}
+//             {user && (
+//               <div className="mb-5 p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+//                 <div className="flex items-center gap-3">
+//                   {getProfilePicture() && !profileImageError ? (
+//                     <img 
+//                       src={getProfilePicture()} 
+//                       alt={getDisplayName()} 
+//                       className="w-12 h-12 rounded-full object-cover border-2 border-[#FFD93D]" 
+//                     />
+//                   ) : (
+//                     <div className="w-12 h-12 rounded-full bg-[#FFD93D] flex items-center justify-center text-[#FF7B54] text-xl font-black">
+//                       {getInitials()}
 //                     </div>
-//                     <div className="mt-2">
-//                       <span 
-//                         className="px-2 py-0.5 text-xs font-medium rounded-full bg-[#3bc24f] text-white"
-//                       >
-//                         {getRoleDisplay()}
-//                       </span>
-//                     </div>
+//                   )}
+//                   <div className="flex-1">
+//                     <p className="text-white font-bold text-sm truncate">{getDisplayName()}</p>
+//                     <p className="text-white/80 text-xs truncate">{user.email}</p>
+//                     <span className="inline-block mt-1 px-2 py-0.5 bg-white/20 rounded-full text-white text-xs font-bold">
+//                       {user.role === 'admin' ? '👑 Admin' : user.role === 'moderator' ? '⭐ Moderator' : '🎮 Customer'}
+//                     </span>
 //                   </div>
-
-//                   {/* Menu Items */}
-//                   <Link
-//                     href={getDashboardLink()}
-//                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#6B4F3A] hover:bg-[#F5E6D3] transition-colors"
-//                     onClick={() => setUserMenuOpen(false)}
-//                   >
-//                     <LayoutDashboard className="w-4 h-4 text-[#3bc24f]" />
-//                     <span>Dashboard</span>
-//                   </Link>
-
-//                   <Link
-//                     href={getSettingsLink()}
-//                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#6B4F3A] hover:bg-[#F5E6D3] transition-colors"
-//                     onClick={() => setUserMenuOpen(false)}
-//                   >
-//                     <Settings className="w-4 h-4 text-[#3bc24f]" />
-//                     <span>Settings</span>
-//                   </Link>
-
-//                   {/* Logout */}
-//                   <button
-//                     onClick={() => {
-//                       setUserMenuOpen(false);
-//                       logout();
-//                     }}
-//                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left border-t border-[#E8D5C0] mt-1 pt-2"
-//                   >
-//                     <LogOut className="w-4 h-4" />
-//                     <span>Logout</span>
-//                   </button>
 //                 </div>
-//               </>
+//               </div>
 //             )}
-//           </div>
-//         ) : (
-//           <>
-//             {/* Sign In Button */}
-//             <Link 
-//               href="/login" 
-//               className="btn btn-outline btn-sm hidden lg:flex"
-//               style={{
-//                 color: '#F5E6D3',
-//                 borderColor: '#F5E6D3',
-//                 backgroundColor: 'transparent'
-//               }}
-//               onMouseEnter={(e) => {
-//                 e.currentTarget.style.backgroundColor = '#3bc24f';
-//                 e.currentTarget.style.borderColor = '#3bc24f';
-//                 e.currentTarget.style.color = 'white';
-//               }}
-//               onMouseLeave={(e) => {
-//                 e.currentTarget.style.backgroundColor = 'transparent';
-//                 e.currentTarget.style.borderColor = '#F5E6D3';
-//                 e.currentTarget.style.color = '#F5E6D3';
-//               }}
-//             >
-//               <User className="h-4 w-4 mr-2" />
-//               Sign In
-//             </Link>
 
-//             {/* Register Button */}
-//             <Link 
-//               href="/register" 
-//               className="btn btn-sm hidden lg:flex"
-//               style={{
-//                 backgroundColor: '#3bc24f',
-//                 color: 'white',
-//                 borderColor: '#3bc24f'
-//               }}
-//               onMouseEnter={(e) => {
-//                 e.currentTarget.style.backgroundColor = '#2da63f';
-//                 e.currentTarget.style.borderColor = '#2da63f';
-//               }}
-//               onMouseLeave={(e) => {
-//                 e.currentTarget.style.backgroundColor = '#3bc24f';
-//                 e.currentTarget.style.borderColor = '#3bc24f';
-//               }}
-//             >
-//               <UserPlus className="h-4 w-4 mr-2" />
-//               Register
-//             </Link>
-//           </>
-//         )}
+//             {/* Mobile Navigation Links - Kids Font */}
+//             <div className="space-y-1">
+//               {navItems.map((item) => (
+//                 <Link
+//                   key={item.name}
+//                   href={item.href}
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all ${
+//                     isActive(item.href)
+//                       ? 'bg-white text-[#4F9DFF] shadow-md'
+//                       : 'text-white hover:bg-white/20'
+//                   }`}
+//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
+//                 >
+//                   <item.icon className="w-4 h-4" />
+//                   <span className="text-sm">{item.name}</span>
+//                   {item.badge && (
+//                     <span className="ml-auto bg-[#FFD93D] text-[#FF7B54] text-xs font-black px-2 py-0.5 rounded-full animate-pulse">
+//                       {item.badge}
+//                     </span>
+//                   )}
+//                 </Link>
+//               ))}
+//             </div>
+
+//             <div className="my-5 h-px bg-white/30"></div>
+
+//             {/* Mobile Auth Section */}
+//             {!user ? (
+//               <div className="space-y-2">
+//                 <Link
+//                   href="/login"
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold border-2 border-white text-white hover:bg-white hover:text-[#4F9DFF] transition-all text-sm"
+//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
+//                 >
+//                   <User className="w-4 h-4" />
+//                   Sign In
+//                 </Link>
+//                 <Link
+//                   href="/register"
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-white text-[#4F9DFF] shadow-md hover:shadow-lg transition-all duration-300 text-sm"
+//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
+//                 >
+//                   <UserCircle className="w-4 h-4" />
+//                   Register
+//                 </Link>
+//               </div>
+//             ) : (
+//               <button
+//                 onClick={() => {
+//                   setIsMenuOpen(false);
+//                   logout();
+//                 }}
+//                 className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-red-500/80 backdrop-blur text-white hover:bg-red-600 transition-all text-sm"
+//                 style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
+//               >
+//                 <LogOut className="w-4 h-4" />
+//                 Logout
+//               </button>
+//             )}
+
+//             {/* Fun Decorative Elements */}
+//             <div className="absolute bottom-5 left-0 right-0 text-center">
+//               <p className="text-white/40 text-xs" style={{ fontFamily: "'Comic Neue', cursive" }}>
+//                 🎈 Play & Learn 🎨
+//               </p>
+//             </div>
+//           </div>
+//         </div>
 //       </div>
-//     </div>
+
+//       {/* Spacer - Reduced */}
+//       <div className="h-14 lg:h-16"></div>
+
+//       {/* Google Fonts for Kids Style */}
+//       <style jsx global>{`
+//         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&family=Poppins:wght@400;600&display=swap');
+        
+//         body {
+//           font-family: 'Comic Neue', 'Fredoka One', 'Poppins', cursive;
+//         }
+//       `}</style>
+
+//       <style jsx>{`
+//         @keyframes slideDown {
+//           from {
+//             opacity: 0;
+//             transform: translateY(-10px);
+//           }
+//           to {
+//             opacity: 1;
+//             transform: translateY(0);
+//           }
+//         }
+//         .animate-slideDown {
+//           animation: slideDown 0.3s ease-out;
+//         }
+//         @keyframes bounce {
+//           0%, 100% { transform: translateY(0); }
+//           50% { transform: translateY(-3px); }
+//         }
+//         .animate-bounce {
+//           animation: bounce 0.8s ease-in-out infinite;
+//         }
+//       `}</style>
+//     </>
 //   );
 // }
 
 
 
 
-
-
-
-
+// 2 navabar
 
 
 // 'use client';
@@ -889,14 +660,18 @@
 //   Settings, 
 //   User, 
 //   LayoutDashboard, 
-//   Users,
+//   ShoppingCart,
 //   Search,
 //   X,
-//   Package,
-//   FileText,
-//   Tag,
-//   Loader2,
-//   UserPlus
+//   Gift,
+//   Flame,
+//   Home,
+//   Info,
+//   Phone,
+//   Menu,
+//   UserCircle,
+//   Heart,
+//   Headphones,
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 
@@ -908,49 +683,38 @@
 //   const [searchResults, setSearchResults] = useState([]);
 //   const [searchLoading, setSearchLoading] = useState(false);
 //   const [showResults, setShowResults] = useState(false);
-  
-//   // Mobile search states
-//   const [mobileSearchQuery, setMobileSearchQuery] = useState('');
-//   const [mobileSearchResults, setMobileSearchResults] = useState([]);
-//   const [mobileSearchLoading, setMobileSearchLoading] = useState(false);
-//   const [showMobileResults, setShowMobileResults] = useState(false);
-  
 //   const [user, setUser] = useState(null);
 //   const [cartCount, setCartCount] = useState(0);
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [profileImageError, setProfileImageError] = useState(false);
+//   const [wishlistCount, setWishlistCount] = useState(0);
 //   const [authLoading, setAuthLoading] = useState(true);
+//   const [scrolled, setScrolled] = useState(false);
+//   const [profileImageError, setProfileImageError] = useState(false);
   
 //   const searchRef = useRef(null);
-//   const mobileSearchRef = useRef(null);
 //   const pathname = usePathname();
 //   const router = useRouter();
 
-//   // Close search results when clicking outside
+//   // Handle scroll effect for navbar
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       setScrolled(window.scrollY > 20);
+//     };
+//     window.addEventListener('scroll', handleScroll);
+//     return () => window.removeEventListener('scroll', handleScroll);
+//   }, []);
+
+//   // Close search on click outside
 //   useEffect(() => {
 //     const handleClickOutside = (event) => {
 //       if (searchRef.current && !searchRef.current.contains(event.target)) {
 //         setShowResults(false);
 //       }
 //     };
-
 //     document.addEventListener('mousedown', handleClickOutside);
 //     return () => document.removeEventListener('mousedown', handleClickOutside);
 //   }, []);
 
-//   // Close mobile search results when clicking outside
-//   useEffect(() => {
-//     const handleClickOutside = (event) => {
-//       if (mobileSearchRef.current && !mobileSearchRef.current.contains(event.target)) {
-//         setShowMobileResults(false);
-//       }
-//     };
-
-//     document.addEventListener('mousedown', handleClickOutside);
-//     return () => document.removeEventListener('mousedown', handleClickOutside);
-//   }, []);
-
-//   // Function to check and update user state
+//   // Check user state
 //   const checkUserState = () => {
 //     if (typeof window !== 'undefined') {
 //       const userData = localStorage.getItem('user');
@@ -973,101 +737,124 @@
 //   // Fetch cart count
 //   const fetchCartCount = async () => {
 //     const token = localStorage.getItem('token');
-    
 //     if (!token) {
 //       setCartCount(0);
 //       return;
 //     }
     
 //     try {
-//       const controller = new AbortController();
-//       const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
 //       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
-//         headers: {
-//           'Authorization': `Bearer ${token}`,
-//           'Content-Type': 'application/json'
-//         },
-//         signal: controller.signal,
-//         mode: 'cors',
-//         cache: 'no-cache'
-//       }).finally(() => clearTimeout(timeoutId));
-      
-//       if (response.status === 401) {
-//         localStorage.removeItem('token');
-//         localStorage.removeItem('user');
-//         setUser(null);
-//         setCartCount(0);
-//         window.dispatchEvent(new Event('auth-change'));
-//         return;
-//       }
-      
-//       if (!response.ok) {
-//         setCartCount(0);
-//         return;
-//       }
-      
-//       const data = await response.json();
-      
-//       if (data.success) {
-//         const itemCount = data.data?.items?.length || 0;
-//         setCartCount(itemCount);
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       if (response.ok) {
+//         const data = await response.json();
+//         setCartCount(data.data?.items?.length || 0);
 //       } else {
 //         setCartCount(0);
 //       }
 //     } catch (error) {
-//       console.warn('Cart fetch failed:', error.message);
 //       setCartCount(0);
 //     }
 //   };
 
-//   // Desktop Search function
+//   // Fetch wishlist count
+//   const fetchWishlistCount = async () => {
+//     const token = localStorage.getItem('token');
+//     if (!token) {
+//       setWishlistCount(0);
+//       return;
+//     }
+    
+//     try {
+//       const response = await fetch('http://localhost:5000/api/wishlist', {
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       if (response.ok) {
+//         const data = await response.json();
+//         setWishlistCount(data.data?.items?.length || 0);
+//       } else {
+//         setWishlistCount(0);
+//       }
+//     } catch (error) {
+//       setWishlistCount(0);
+//     }
+//   };
+
+//   useEffect(() => {
+//     checkUserState();
+//     fetchCartCount();
+//     fetchWishlistCount();
+
+//     const handleAuthChange = () => {
+//       checkUserState();
+//       fetchCartCount();
+//       fetchWishlistCount();
+//     };
+
+//     window.addEventListener('auth-change', handleAuthChange);
+//     window.addEventListener('focus', handleAuthChange);
+//     window.addEventListener('cart-update', fetchCartCount);
+//     window.addEventListener('wishlist-update', fetchWishlistCount);
+
+//     return () => {
+//       window.removeEventListener('auth-change', handleAuthChange);
+//       window.removeEventListener('focus', handleAuthChange);
+//       window.removeEventListener('cart-update', fetchCartCount);
+//       window.removeEventListener('wishlist-update', fetchWishlistCount);
+//     };
+//   }, []);
+
+//   useEffect(() => {
+//     fetchCartCount();
+//     fetchWishlistCount();
+//   }, [pathname]);
+
+//   // Navigation items for bottom navbar
+//   const navItems = [
+//     { name: 'Home', href: '/', icon: Home },
+//     { name: 'Toys', href: '/products', icon: Gift, highlight: true },
+//     { name: 'Flash Sale', href: '/flash-sale', icon: Flame, badge: 'HOT' },
+//     { name: 'About', href: '/about', icon: Info },
+//     { name: 'Contact', href: '/contact', icon: Phone },
+//   ];
+
+//   const isActive = (path) => {
+//     if (path === '/') return pathname === '/';
+//     return pathname.startsWith(path);
+//   };
+
+//   // Fixed Search functionality - Shows products when typing
 //   const performSearch = async (query) => {
 //     if (!query.trim()) {
 //       setSearchResults([]);
+//       setShowResults(false);
 //       return;
 //     }
-
+    
 //     setSearchLoading(true);
 //     try {
 //       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
 //       const data = await response.json();
       
-//       if (data.success) {
+//       console.log('Search API response:', data); // Debug log
+      
+//       if (data.success && data.data && data.data.length > 0) {
 //         setSearchResults(data.data);
 //         setShowResults(true);
+//       } else {
+//         setSearchResults([]);
+//         setShowResults(false);
 //       }
 //     } catch (error) {
 //       console.error('Search error:', error);
+//       setSearchResults([]);
+//       setShowResults(false);
 //     } finally {
 //       setSearchLoading(false);
 //     }
 //   };
 
-//   // Mobile Search function
-//   const performMobileSearch = async (query) => {
-//     if (!query.trim()) {
-//       setMobileSearchResults([]);
-//       return;
-//     }
-
-//     setMobileSearchLoading(true);
-//     try {
-//       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
-//       const data = await response.json();
-      
-//       if (data.success) {
-//         setMobileSearchResults(data.data);
-//         setShowMobileResults(true);
-//       }
-//     } catch (error) {
-//       console.error('Mobile search error:', error);
-//     } finally {
-//       setMobileSearchLoading(false);
-//     }
-//   };
-
-//   // Debounce desktop search
+//   // Debounced search
 //   useEffect(() => {
 //     const timer = setTimeout(() => {
 //       if (searchQuery) {
@@ -1077,23 +864,8 @@
 //         setShowResults(false);
 //       }
 //     }, 300);
-
 //     return () => clearTimeout(timer);
 //   }, [searchQuery]);
-
-//   // Debounce mobile search
-//   useEffect(() => {
-//     const timer = setTimeout(() => {
-//       if (mobileSearchQuery) {
-//         performMobileSearch(mobileSearchQuery);
-//       } else {
-//         setMobileSearchResults([]);
-//         setShowMobileResults(false);
-//       }
-//     }, 300);
-
-//     return () => clearTimeout(timer);
-//   }, [mobileSearchQuery]);
 
 //   const handleSearchSubmit = (e) => {
 //     e.preventDefault();
@@ -1105,775 +877,457 @@
 //     }
 //   };
 
-//   const handleMobileSearchSubmit = (e) => {
-//     e.preventDefault();
-//     if (mobileSearchQuery.trim()) {
-//       router.push(`/search?q=${encodeURIComponent(mobileSearchQuery)}`);
-//       setSearchOpen(false);
-//       setMobileSearchQuery('');
-//       setShowMobileResults(false);
-//     }
-//   };
-
 //   const handleResultClick = (result) => {
-//     let url = '';
-//     switch (result.type) {
-//       case 'product':
-//         url = `/productDetails?id=${result._id}`;
-//         break;
-//       case 'blog':
-//         url = `/blog/${result._id}`;
-//         break;
-//       case 'category':
-//         url = `/products?category=${result._id}`;
-//         break;
-//       default:
-//         url = `/search?q=${encodeURIComponent(result.title || result.name)}`;
+//     // Handle different product ID field names
+//     const productId = result._id || result.id || result.productId;
+//     if (productId) {
+//       router.push(`/product/${productId}`);
+//     } else {
+//       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
 //     }
-//     router.push(url);
 //     setSearchOpen(false);
 //     setSearchQuery('');
 //     setShowResults(false);
 //   };
 
-//   const handleMobileResultClick = (result) => {
-//     let url = '';
-//     switch (result.type) {
-//       case 'product':
-//         url = `/productDetails?id=${result._id}`;
-//         break;
-//       case 'blog':
-//         url = `/blog/${result._id}`;
-//         break;
-//       case 'category':
-//         url = `/products?category=${result._id}`;
-//         break;
-//       default:
-//         url = `/search?q=${encodeURIComponent(result.title || result.name)}`;
-//     }
-//     router.push(url);
-//     setSearchOpen(false);
-//     setMobileSearchQuery('');
-//     setShowMobileResults(false);
-//   };
-
-//   const handleViewAllResults = () => {
-//     if (searchQuery.trim()) {
-//       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-//       setSearchOpen(false);
-//       setSearchQuery('');
-//       setShowResults(false);
-//     }
-//   };
-
-//   const handleMobileViewAllResults = () => {
-//     if (mobileSearchQuery.trim()) {
-//       router.push(`/search?q=${encodeURIComponent(mobileSearchQuery)}`);
-//       setSearchOpen(false);
-//       setMobileSearchQuery('');
-//       setShowMobileResults(false);
-//     }
-//   };
-
-//   // Test API connection on mount
-//   useEffect(() => {
-//     const testConnection = async () => {
-//       try {
-//         const response = await fetch('http://localhost:5000/api/health');
-//         const data = await response.json();
-//         console.log('✅ Backend connection test:', data);
-//       } catch (error) {
-//         console.error('❌ Backend connection failed:', error);
-//       }
-//     };
-    
-//     testConnection();
-//   }, []);
-
-//   // Initial check
-//   useEffect(() => {
-//     checkUserState();
-//     fetchCartCount();
-
-//     const handleStorageChange = (e) => {
-//       if (e.key === 'user' || e.key === 'token') {
-//         checkUserState();
-//         fetchCartCount();
-//       }
-//     };
-
-//     window.addEventListener('storage', handleStorageChange);
-
-//     const handleAuthChange = () => {
-//       checkUserState();
-//       fetchCartCount();
-//     };
-
-//     window.addEventListener('auth-change', handleAuthChange);
-
-//     const handleCartUpdate = () => {
-//       fetchCartCount();
-//     };
-
-//     window.addEventListener('cart-update', handleCartUpdate);
-
-//     return () => {
-//       window.removeEventListener('storage', handleStorageChange);
-//       window.removeEventListener('auth-change', handleAuthChange);
-//       window.removeEventListener('cart-update', handleCartUpdate);
-//     };
-//   }, []);
-
-//   // Listen for route changes
-//   useEffect(() => {
-//     fetchCartCount();
-//   }, [pathname]);
-
-//   const navItems = [
-//     { name: 'Home', href: '/' },
-//     { name: 'Products', href: '/products' },
-//     { name: 'About', href: '/about' },
-//     { name: 'Contact', href: '/contact' },
-//     { name: 'Blog', href: '/blog' },
-//   ];
-
-//   const isActive = (path) => {
-//     if (path === '/') {
-//       return pathname === '/';
-//     }
-//     return pathname.startsWith(path);
-//   };
-
 //   const logout = () => {
 //     localStorage.removeItem('token');
 //     localStorage.removeItem('user');
-//     localStorage.removeItem('rememberedEmail');
 //     setUser(null);
 //     setCartCount(0);
+//     setWishlistCount(0);
 //     setUserMenuOpen(false);
-//     setProfileImageError(false);
-    
 //     window.dispatchEvent(new Event('auth-change'));
-    
-//     toast.success('Logged out successfully');
+//     toast.success('🎉 Logged out successfully! See you soon!');
 //     router.push('/');
 //   };
 
 //   const getDashboardLink = () => {
 //     if (!user) return '/';
 //     switch (user.role) {
-//       case 'admin':
-//         return '/admin/dashboard';
-//       case 'moderator':
-//         return '/moderator/dashboard';
-//       case 'customer':
-//         return '/customer/dashboard';
-//       default:
-//         return '/';
-//     }
-//   };
-
-//   const getSettingsLink = () => {
-//     if (!user) return '/';
-//     switch (user.role) {
-//       case 'admin':
-//         return '/admin/settings';
-//       case 'moderator':
-//         return '/moderator/settings';
-//       case 'customer':
-//         return '/customer/settings';
-//       default:
-//         return '/';
-//     }
-//   };
-
-//   const getRoleDisplay = () => {
-//     if (!user) return '';
-//     switch (user.role) {
-//       case 'admin':
-//         return 'Administrator';
-//       case 'moderator':
-//         return 'Moderator';
-//       case 'customer':
-//         return 'Customer';
-//       default:
-//         return user.role;
+//       case 'admin': return '/admin/dashboard';
+//       case 'moderator': return '/moderator/dashboard';
+//       default: return '/customer/dashboard';
 //     }
 //   };
 
 //   const getDisplayName = () => {
 //     if (!user) return '';
-//     return user.companyName || user.contactPerson || user.email?.split('@')[0] || 'User';
+//     return user.companyName || user.contactPerson || user.email?.split('@')[0] || 'Toy Lover';
 //   };
 
 //   const getInitials = () => {
-//     if (!user) return 'U';
-//     const name = user.companyName || user.contactPerson || user.email;
-//     return name?.charAt(0).toUpperCase() || 'U';
+//     if (!user) return '🎈';
+//     const name = getDisplayName();
+//     return name.charAt(0).toUpperCase();
 //   };
 
 //   const getProfilePicture = () => {
-//     if (!user) return null;
-//     return user.profilePicture || user.photoURL || null;
-//   };
-
-//   const getResultIcon = (type) => {
-//     switch (type) {
-//       case 'product':
-//         return <Package className="w-4 h-4 text-[#3bc24f]" />;
-//       case 'blog':
-//         return <FileText className="w-4 h-4 text-[#3bc24f]" />;
-//       case 'category':
-//         return <Tag className="w-4 h-4 text-[#3bc24f]" />;
-//       default:
-//         return <Search className="w-4 h-4 text-[#3bc24f]" />;
-//     }
-//   };
-
-//   const handleImageError = () => {
-//     setProfileImageError(true);
+//     return user?.profilePicture || user?.photoURL || null;
 //   };
 
 //   if (authLoading) {
 //     return (
-//       <div className="navbar fixed top-0 z-50 w-full shadow-md" style={{ backgroundColor: '#6B4F3A' }}>
-//         <div className="navbar-start">
-//           <Link href="/" className="flex items-center">
-//            <div className="relative w-36 h-[54px] overflow-hidden flex items-center">
-//               <img 
-//                 src="https://i.ibb.co.com/YBG2DF6f/Chat-GPT-Image-Feb-26-2026-09-57-28-AM-removebg-preview.png"
-//                 alt="Jute Craftify Logo"
-//                 className="w-full h-full object-contain"
-//               />
+//       <div className="fixed top-0 z-50 w-full">
+//         <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] py-2">
+//           <div className="container mx-auto px-4">
+//             <div className="flex items-center justify-between">
+//               <div className="w-32 h-6 bg-white/20 rounded animate-pulse"></div>
+//               <div className="flex gap-4">
+//                 <div className="w-20 h-6 bg-white/20 rounded animate-pulse"></div>
+//                 <div className="w-20 h-6 bg-white/20 rounded animate-pulse"></div>
+//               </div>
 //             </div>
-//           </Link>
+//           </div>
 //         </div>
-//         <div className="navbar-center hidden lg:flex">
-//           <ul className="menu menu-horizontal px-1" style={{ color: '#F5E6D3' }}>
-//             {navItems.map((item) => (
-//               <li key={item.name}>
-//                 <Link 
-//                   href={item.href}
-//                   style={{ color: '#F5E6D3' }}
-//                   className="hover:text-[#3bc24f] transition-colors duration-200"
-//                 >
-//                   {item.name}
-//                 </Link>
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-//         <div className="navbar-end gap-1">
-//           <div className="w-8 h-8"></div>
+//         <div className="bg-transparent py-3">
+//           <div className="container mx-auto px-4">
+//             <div className="flex items-center justify-between">
+//               <div className="w-32 h-10 bg-gray-200 rounded animate-pulse"></div>
+//               <div className="flex gap-4">
+//                 <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+//                 <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+//                 <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+//               </div>
+//             </div>
+//           </div>
 //         </div>
 //       </div>
 //     );
 //   }
 
 //   return (
-//     <div className="navbar fixed top-0 z-50 w-full shadow-md" style={{ backgroundColor: '#6B4F3A' }}>
-//       {/* Left side - Menu button and Logo */}
-//       <div className="navbar-start gap-0">
-//         <div className="dropdown">
-//           <label tabIndex={0} className="btn btn-ghost lg:hidden p-1.5" style={{ color: '#F5E6D3' }}>
-//             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
-//             </svg>
-//           </label>
-//           <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow rounded-box w-56" style={{ backgroundColor: '#6B4F3A', color: '#F5E6D3', border: '1px solid #8B6B4F' }}>
-//             {navItems.map((item) => (
-//               <li key={item.name} className="w-full">
-//                 <Link 
-//                   href={item.href}
-//                   style={{
-//                     color: '#F5E6D3',
-//                     backgroundColor: isActive(item.href) ? '#3bc24f' : 'transparent',
-//                   }}
-//                   className={`hover:bg-[#3bc24f] hover:text-white block w-full rounded-md text-sm py-1.5 ${isActive(item.href) ? 'text-white pointer-events-none' : ''}`}
-//                 >
-//                   {item.name}
-//                 </Link>
-//               </li>
-//             ))}
+//     <>
+//       {/* ========== TOP NAVBAR - GRADIENT ========== */}
+//       <div className={`fixed top-0 z-50 w-full transition-all duration-500 ${
+//         scrolled ? 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] shadow-md' : 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]'
+//       }`}>
+//         <div className="container mx-auto px-4 lg:px-8">
+//           <div className="flex items-center justify-between h-10 lg:h-12">
             
-//             {/* Mobile menu user section */}
-//             {user ? (
-//               <>
-//                 <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-//                   <div className="flex flex-col px-2 py-1 text-sm text-[#F5E6D3] w-full items-start">
-//                     <div className="flex items-center gap-2 w-full">
-//                       {getProfilePicture() && !profileImageError ? (
-//                         <img 
-//                           src={getProfilePicture()} 
-//                           alt={getDisplayName()}
-//                           className="w-5 h-5 rounded-full object-cover border border-[#3bc24f]"
-//                           onError={handleImageError}
-//                         />
-//                       ) : (
-//                         <div className="w-5 h-5 rounded-full bg-[#3bc24f] flex items-center justify-center text-white text-[10px] font-semibold">
-//                           {getInitials()}
-//                         </div>
-//                       )}
-//                       <div className="font-semibold truncate text-left text-xs">{getDisplayName()}</div>
-//                     </div>
-//                     <div className="text-[10px] opacity-80 truncate text-left w-full mt-0.5">{user.email}</div>
-//                     <div className="text-[9px] mt-1 text-left w-full">
-//                       <span className="inline-block bg-[#3bc24f] text-white px-1.5 py-0.5 rounded-full text-[9px] whitespace-nowrap">
-//                         {getRoleDisplay()}
-//                       </span>
-//                     </div>
-//                   </div>
-//                 </li>
-//                 <li className="w-full">
-//                   <Link 
-//                     href={getDashboardLink()} 
-//                     className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-1.5 justify-start rounded-md text-sm"
-//                     onClick={() => setIsMenuOpen(false)}
-//                   >
-//                     <LayoutDashboard className="h-3.5 w-3.5 flex-shrink-0" />
-//                     <span>Dashboard</span>
-//                   </Link>
-//                 </li>
-//                 <li className="w-full">
-//                   <Link 
-//                     href={getSettingsLink()} 
-//                     className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-1.5 justify-start rounded-md text-sm"
-//                     onClick={() => setIsMenuOpen(false)}
-//                   >
-//                     <Settings className="h-3.5 w-3.5 flex-shrink-0" />
-//                     <span>Settings</span>
-//                   </Link>
-//                 </li>
-//                 <li className="w-full">
-//                   <button
-//                     onClick={() => {
-//                       setIsMenuOpen(false);
-//                       logout();
-//                     }}
-//                     className="flex items-center gap-2 text-red-300 hover:bg-red-500 hover:text-white w-full text-left px-2 py-1.5 justify-start rounded-md text-sm"
-//                   >
-//                     <LogOut className="h-3.5 w-3.5 flex-shrink-0" />
-//                     <span>Logout</span>
-//                   </button>
-//                 </li>
-//               </>
-//             ) : (
-//               <>
-//                 <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-//                   <Link href="/login" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-1.5 justify-start rounded-md text-sm">
-//                     <User className="h-3.5 w-3.5 flex-shrink-0" />
-//                     <span>Sign In</span>
-//                   </Link>
-//                 </li>
-//                 <li className="w-full">
-//                   <Link href="/register" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-1.5 justify-start rounded-md text-sm">
-//                     <Users className="h-3.5 w-3.5 flex-shrink-0" />
-//                     <span>Register</span>
-//                   </Link>
-//                 </li>
-//               </>
-//             )}
-            
-//             <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-//               <Link href="/inquiry-cart" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-1.5 justify-start rounded-md text-sm">
-//                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-//                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-//                 </svg>
-//                 Inquiry Cart
-//                 {cartCount > 0 && (
-//                   <span className="badge badge-sm ml-1" style={{ backgroundColor: '#3bc24f', color: 'white', border: 'none', fontSize: '9px', padding: '0 4px' }}>
-//                     {cartCount}
-//                   </span>
-//                 )}
-//               </Link>
-//             </li>
-//           </ul>
-//         </div>
-        
-//         {/* Logo */}
-//         <Link 
-//           href="/" 
-//           className="flex items-center -ml-1"
-//         >
-//           <div className="relative w-36 h-[54px] overflow-hidden flex items-center">
-//             <img 
-//               src="https://i.ibb.co.com/YBG2DF6f/Chat-GPT-Image-Feb-26-2026-09-57-28-AM-removebg-preview.png"
-//               alt="Jute Craftify Logo"
-//               className="w-full h-full object-contain"
-//             />
-//           </div>
-//         </Link>
-//       </div>
+//             {/* Customer Support */}
+//             <div className="hidden md:flex items-center gap-2 text-white">
+//               <Headphones className="w-4 h-4" />
+//               <span className="text-xs font-medium">Support: +880 1234 567890</span>
+//             </div>
 
-//       {/* Desktop Menu - Center */}
-//       <div className="navbar-center hidden lg:flex">
-//         <ul className="menu menu-horizontal px-1">
-//           {navItems.map((item) => (
-//             <li key={item.name}>
-//               <Link 
-//                 href={item.href}
-//                 style={{
-//                   color: isActive(item.href) ? '#3bc24f' : '#F5E6D3',
-//                   fontWeight: isActive(item.href) ? '600' : '500',
-//                   borderBottom: isActive(item.href) ? '2px solid #3bc24f' : 'none',
-//                 }}
-//                 className={`hover:text-[#3bc24f] transition-all duration-200 pb-1 text-sm`}
-//               >
-//                 {item.name}
-//               </Link>
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-
-//       {/* Right side - Actions */}
-//       <div className="navbar-end gap-1 lg:gap-2">
-//         {/* Mobile Search Button */}
-//         <button
-//           onClick={() => setSearchOpen(!searchOpen)}
-//           className="lg:hidden p-1.5 hover:bg-[#8B6B4F] rounded-lg transition-colors"
-//           title="Search"
-//         >
-//           <Search className="w-4 h-4 text-[#F5E6D3]" />
-//         </button>
-
-//         {/* Mobile Search Input with Results */}
-//         {searchOpen && (
-//           <div className="absolute top-14 left-0 right-0 px-3 py-2 bg-[#6B4F3A] border-t border-[#8B6B4F] z-50 lg:hidden" ref={mobileSearchRef}>
-//             <form onSubmit={handleMobileSearchSubmit} className="relative">
-//               <input
-//                 type="text"
-//                 value={mobileSearchQuery}
-//                 onChange={(e) => setMobileSearchQuery(e.target.value)}
-//                 placeholder="Search products..."
-//                 className="w-full px-3 py-2 pr-8 text-sm bg-[#F5E6D3] text-[#6B4F3A] rounded-lg border border-[#8B6B4F] focus:outline-none focus:border-[#3bc24f] focus:ring-1 focus:ring-[#3bc24f] placeholder:text-[#8B6B4F]"
-//                 autoFocus
-//               />
-//               {mobileSearchLoading ? (
-//                 <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3bc24f] animate-spin" />
-//               ) : (
-//                 <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2">
-//                   <Search className="w-4 h-4 text-[#8B6B4F]" />
-//                 </button>
-//               )}
-//             </form>
-
-//             {/* Mobile Search Results */}
-//             {showMobileResults && mobileSearchResults.length > 0 && (
-//               <div className="mt-2 bg-white rounded-xl shadow-xl border border-[#E8D5C0] max-h-80 overflow-y-auto">
-//                 {mobileSearchResults.map((result, index) => (
-//                   <button
-//                     key={`mobile-${result.type}-${result._id}`}
-//                     onClick={() => handleMobileResultClick(result)}
-//                     className="w-full px-3 py-2 text-left hover:bg-[#F5E6D3] border-b border-[#E8D5C0] last:border-0 flex items-center gap-2 transition-colors"
-//                   >
-//                     {result.type === 'product' && result.image && (
-//                       <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-//                         <img 
-//                           src={result.image} 
-//                           alt={result.title || result.name}
-//                           className="w-full h-full object-cover"
-//                           onError={(e) => {
-//                             e.target.src = 'https://via.placeholder.com/40?text=No+Image';
-//                           }}
-//                         />
-//                       </div>
-//                     )}
-//                     {result.type !== 'product' && (
-//                       <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-//                         {getResultIcon(result.type)}
-//                       </div>
-//                     )}
-//                     <div className="flex-1 min-w-0">
-//                       <p className="text-sm font-medium text-[#6B4F3A] truncate">
-//                         {result.title || result.name}
-//                       </p>
-//                       <p className="text-xs text-[#8B6B4F] capitalize">
-//                         {result.type}
-//                       </p>
-//                     </div>
-//                   </button>
-//                 ))}
-//                 <button
-//                   onClick={handleMobileViewAllResults}
-//                   className="w-full px-3 py-2 text-center text-sm text-[#3bc24f] hover:bg-[#F5E6D3] font-medium border-t border-[#E8D5C0] transition-colors"
-//                 >
-//                   View all results for "{mobileSearchQuery}"
-//                 </button>
-//               </div>
-//             )}
-            
-//             {showMobileResults && mobileSearchResults.length === 0 && mobileSearchQuery && !mobileSearchLoading && (
-//               <div className="mt-2 bg-white rounded-xl shadow-xl border border-[#E8D5C0] p-4 text-center">
-//                 <p className="text-sm text-gray-500">No results found for "{mobileSearchQuery}"</p>
-//               </div>
-//             )}
-//           </div>
-//         )}
-
-//         {/* Desktop Search */}
-//         <div className="hidden lg:block relative" ref={searchRef}>
-//           {searchOpen ? (
-//             <form 
-//               onSubmit={handleSearchSubmit}
-//               className="relative flex items-center"
-//             >
-//               <div className="relative">
+//             {/* Search Bar - Desktop with Results */}
+//             <div className="hidden lg:block flex-1 max-w-md mx-4 relative" ref={searchRef}>
+//               <form onSubmit={handleSearchSubmit} className="relative">
 //                 <input
 //                   type="text"
 //                   value={searchQuery}
 //                   onChange={(e) => setSearchQuery(e.target.value)}
-//                   placeholder="Search products..."
-//                   className="w-80 px-4 py-2 pr-10 text-sm bg-[#F5E6D3] text-[#6B4F3A] rounded-lg border border-[#8B6B4F] focus:outline-none focus:border-[#3bc24f] focus:ring-1 focus:ring-[#3bc24f] placeholder:text-[#8B6B4F]"
-//                   autoFocus
+//                   placeholder="🔍 Search for toys..."
+//                   className="w-full px-4 py-1.5 pr-8 text-sm text-gray-700 bg-white/90 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFD93D]"
+//                   style={{ fontFamily: "'Comic Neue', 'Poppins', sans-serif" }}
 //                 />
 //                 {searchLoading ? (
-//                   <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3bc24f] animate-spin" />
+//                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
+//                     <div className="w-3.5 h-3.5 border-2 border-[#4F9DFF] border-t-transparent rounded-full animate-spin"></div>
+//                   </div>
 //                 ) : (
 //                   <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
-//                     <Search className="w-4 h-4 text-[#8B6B4F] hover:text-[#3bc24f]" />
+//                     <Search className="w-3.5 h-3.5 text-gray-400" />
 //                   </button>
 //                 )}
-//               </div>
-//               <button
-//                 type="button"
-//                 onClick={() => {
-//                   setSearchOpen(false);
-//                   setSearchQuery('');
-//                   setShowResults(false);
-//                 }}
-//                 className="ml-2 p-1.5 hover:bg-[#8B6B4F] rounded-full transition-colors"
-//                 title="Close search"
-//               >
-//                 <X className="w-4 h-4 text-[#F5E6D3]" />
-//               </button>
+//               </form>
 
-//               {/* Desktop Search Results Dropdown */}
+//               {/* Search Results Dropdown */}
 //               {showResults && searchResults.length > 0 && (
-//                 <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-[#E8D5C0] max-h-96 overflow-y-auto z-50 w-full">
-//                   {searchResults.map((result, index) => (
+//                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 max-h-80 overflow-y-auto z-50">
+//                   {searchResults.map((result) => (
 //                     <button
-//                       key={`desktop-${result.type}-${result._id}`}
+//                       key={result._id || result.id}
 //                       onClick={() => handleResultClick(result)}
-//                       className="w-full px-4 py-3 text-left hover:bg-[#F5E6D3] border-b border-[#E8D5C0] last:border-0 flex items-center gap-3 transition-colors"
+//                       className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
 //                     >
-//                       {result.type === 'product' && result.image && (
-//                         <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-//                           <img 
-//                             src={result.image} 
-//                             alt={result.title || result.name}
-//                             className="w-full h-full object-cover"
-//                             onError={(e) => {
-//                               e.target.src = 'https://via.placeholder.com/48?text=No+Image';
-//                             }}
-//                           />
-//                         </div>
-//                       )}
-//                       {result.type !== 'product' && (
-//                         <div className="mt-1">{getResultIcon(result.type)}</div>
+//                       {/* Product Image */}
+//                       {(result.images || result.image) && (
+//                         <img 
+//                           src={result.images?.[0] || result.image} 
+//                           alt={result.name || result.title} 
+//                           className="w-10 h-10 rounded-lg object-cover"
+//                         />
 //                       )}
 //                       <div className="flex-1">
-//                         <p className="text-sm font-medium text-[#6B4F3A]">
-//                           {result.title || result.name}
-//                         </p>
-//                         <p className="text-xs text-[#8B6B4F] mt-0.5 capitalize">
-//                           {result.type}
-//                         </p>
+//                         <p className="font-medium text-gray-800 text-sm">{result.name || result.title}</p>
+//                         {result.price && (
+//                           <p className="text-xs text-[#FF7B54] font-semibold">BDT {result.price}</p>
+//                         )}
 //                       </div>
 //                     </button>
 //                   ))}
 //                   <button
-//                     onClick={handleViewAllResults}
-//                     className="w-full px-4 py-3 text-center text-sm text-[#3bc24f] hover:bg-[#F5E6D3] font-medium border-t border-[#E8D5C0] transition-colors"
+//                     onClick={handleSearchSubmit}
+//                     className="w-full px-4 py-2 text-center text-sm text-[#4F9DFF] hover:bg-gray-50 font-medium border-t border-gray-100"
 //                   >
 //                     View all results for "{searchQuery}"
 //                   </button>
 //                 </div>
 //               )}
-//             </form>
-//           ) : (
-//             <button
-//               onClick={() => setSearchOpen(true)}
-//               className="p-2 hover:bg-[#8B6B4F] rounded-lg transition-colors"
-//               title="Open search"
-//             >
-//               <Search className="w-5 h-5 text-[#F5E6D3] hover:text-[#3bc24f]" />
-//             </button>
-//           )}
-//         </div>
 
-//         {/* Inquiry Cart - Desktop */}
-//         <Link 
-//           href="/inquiry-cart" 
-//           className="btn btn-ghost btn-circle hidden lg:flex relative min-w-[36px]"
-//           style={{ color: '#F5E6D3' }}
-//           onMouseEnter={(e) => {
-//             e.currentTarget.style.backgroundColor = '#3bc24f';
-//             e.currentTarget.style.color = 'white';
-//           }}
-//           onMouseLeave={(e) => {
-//             e.currentTarget.style.backgroundColor = 'transparent';
-//             e.currentTarget.style.color = '#F5E6D3';
-//           }}
-//         >
-//           <div className="indicator">
-//             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-//             </svg>
-//             {cartCount > 0 && (
-//               <span className="badge badge-sm indicator-item" style={{ backgroundColor: '#3bc24f', color: 'white', border: 'none' }}>
-//                 {cartCount}
-//               </span>
-//             )}
-//           </div>
-//         </Link>
-
-//         {/* User Menu or Auth Buttons */}
-//         {user ? (
-//           <div className="relative">
-//             <button
-//               onClick={() => setUserMenuOpen(!userMenuOpen)}
-//               className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-[#8B6B4F] transition-colors"
-//               style={{ color: '#F5E6D3' }}
-//             >
-//               {getProfilePicture() && !profileImageError ? (
-//                 <img 
-//                   src={getProfilePicture()} 
-//                   alt={getDisplayName()}
-//                   className="w-7 h-7 rounded-full object-cover border-2 border-[#3bc24f]"
-//                   onError={handleImageError}
-//                 />
-//               ) : (
-//                 <div className="w-7 h-7 rounded-full bg-[#3bc24f] flex items-center justify-center text-white font-semibold text-sm">
-//                   {getInitials()}
+//               {/* No Results Message */}
+//               {showResults && searchResults.length === 0 && searchQuery && !searchLoading && (
+//                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 p-4 text-center z-50">
+//                   <p className="text-gray-500 text-sm">No products found for "{searchQuery}"</p>
 //                 </div>
 //               )}
-//               <span className="hidden lg:inline max-w-[100px] truncate font-medium text-sm">
-//                 {getDisplayName()}
-//               </span>
-//               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
-//             </button>
+//             </div>
 
-//             {/* Dropdown Menu */}
-//             {userMenuOpen && (
-//               <>
-//                 <div 
-//                   className="fixed inset-0 z-40"
-//                   onClick={() => setUserMenuOpen(false)}
-//                 />
-//                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-[#E8D5C0] py-2 z-50">
-//                   <div className="px-4 py-3 border-b border-[#E8D5C0]">
-//                     <div className="flex items-center gap-3">
-//                       {getProfilePicture() && !profileImageError ? (
-//                         <img 
-//                           src={getProfilePicture()} 
-//                           alt={getDisplayName()}
-//                           className="w-10 h-10 rounded-full object-cover border-2 border-[#3bc24f]"
-//                           onError={handleImageError}
-//                         />
-//                       ) : (
-//                         <div className="w-10 h-10 rounded-full bg-[#3bc24f] flex items-center justify-center text-white font-semibold text-lg">
-//                           {getInitials()}
-//                         </div>
-//                       )}
-//                       <div className="flex-1 min-w-0">
-//                         <p className="text-sm font-semibold text-[#6B4F3A] truncate">{getDisplayName()}</p>
-//                         <p className="text-xs text-[#8B6B4F] truncate mt-0.5">{user.email}</p>
-//                       </div>
-//                     </div>
-//                     <div className="mt-2">
-//                       <span 
-//                         className="px-2 py-0.5 text-xs font-medium rounded-full bg-[#3bc24f] text-white"
-//                       >
-//                         {getRoleDisplay()}
-//                       </span>
-//                     </div>
-//                   </div>
+//             {/* Right Icons */}
+//             <div className="flex items-center gap-3 lg:gap-4">
+              
+//               {/* Mobile Search Button */}
+//               <button
+//                 onClick={() => setSearchOpen(!searchOpen)}
+//                 className="lg:hidden p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all"
+//               >
+//                 <Search className="w-4 h-4 text-white" />
+//               </button>
 
-//                   <Link
-//                     href={getDashboardLink()}
-//                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#6B4F3A] hover:bg-[#F5E6D3] transition-colors"
-//                     onClick={() => setUserMenuOpen(false)}
-//                   >
-//                     <LayoutDashboard className="w-4 h-4 text-[#3bc24f]" />
-//                     <span>Dashboard</span>
-//                   </Link>
+//               {/* Wishlist */}
+//               <Link href="/wishlist" className="relative p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all group">
+//                 <Heart className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+//                 {wishlistCount > 0 && (
+//                   <span className="absolute -top-1 -right-1 bg-[#FFD93D] text-[#FF7B54] text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
+//                     {wishlistCount > 9 ? '9+' : wishlistCount}
+//                   </span>
+//                 )}
+//               </Link>
 
-//                   <Link
-//                     href={getSettingsLink()}
-//                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#6B4F3A] hover:bg-[#F5E6D3] transition-colors"
-//                     onClick={() => setUserMenuOpen(false)}
-//                   >
-//                     <Settings className="w-4 h-4 text-[#3bc24f]" />
-//                     <span>Settings</span>
-//                   </Link>
+//               {/* Cart */}
+//               <Link href="/inquiry-cart" className="relative p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all group">
+//                 <ShoppingCart className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+//                 {cartCount > 0 && (
+//                   <span className="absolute -top-1 -right-1 bg-[#FFD93D] text-[#FF7B54] text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
+//                     {cartCount > 9 ? '9+' : cartCount}
+//                   </span>
+//                 )}
+//               </Link>
 
+//               {/* User Menu / Auth Buttons */}
+//               {user ? (
+//                 <div className="relative">
 //                   <button
-//                     onClick={() => {
-//                       setUserMenuOpen(false);
-//                       logout();
-//                     }}
-//                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left border-t border-[#E8D5C0] mt-1 pt-2"
+//                     onClick={() => setUserMenuOpen(!userMenuOpen)}
+//                     className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 hover:bg-white/30 transition-all"
 //                   >
-//                     <LogOut className="w-4 h-4" />
-//                     <span>Logout</span>
+//                     {getProfilePicture() && !profileImageError ? (
+//                       <img 
+//                         src={getProfilePicture()} 
+//                         alt={getDisplayName()}
+//                         className="w-6 h-6 rounded-full object-cover border border-[#FFD93D]"
+//                         onError={() => setProfileImageError(true)}
+//                       />
+//                     ) : (
+//                       <div className="w-6 h-6 rounded-full bg-[#FFD93D] flex items-center justify-center text-[#FF7B54] font-black text-xs">
+//                         {getInitials()}
+//                       </div>
+//                     )}
+//                     <span className="hidden md:inline text-white font-bold text-xs max-w-[80px] truncate">
+//                       {getDisplayName()}
+//                     </span>
+//                     <ChevronDown className={`w-3 h-3 text-white transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
 //                   </button>
+
+//                   {/* User Dropdown */}
+//                   {userMenuOpen && (
+//                     <>
+//                       <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+//                       <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl overflow-hidden z-50">
+//                         <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] px-3 py-2">
+//                           <div className="flex items-center gap-2">
+//                             {getProfilePicture() && !profileImageError ? (
+//                               <img src={getProfilePicture()} alt={getDisplayName()} className="w-8 h-8 rounded-full object-cover border border-white" />
+//                             ) : (
+//                               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white text-sm font-bold">
+//                                 {getInitials()}
+//                               </div>
+//                             )}
+//                             <div>
+//                               <p className="text-white font-bold text-xs truncate">{getDisplayName()}</p>
+//                               <p className="text-white/70 text-[10px] truncate">{user.email}</p>
+//                             </div>
+//                           </div>
+//                         </div>
+//                         <div className="p-1">
+//                           <Link href={getDashboardLink()} className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 text-sm" onClick={() => setUserMenuOpen(false)}>
+//                             <LayoutDashboard className="w-3.5 h-3.5 text-[#4F9DFF]" />
+//                             <span>Dashboard</span>
+//                           </Link>
+//                           <button onClick={() => { setUserMenuOpen(false); logout(); }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 w-full text-sm">
+//                             <LogOut className="w-3.5 h-3.5" />
+//                             <span>Logout</span>
+//                           </button>
+//                         </div>
+//                       </div>
+//                     </>
+//                   )}
 //                 </div>
-//               </>
+//               ) : (
+//                 <div className="flex items-center gap-2">
+//                   <Link href="/login" className="px-2 py-1 rounded-full font-bold text-white hover:text-[#FFD93D] transition-all text-xs">
+//                     Sign In
+//                   </Link>
+//                   <Link href="/register" className="px-3 py-1 rounded-full font-bold bg-white text-[#4F9DFF] shadow-md hover:shadow-lg transition-all text-xs">
+//                     Register
+//                   </Link>
+//                 </div>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* ========== BOTTOM NAVBAR - TRANSPARENT ========== */}
+//       <div className={`fixed top-10 lg:top-12 z-40 w-full transition-all duration-500 bg-transparent ${
+//         scrolled ? 'backdrop-blur-md' : ''
+//       }`}>
+//         <div className="container mx-auto px-4 lg:px-8">
+//           <div className="flex items-center justify-between h-14 lg:h-16">
+            
+//             {/* Logo */}
+//             <Link href="/" className="group flex items-center">
+//               <div className="relative w-12 h-12 lg:w-28 lg:h-14 overflow-hidden transition-all duration-300 group-hover:scale-105">
+//                 <img 
+//                   src="https://i.ibb.co.com/DPz8BcQm/favicon-ico.png"
+//                   alt="ToyMart Logo"
+//                   className="w-full h-full object-contain"
+//                 />
+//               </div>
+//             </Link>
+
+//             {/* Desktop Navigation - Transparent background */}
+//             <div className="hidden lg:flex items-center gap-1">
+//               {navItems.map((item) => (
+//                 <Link
+//                   key={item.name}
+//                   href={item.href}
+//                   className={`relative px-4 py-1.5 rounded-full font-bold transition-all duration-300 ${
+//                     isActive(item.href)
+//                       ? 'text-[#4F9DFF] bg-white shadow-md'
+//                       : 'text-[#F2826B] hover:text-[#FFD93D] hover:bg-white/20'
+//                   }`}
+//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', 'Poppins', cursive" }}
+//                 >
+//                   <div className="flex items-center gap-2 text-sm">
+//                     <item.icon className="w-4 h-4" />
+//                     <span>{item.name}</span>
+//                     {item.badge && (
+//                       <span className="absolute -top-2 -right-2 bg-[#FFD93D] text-[#FF7B54] text-xs font-black px-1.5 py-0.5 rounded-full animate-bounce">
+//                         {item.badge}
+//                       </span>
+//                     )}
+//                   </div>
+//                 </Link>
+//               ))}
+//             </div>
+
+//             {/* Mobile Menu Button */}
+//             <button
+//               onClick={() => setIsMenuOpen(!isMenuOpen)}
+//               className="lg:hidden p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-all"
+//             >
+//               <Menu className="w-5 h-5 text-white" />
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Search Overlay (Mobile) */}
+//       {searchOpen && (
+//         <div className="fixed top-10 left-0 right-0 z-50 bg-white shadow-xl p-3 animate-slideDown" ref={searchRef}>
+//           <div className="container mx-auto px-4">
+//             <form onSubmit={handleSearchSubmit} className="relative">
+//               <input
+//                 type="text"
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 placeholder="🔍 Search for toys..."
+//                 className="w-full px-4 py-2 pr-20 text-gray-700 bg-gray-50 rounded-full border border-gray-200 focus:outline-none focus:border-[#4F9DFF]"
+//                 autoFocus
+//               />
+//               <button type="button" onClick={() => setSearchOpen(false)} className="absolute right-12 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+//                 Cancel
+//               </button>
+//               <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+//                 <Search className="w-4 h-4 text-gray-400" />
+//               </button>
+//             </form>
+
+//             {/* Mobile Search Results */}
+//             {showResults && searchResults.length > 0 && (
+//               <div className="mt-3 bg-white rounded-xl shadow-lg max-h-60 overflow-y-auto">
+//                 {searchResults.slice(0, 5).map((result) => (
+//                   <button
+//                     key={result._id || result.id}
+//                     onClick={() => handleResultClick(result)}
+//                     className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-b border-gray-100"
+//                   >
+//                     {(result.images || result.image) && (
+//                       <img src={result.images?.[0] || result.image} alt={result.name} className="w-8 h-8 rounded object-cover" />
+//                     )}
+//                     <div>
+//                       <p className="text-sm font-medium text-gray-800">{result.name || result.title}</p>
+//                       {result.price && <p className="text-xs text-[#FF7B54]">BDT {result.price}</p>}
+//                     </div>
+//                   </button>
+//                 ))}
+//               </div>
 //             )}
 //           </div>
-//         ) : (
-//           <>
-//             <Link 
-//               href="/login" 
-//               className="btn btn-outline btn-sm hidden lg:flex text-xs"
-//               style={{
-//                 color: '#F5E6D3',
-//                 borderColor: '#F5E6D3',
-//                 backgroundColor: 'transparent'
-//               }}
-//               onMouseEnter={(e) => {
-//                 e.currentTarget.style.backgroundColor = '#3bc24f';
-//                 e.currentTarget.style.borderColor = '#3bc24f';
-//                 e.currentTarget.style.color = 'white';
-//               }}
-//               onMouseLeave={(e) => {
-//                 e.currentTarget.style.backgroundColor = 'transparent';
-//                 e.currentTarget.style.borderColor = '#F5E6D3';
-//                 e.currentTarget.style.color = '#F5E6D3';
-//               }}
-//             >
-//               <User className="h-3.5 w-3.5 mr-1" />
-//               Sign In
-//             </Link>
+//         </div>
+//       )}
 
-//             <Link 
-//               href="/register" 
-//               className="btn btn-sm hidden lg:flex text-xs"
-//               style={{
-//                 backgroundColor: '#3bc24f',
-//                 color: 'white',
-//                 borderColor: '#3bc24f'
-//               }}
-//               onMouseEnter={(e) => {
-//                 e.currentTarget.style.backgroundColor = '#2da63f';
-//                 e.currentTarget.style.borderColor = '#2da63f';
-//               }}
-//               onMouseLeave={(e) => {
-//                 e.currentTarget.style.backgroundColor = '#3bc24f';
-//                 e.currentTarget.style.borderColor = '#3bc24f';
-//               }}
-//             >
-//               <UserPlus className="h-3.5 w-3.5 mr-1" />
-//               Register
-//             </Link>
-//           </>
-//         )}
+//       {/* Mobile Sidebar Menu */}
+//       <div className={`fixed inset-0 z-50 lg:hidden transition-all duration-500 ${isMenuOpen ? 'visible' : 'invisible'}`}>
+//         <div className={`absolute inset-0 bg-black/60 transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setIsMenuOpen(false)} />
+        
+//         <div className={`absolute right-0 top-0 h-full w-80 bg-white shadow-2xl transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+//           <div className="p-5">
+//             <div className="flex items-center justify-between mb-6">
+//               <div className="w-14 h-14">
+//                 <img src="https://i.ibb.co.com/DPz8BcQm/favicon-ico.png" alt="ToyMart Logo" className="w-full h-full object-contain" />
+//               </div>
+//               <button onClick={() => setIsMenuOpen(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+//                 <X className="w-4 h-4" />
+//               </button>
+//             </div>
+
+//             {user && (
+//               <div className="mb-5 p-3 bg-gradient-to-r from-[#4F9DFF]/10 to-[#FF7B54]/10 rounded-xl">
+//                 <div className="flex items-center gap-3">
+//                   {getProfilePicture() && !profileImageError ? (
+//                     <img src={getProfilePicture()} alt={getDisplayName()} className="w-12 h-12 rounded-full object-cover border-2 border-[#4F9DFF]" />
+//                   ) : (
+//                     <div className="w-12 h-12 rounded-full bg-[#4F9DFF] flex items-center justify-center text-white text-xl font-bold">
+//                       {getInitials()}
+//                     </div>
+//                   )}
+//                   <div>
+//                     <p className="font-bold text-gray-800 text-sm">{getDisplayName()}</p>
+//                     <p className="text-gray-500 text-xs">{user.email}</p>
+//                   </div>
+//                 </div>
+//               </div>
+//             )}
+
+//             <div className="space-y-1">
+//               {navItems.map((item) => (
+//                 <Link
+//                   key={item.name}
+//                   href={item.href}
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all ${
+//                     isActive(item.href) ? 'bg-[#4F9DFF] text-white' : 'text-gray-700 hover:bg-gray-100'
+//                   }`}
+//                 >
+//                   <item.icon className="w-4 h-4" />
+//                   <span className="text-sm">{item.name}</span>
+//                   {item.badge && <span className="ml-auto bg-[#FF7B54] text-white text-xs px-2 py-0.5 rounded-full">{item.badge}</span>}
+//                 </Link>
+//               ))}
+//             </div>
+
+//             <div className="my-5 h-px bg-gray-200"></div>
+
+//             {!user ? (
+//               <div className="space-y-2">
+//                 <Link href="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold border-2 border-[#4F9DFF] text-[#4F9DFF] hover:bg-[#4F9DFF] hover:text-white transition-all">
+//                   <User className="w-4 h-4" /> Sign In
+//                 </Link>
+//                 <Link href="/register" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-[#4F9DFF] text-white shadow-md">
+//                   <UserCircle className="w-4 h-4" /> Register
+//                 </Link>
+//               </div>
+//             ) : (
+//               <button onClick={() => { setIsMenuOpen(false); logout(); }} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-red-500 text-white">
+//                 <LogOut className="w-4 h-4" /> Logout
+//               </button>
+//             )}
+//           </div>
+//         </div>
 //       </div>
-//     </div>
+
+//       {/* Spacer for both navbars */}
+//       <div className="h-24 lg:h-28"></div>
+
+//       <style jsx>{`
+//         @keyframes slideDown {
+//           from { opacity: 0; transform: translateY(-10px); }
+//           to { opacity: 1; transform: translateY(0); }
+//         }
+//         .animate-slideDown { animation: slideDown 0.3s ease-out; }
+//         @keyframes bounce {
+//           0%, 100% { transform: translateY(0); }
+//           50% { transform: translateY(-3px); }
+//         }
+//         .animate-bounce { animation: bounce 0.8s ease-in-out infinite; }
+//       `}</style>
+//     </>
 //   );
 // }
-
 
 
 
@@ -1888,14 +1342,18 @@ import {
   Settings, 
   User, 
   LayoutDashboard, 
-  Users,
+  ShoppingCart,
   Search,
   X,
-  Package,
-  FileText,
-  Tag,
-  Loader2,
-  UserPlus
+  Gift,
+  Flame,
+  Home,
+  Info,
+  Phone,
+  Menu,
+  UserCircle,
+  Heart,
+  Headphones,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -1909,47 +1367,48 @@ export default function Navbar() {
   const [showResults, setShowResults] = useState(false);
   const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [profileImageError, setProfileImageError] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0);
   const [authLoading, setAuthLoading] = useState(true);
-  
-  // Mobile search states
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
-  const [mobileSearchResults, setMobileSearchResults] = useState([]);
-  const [mobileSearchLoading, setMobileSearchLoading] = useState(false);
-  const [showMobileResults, setShowMobileResults] = useState(false);
-  
+  const [scrolled, setScrolled] = useState(false);
+  const [profileImageError, setProfileImageError] = useState(false);
+  const [hideTopNavbar, setHideTopNavbar] = useState(false);
+  const lastScrollY = useRef(0);
+
   const searchRef = useRef(null);
-  const mobileSearchRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
 
-  // Close desktop search results when clicking outside
+  // Handle scroll effect for navbars
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 20);
+      
+      // Hide top navbar when scrolling down, show when scrolling up
+      if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
+        setHideTopNavbar(true);
+      } else {
+        setHideTopNavbar(false);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close search on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close mobile search results when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (mobileSearchRef.current && !mobileSearchRef.current.contains(event.target)) {
-        setShowMobileResults(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Function to check and update user state
+  // Check user state
   const checkUserState = () => {
     if (typeof window !== 'undefined') {
       const userData = localStorage.getItem('user');
@@ -1972,101 +1431,124 @@ export default function Navbar() {
   // Fetch cart count
   const fetchCartCount = async () => {
     const token = localStorage.getItem('token');
-    
     if (!token) {
       setCartCount(0);
       return;
     }
     
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        signal: controller.signal,
-        mode: 'cors',
-        cache: 'no-cache'
-      }).finally(() => clearTimeout(timeoutId));
-      
-      if (response.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-        setCartCount(0);
-        window.dispatchEvent(new Event('auth-change'));
-        return;
-      }
-      
-      if (!response.ok) {
-        setCartCount(0);
-        return;
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        const itemCount = data.data?.items?.length || 0;
-        setCartCount(itemCount);
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCartCount(data.data?.items?.length || 0);
       } else {
         setCartCount(0);
       }
     } catch (error) {
-      console.warn('Cart fetch failed:', error.message);
       setCartCount(0);
     }
   };
 
-  // Desktop Search function
+  // Fetch wishlist count
+  const fetchWishlistCount = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setWishlistCount(0);
+      return;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/wishlist', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setWishlistCount(data.data?.items?.length || 0);
+      } else {
+        setWishlistCount(0);
+      }
+    } catch (error) {
+      setWishlistCount(0);
+    }
+  };
+
+  useEffect(() => {
+    checkUserState();
+    fetchCartCount();
+    fetchWishlistCount();
+
+    const handleAuthChange = () => {
+      checkUserState();
+      fetchCartCount();
+      fetchWishlistCount();
+    };
+
+    window.addEventListener('auth-change', handleAuthChange);
+    window.addEventListener('focus', handleAuthChange);
+    window.addEventListener('cart-update', fetchCartCount);
+    window.addEventListener('wishlist-update', fetchWishlistCount);
+
+    return () => {
+      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('focus', handleAuthChange);
+      window.removeEventListener('cart-update', fetchCartCount);
+      window.removeEventListener('wishlist-update', fetchWishlistCount);
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchCartCount();
+    fetchWishlistCount();
+  }, [pathname]);
+
+  // Navigation items for bottom navbar
+  const navItems = [
+    { name: 'Home', href: '/', icon: Home },
+    { name: 'Toys', href: '/products', icon: Gift, highlight: true },
+    { name: 'Flash Sale', href: '/flash-sale', icon: Flame, badge: 'HOT' },
+    { name: 'About', href: '/about', icon: Info },
+    { name: 'Contact', href: '/contact', icon: Phone },
+  ];
+
+  const isActive = (path) => {
+    if (path === '/') return pathname === '/';
+    return pathname.startsWith(path);
+  };
+
+  // Fixed Search functionality - Shows products when typing
   const performSearch = async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
+      setShowResults(false);
       return;
     }
-
+    
     setSearchLoading(true);
     try {
       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
       const data = await response.json();
       
-      if (data.success) {
+      console.log('Search API response:', data);
+      
+      if (data.success && data.data && data.data.length > 0) {
         setSearchResults(data.data);
         setShowResults(true);
+      } else {
+        setSearchResults([]);
+        setShowResults(false);
       }
     } catch (error) {
       console.error('Search error:', error);
+      setSearchResults([]);
+      setShowResults(false);
     } finally {
       setSearchLoading(false);
     }
   };
 
-  // Mobile Search function
-  const performMobileSearch = async (query) => {
-    if (!query.trim()) {
-      setMobileSearchResults([]);
-      return;
-    }
-
-    setMobileSearchLoading(true);
-    try {
-      const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setMobileSearchResults(data.data);
-        setShowMobileResults(true);
-      }
-    } catch (error) {
-      console.error('Mobile search error:', error);
-    } finally {
-      setMobileSearchLoading(false);
-    }
-  };
-
-  // Debounce desktop search
+  // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchQuery) {
@@ -2076,23 +1558,8 @@ export default function Navbar() {
         setShowResults(false);
       }
     }, 300);
-
     return () => clearTimeout(timer);
   }, [searchQuery]);
-
-  // Debounce mobile search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (mobileSearchQuery) {
-        performMobileSearch(mobileSearchQuery);
-      } else {
-        setMobileSearchResults([]);
-        setShowMobileResults(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [mobileSearchQuery]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -2104,814 +1571,454 @@ export default function Navbar() {
     }
   };
 
-  const handleMobileSearchSubmit = (e) => {
-    e.preventDefault();
-    if (mobileSearchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(mobileSearchQuery)}`);
-      setMobileSearchOpen(false);
-      setMobileSearchQuery('');
-      setShowMobileResults(false);
-    }
-  };
-
   const handleResultClick = (result) => {
-    let url = '';
-    switch (result.type) {
-      case 'product':
-        url = `/productDetails?id=${result._id}`;
-        break;
-      case 'blog':
-        url = `/blog/${result._id}`;
-        break;
-      case 'category':
-        url = `/products?category=${result._id}`;
-        break;
-      default:
-        url = `/search?q=${encodeURIComponent(result.title || result.name)}`;
+    const productId = result._id || result.id || result.productId;
+    if (productId) {
+      router.push(`/product/${productId}`);
+    } else {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
-    router.push(url);
     setSearchOpen(false);
     setSearchQuery('');
     setShowResults(false);
   };
 
-  const handleMobileResultClick = (result) => {
-    let url = '';
-    switch (result.type) {
-      case 'product':
-        url = `/productDetails?id=${result._id}`;
-        break;
-      case 'blog':
-        url = `/blog/${result._id}`;
-        break;
-      case 'category':
-        url = `/products?category=${result._id}`;
-        break;
-      default:
-        url = `/search?q=${encodeURIComponent(result.title || result.name)}`;
-    }
-    router.push(url);
-    setMobileSearchOpen(false);
-    setMobileSearchQuery('');
-    setShowMobileResults(false);
-  };
-
-  const handleViewAllResults = () => {
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setSearchOpen(false);
-      setSearchQuery('');
-      setShowResults(false);
-    }
-  };
-
-  const handleMobileViewAllResults = () => {
-    if (mobileSearchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(mobileSearchQuery)}`);
-      setMobileSearchOpen(false);
-      setMobileSearchQuery('');
-      setShowMobileResults(false);
-    }
-  };
-
-  // Test API connection on mount
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/health');
-        const data = await response.json();
-        console.log('✅ Backend connection test:', data);
-      } catch (error) {
-        console.error('❌ Backend connection failed:', error);
-      }
-    };
-    
-    testConnection();
-  }, []);
-
-  // Initial check
-  // useEffect(() => {
-  //   checkUserState();
-  //   fetchCartCount();
-
-  //   const handleStorageChange = (e) => {
-  //     if (e.key === 'user' || e.key === 'token') {
-  //       checkUserState();
-  //       fetchCartCount();
-  //     }
-  //   };
-
-  //   window.addEventListener('storage', handleStorageChange);
-
-  //   const handleAuthChange = () => {
-  //     checkUserState();
-  //     fetchCartCount();
-  //   };
-
-  //   window.addEventListener('auth-change', handleAuthChange);
-
-  //   const handleCartUpdate = () => {
-  //     fetchCartCount();
-  //   };
-
-  //   window.addEventListener('cart-update', handleCartUpdate);
-
-  //   return () => {
-  //     window.removeEventListener('storage', handleStorageChange);
-  //     window.removeEventListener('auth-change', handleAuthChange);
-  //     window.removeEventListener('cart-update', handleCartUpdate);
-  //   };
-  // }, []);
-
-  // In Navbar.js, add this to your existing useEffect
-useEffect(() => {
-  checkUserState();
-  fetchCartCount();
-
-  const handleStorageChange = (e) => {
-    if (e.key === 'user' || e.key === 'token') {
-      checkUserState();
-      fetchCartCount();
-    }
-  };
-
-  window.addEventListener('storage', handleStorageChange);
-
-  const handleAuthChange = () => {
-    console.log('🔄 Auth change detected, refreshing user state...');
-    checkUserState();
-    fetchCartCount();
-  };
-
-  window.addEventListener('auth-change', handleAuthChange);
-  
-  // 🔥 NEW: Listen for focus events (when user returns to tab after login)
-  const handleFocus = () => {
-    console.log('👁️ Tab focused, checking user state...');
-    checkUserState();
-    fetchCartCount();
-  };
-  
-  window.addEventListener('focus', handleFocus);
-
-  const handleCartUpdate = () => {
-    fetchCartCount();
-  };
-
-  window.addEventListener('cart-update', handleCartUpdate);
-
-  return () => {
-    window.removeEventListener('storage', handleStorageChange);
-    window.removeEventListener('auth-change', handleAuthChange);
-    window.removeEventListener('focus', handleFocus);
-    window.removeEventListener('cart-update', handleCartUpdate);
-  };
-}, []);
-
-  // Listen for route changes
-  useEffect(() => {
-    fetchCartCount();
-  }, [pathname]);
-
-  const navItems = [
-    { name: 'Home', href: '/' },
-    { name: 'Products', href: '/products' },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' },
-    { name: 'Blog', href: '/blog' },
-  ];
-
-  const isActive = (path) => {
-    if (path === '/') {
-      return pathname === '/';
-    }
-    return pathname.startsWith(path);
-  };
-
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    localStorage.removeItem('rememberedEmail');
     setUser(null);
     setCartCount(0);
+    setWishlistCount(0);
     setUserMenuOpen(false);
-    setProfileImageError(false);
-    
     window.dispatchEvent(new Event('auth-change'));
-    
-    toast.success('Logged out successfully');
+    toast.success('🎉 Logged out successfully! See you soon!');
     router.push('/');
   };
 
   const getDashboardLink = () => {
     if (!user) return '/';
     switch (user.role) {
-      case 'admin':
-        return '/admin/dashboard';
-      case 'moderator':
-        return '/moderator/dashboard';
-      case 'customer':
-        return '/customer/dashboard';
-      default:
-        return '/';
-    }
-  };
-
-  const getSettingsLink = () => {
-    if (!user) return '/';
-    switch (user.role) {
-      case 'admin':
-        return '/admin/settings';
-      case 'moderator':
-        return '/moderator/settings';
-      case 'customer':
-        return '/customer/settings';
-      default:
-        return '/';
-    }
-  };
-
-  const getRoleDisplay = () => {
-    if (!user) return '';
-    switch (user.role) {
-      case 'admin':
-        return 'Administrator';
-      case 'moderator':
-        return 'Moderator';
-      case 'customer':
-        return 'Customer';
-      default:
-        return user.role;
+      case 'admin': return '/admin/dashboard';
+      case 'moderator': return '/moderator/dashboard';
+      default: return '/customer/dashboard';
     }
   };
 
   const getDisplayName = () => {
     if (!user) return '';
-    return user.companyName || user.contactPerson || user.email?.split('@')[0] || 'User';
+    return user.companyName || user.contactPerson || user.email?.split('@')[0] || 'Toy Lover';
   };
 
   const getInitials = () => {
-    if (!user) return 'U';
-    const name = user.companyName || user.contactPerson || user.email;
-    return name?.charAt(0).toUpperCase() || 'U';
+    if (!user) return '🎈';
+    const name = getDisplayName();
+    return name.charAt(0).toUpperCase();
   };
 
   const getProfilePicture = () => {
-    if (!user) return null;
-    return user.profilePicture || user.photoURL || null;
-  };
-
-  const getResultIcon = (type) => {
-    switch (type) {
-      case 'product':
-        return <Package className="w-4 h-4 text-[#3bc24f]" />;
-      case 'blog':
-        return <FileText className="w-4 h-4 text-[#3bc24f]" />;
-      case 'category':
-        return <Tag className="w-4 h-4 text-[#3bc24f]" />;
-      default:
-        return <Search className="w-4 h-4 text-[#3bc24f]" />;
-    }
-  };
-
-  const handleImageError = () => {
-    setProfileImageError(true);
+    return user?.profilePicture || user?.photoURL || null;
   };
 
   if (authLoading) {
     return (
-      <div className="navbar fixed top-0 z-50 w-full shadow-md" style={{ backgroundColor: '#6B4F3A' }}>
-        <div className="navbar-start">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="relative w-36 h-[54px] overflow-hidden flex items-center">
-              <img 
-                src="https://i.ibb.co.com/YBG2DF6f/Chat-GPT-Image-Feb-26-2026-09-57-28-AM-removebg-preview.png"
-                alt="Jute Craftify Logo"
-                className="w-full h-full object-contain scale-125"
-              />
+      <div className="fixed top-0 z-50 w-full">
+        <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] py-2">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between">
+              <div className="w-32 h-6 bg-white/20 rounded animate-pulse"></div>
+              <div className="flex gap-4">
+                <div className="w-20 h-6 bg-white/20 rounded animate-pulse"></div>
+                <div className="w-20 h-6 bg-white/20 rounded animate-pulse"></div>
+              </div>
             </div>
-          </Link>
+          </div>
         </div>
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1" style={{ color: '#F5E6D3' }}>
-            {navItems.map((item) => (
-              <li key={item.name}>
-                <Link 
-                  href={item.href}
-                  style={{ color: '#F5E6D3' }}
-                  className="hover:text-[#3bc24f] transition-colors duration-200"
-                >
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="navbar-end gap-2">
-          <div className="w-8 h-8"></div>
+        <div className="bg-white shadow-md py-3">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between">
+              <div className="w-32 h-10 bg-gray-200 rounded animate-pulse"></div>
+              <div className="flex gap-4">
+                <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="navbar fixed top-0 z-50 w-full shadow-md" style={{ backgroundColor: '#6B4F3A' }}>
-      {/* Mobile Menu */}
-      <div className="navbar-start">
-        <div className="dropdown">
-          <label tabIndex={0} className="btn btn-ghost lg:hidden" style={{ color: '#F5E6D3' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
-            </svg>
-          </label>
-          <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow rounded-box w-52" style={{ backgroundColor: '#6B4F3A', color: '#F5E6D3', border: '1px solid #8B6B4F' }}>
-            {navItems.map((item) => (
-              <li key={item.name} className="w-full">
-                <Link 
-                  href={item.href}
-                  style={{
-                    color: '#F5E6D3',
-                    backgroundColor: isActive(item.href) ? '#3bc24f' : 'transparent',
-                  }}
-                  className={`hover:bg-[#3bc24f] hover:text-white block w-full rounded-md ${isActive(item.href) ? 'text-white pointer-events-none' : ''}`}
-                >
-                  {item.name}
-                </Link>
-              </li>
-            ))}
+    <>
+      {/* ========== TOP NAVBAR - SCROLLS AWAY ========== */}
+      <div className={`fixed top-0 z-50 w-full transition-all duration-500 transform ${
+        hideTopNavbar ? '-translate-y-full' : 'translate-y-0'
+      } ${scrolled ? 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] shadow-md' : 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]'}`}>
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-between h-10 lg:h-12">
             
-            {/* Mobile menu user section */}
-            {user ? (
-              <>
-                <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-                  <div className="flex flex-col px-2 py-1 text-sm text-[#F5E6D3] w-full items-start">
-                    <div className="flex items-center gap-2 w-full">
-                      {getProfilePicture() && !profileImageError ? (
-                        <img 
-                          src={getProfilePicture()} 
-                          alt={getDisplayName()}
-                          className="w-6 h-6 rounded-full object-cover border border-[#3bc24f]"
-                          onError={handleImageError}
-                        />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-[#3bc24f] flex items-center justify-center text-white text-xs font-semibold">
-                          {getInitials()}
-                        </div>
-                      )}
-                      <div className="font-semibold truncate text-left">{getDisplayName()}</div>
-                    </div>
-                    <div className="text-xs opacity-80 truncate text-left w-full mt-1">{user.email}</div>
-                    <div className="text-xs mt-1.5 text-left w-full">
-                      <span className="inline-block bg-[#3bc24f] text-white px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
-                        {getRoleDisplay()}
-                      </span>
-                    </div>
-                  </div>
-                </li>
-                <li className="w-full">
-                  <Link 
-                    href={getDashboardLink()} 
-                    className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-                    <span>Dashboard</span>
-                  </Link>
-                </li>
-                <li className="w-full">
-                  <Link 
-                    href={getSettingsLink()} 
-                    className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Settings className="h-4 w-4 flex-shrink-0" />
-                    <span>Settings</span>
-                  </Link>
-                </li>
-                <li className="w-full">
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      logout();
-                    }}
-                    className="flex items-center gap-2 text-red-300 hover:bg-red-500 hover:text-white w-full text-left px-2 py-2 justify-start rounded-md"
-                  >
-                    <LogOut className="h-4 w-4 flex-shrink-0" />
-                    <span>Logout</span>
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-                  <Link href="/login" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md">
-                    <User className="h-4 w-4 flex-shrink-0" />
-                    <span>Sign In</span>
-                  </Link>
-                </li>
-                <li className="w-full">
-                  <Link href="/register" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md">
-                    <Users className="h-4 w-4 flex-shrink-0" />
-                    <span>Register</span>
-                  </Link>
-                </li>
-              </>
-            )}
-            
-            <li className="border-t border-[#8B6B4F] mt-2 pt-2 w-full">
-              <Link href="/inquiry-cart" className="flex items-center gap-2 text-[#F5E6D3] hover:bg-[#3bc24f] hover:text-white w-full px-2 py-2 justify-start rounded-md">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                Inquiry Cart
-                {cartCount > 0 && (
-                  <span className="badge badge-sm ml-2" style={{ backgroundColor: '#3bc24f', color: 'white', border: 'none' }}>
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-            </li>
-          </ul>
-        </div>
-        
-        {/* Logo/Brand */}
-        <Link 
-          href="/" 
-          className="flex items-center gap-2"
-        >
-          <div className="relative w-36 h-[54px] overflow-hidden flex items-center">
-            <img 
-              src="https://i.ibb.co.com/YBG2DF6f/Chat-GPT-Image-Feb-26-2026-09-57-28-AM-removebg-preview.png"
-              alt="Jute Craftify Logo"
-              className="w-full h-full object-contain scale-125"
-            />
-          </div>
-        </Link>
-      </div>
+            {/* Customer Support */}
+            <div className="hidden md:flex items-center gap-2 text-white">
+              <Headphones className="w-4 h-4" />
+              <span className="text-xs font-medium">Support: +880 1234 567890</span>
+            </div>
 
-      {/* Desktop Menu - Center */}
-      <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1">
-          {navItems.map((item) => (
-            <li key={item.name}>
-              <Link 
-                href={item.href}
-                style={{
-                  color: isActive(item.href) ? '#3bc24f' : '#F5E6D3',
-                  fontWeight: isActive(item.href) ? '600' : '500',
-                  borderBottom: isActive(item.href) ? '2px solid #3bc24f' : 'none',
-                }}
-                className={`hover:text-[#3bc24f] transition-all duration-200 pb-1`}
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Right side - Actions */}
-      <div className="navbar-end gap-2">
-        {/* Mobile Search Button - Now on top navbar */}
-        <button
-          onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-          className="lg:hidden p-2 hover:bg-[#8B6B4F] rounded-lg transition-colors"
-          title="Search"
-        >
-          <Search className="w-5 h-5 text-[#F5E6D3]" />
-        </button>
-
-        {/* Mobile Search Input - Shows below navbar when search button is clicked */}
-        {mobileSearchOpen && (
-          <div className="absolute top-16 left-0 right-0 px-3 py-2 bg-[#6B4F3A] border-t border-[#8B6B4F] z-50 lg:hidden" ref={mobileSearchRef}>
-            <form onSubmit={handleMobileSearchSubmit} className="relative">
-              <input
-                type="text"
-                value={mobileSearchQuery}
-                onChange={(e) => setMobileSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="w-full px-4 py-2 pr-10 text-sm bg-[#F5E6D3] text-[#6B4F3A] rounded-lg border border-[#8B6B4F] focus:outline-none focus:border-[#3bc24f] focus:ring-1 focus:ring-[#3bc24f] placeholder:text-[#8B6B4F]"
-                autoFocus
-              />
-              {mobileSearchLoading ? (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3bc24f] animate-spin" />
-              ) : (
-                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <Search className="w-4 h-4 text-[#8B6B4F]" />
-                </button>
-              )}
-            </form>
-
-            {/* Mobile Search Results with Images */}
-            {showMobileResults && mobileSearchResults.length > 0 && (
-              <div className="mt-2 bg-white rounded-xl shadow-xl border border-[#E8D5C0] max-h-80 overflow-y-auto">
-                {mobileSearchResults.map((result) => (
-                  <button
-                    key={`mobile-${result.type}-${result._id}`}
-                    onClick={() => handleMobileResultClick(result)}
-                    className="w-full px-3 py-3 text-left hover:bg-[#F5E6D3] border-b border-[#E8D5C0] last:border-0 flex items-center gap-3 transition-colors"
-                  >
-                    {/* Product Image for mobile */}
-                    {result.type === 'product' && result.image && (
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        <img 
-                          src={result.image} 
-                          alt={result.title || result.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/48?text=No+Image';
-                          }}
-                        />
-                      </div>
-                    )}
-                    {result.type !== 'product' && (
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        {getResultIcon(result.type)}
-                      </div>
-                    )}
-                    <div className="flex-1 text-left">
-                      <p className="text-sm font-medium text-[#6B4F3A] line-clamp-1">
-                        {result.title || result.name}
-                      </p>
-                      <p className="text-xs text-[#8B6B4F] mt-0.5 capitalize">
-                        {result.type}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-                <button
-                  onClick={handleMobileViewAllResults}
-                  className="w-full px-3 py-2 text-center text-sm text-[#3bc24f] hover:bg-[#F5E6D3] font-medium border-t border-[#E8D5C0] transition-colors"
-                >
-                  View all results for "{mobileSearchQuery}"
-                </button>
-              </div>
-            )}
-            
-            {showMobileResults && mobileSearchResults.length === 0 && mobileSearchQuery && !mobileSearchLoading && (
-              <div className="mt-2 bg-white rounded-xl shadow-xl border border-[#E8D5C0] p-4 text-center">
-                <p className="text-sm text-gray-500">No results found for "{mobileSearchQuery}"</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Desktop Search */}
-        <div className="hidden lg:block relative" ref={searchRef}>
-          {searchOpen ? (
-            <form 
-              onSubmit={handleSearchSubmit}
-              className="relative flex items-center"
-            >
-              <div className="relative">
+            {/* Search Bar - Desktop with Results */}
+            <div className="hidden lg:block flex-1 max-w-md mx-4 relative" ref={searchRef}>
+              <form onSubmit={handleSearchSubmit} className="relative">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-80 px-4 py-2 pr-10 text-sm bg-[#F5E6D3] text-[#6B4F3A] rounded-lg border border-[#8B6B4F] focus:outline-none focus:border-[#3bc24f] focus:ring-1 focus:ring-[#3bc24f] placeholder:text-[#8B6B4F]"
-                  autoFocus
+                  placeholder="🔍 Search for toys..."
+                  className="w-full px-4 py-1.5 pr-8 text-sm text-gray-700 bg-white/90 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFD93D]"
+                  style={{ fontFamily: "'Comic Neue', 'Poppins', sans-serif" }}
                 />
                 {searchLoading ? (
-                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3bc24f] animate-spin" />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="w-3.5 h-3.5 border-2 border-[#4F9DFF] border-t-transparent rounded-full animate-spin"></div>
+                  </div>
                 ) : (
                   <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <Search className="w-4 h-4 text-[#8B6B4F] hover:text-[#3bc24f]" />
+                    <Search className="w-3.5 h-3.5 text-gray-400" />
                   </button>
                 )}
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchOpen(false);
-                  setSearchQuery('');
-                  setShowResults(false);
-                }}
-                className="ml-2 p-1.5 hover:bg-[#8B6B4F] rounded-full transition-colors"
-                title="Close search"
-              >
-                <X className="w-4 h-4 text-[#F5E6D3]" />
-              </button>
+              </form>
 
-              {/* Desktop Search Results with Images */}
+              {/* Search Results Dropdown */}
               {showResults && searchResults.length > 0 && (
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-[#E8D5C0] max-h-96 overflow-y-auto z-50 w-full">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 max-h-80 overflow-y-auto z-50">
                   {searchResults.map((result) => (
                     <button
-                      key={`desktop-${result.type}-${result._id}`}
+                      key={result._id || result.id}
                       onClick={() => handleResultClick(result)}
-                      className="w-full px-4 py-3 text-left hover:bg-[#F5E6D3] border-b border-[#E8D5C0] last:border-0 flex items-center gap-3 transition-colors"
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
                     >
-                      {result.type === 'product' && result.image && (
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          <img 
-                            src={result.image} 
-                            alt={result.title || result.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.src = 'https://via.placeholder.com/48?text=No+Image';
-                            }}
-                          />
-                        </div>
-                      )}
-                      {result.type !== 'product' && (
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          {getResultIcon(result.type)}
-                        </div>
+                      {(result.images || result.image) && (
+                        <img 
+                          src={result.images?.[0] || result.image} 
+                          alt={result.name || result.title} 
+                          className="w-10 h-10 rounded-lg object-cover"
+                        />
                       )}
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-[#6B4F3A]">
-                          {result.title || result.name}
-                        </p>
-                        <p className="text-xs text-[#8B6B4F] mt-0.5 capitalize">
-                          {result.type}
-                        </p>
+                        <p className="font-medium text-gray-800 text-sm">{result.name || result.title}</p>
+                        {result.price && (
+                          <p className="text-xs text-[#FF7B54] font-semibold">BDT {result.price}</p>
+                        )}
                       </div>
                     </button>
                   ))}
                   <button
-                    onClick={handleViewAllResults}
-                    className="w-full px-4 py-3 text-center text-sm text-[#3bc24f] hover:bg-[#F5E6D3] font-medium border-t border-[#E8D5C0] transition-colors"
+                    onClick={handleSearchSubmit}
+                    className="w-full px-4 py-2 text-center text-sm text-[#4F9DFF] hover:bg-gray-50 font-medium border-t border-gray-100"
                   >
                     View all results for "{searchQuery}"
                   </button>
                 </div>
               )}
-            </form>
-          ) : (
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="p-2 hover:bg-[#8B6B4F] rounded-lg transition-colors"
-              title="Open search"
-            >
-              <Search className="w-5 h-5 text-[#F5E6D3] hover:text-[#3bc24f]" />
-            </button>
-          )}
-        </div>
 
-        {/* Inquiry Cart - Desktop */}
-        <Link 
-          href="/inquiry-cart" 
-          className="btn btn-ghost btn-circle hidden lg:flex relative"
-          style={{ color: '#F5E6D3' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#3bc24f';
-            e.currentTarget.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#F5E6D3';
-          }}
-        >
-          <div className="indicator">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {cartCount > 0 && (
-              <span className="badge badge-sm indicator-item" style={{ backgroundColor: '#3bc24f', color: 'white', border: 'none' }}>
-                {cartCount}
-              </span>
-            )}
-          </div>
-        </Link>
-
-        {/* User Menu or Auth Buttons */}
-        {user ? (
-          <div className="relative">
-            <button
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#8B6B4F] transition-colors"
-              style={{ color: '#F5E6D3' }}
-            >
-              {getProfilePicture() && !profileImageError ? (
-                <img 
-                  src={getProfilePicture()} 
-                  alt={getDisplayName()}
-                  className="w-8 h-8 rounded-full object-cover border-2 border-[#3bc24f]"
-                  onError={handleImageError}
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-[#3bc24f] flex items-center justify-center text-white font-semibold">
-                  {getInitials()}
+              {/* No Results Message */}
+              {showResults && searchResults.length === 0 && searchQuery && !searchLoading && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 p-4 text-center z-50">
+                  <p className="text-gray-500 text-sm">No products found for "{searchQuery}"</p>
                 </div>
               )}
-              <span className="hidden lg:inline max-w-[100px] truncate font-medium">
-                {getDisplayName()}
-              </span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
+            </div>
 
-            {/* Dropdown Menu */}
-            {userMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-[#E8D5C0] py-2 z-50">
-                  <div className="px-4 py-3 border-b border-[#E8D5C0]">
-                    <div className="flex items-center gap-3">
-                      {getProfilePicture() && !profileImageError ? (
-                        <img 
-                          src={getProfilePicture()} 
-                          alt={getDisplayName()}
-                          className="w-10 h-10 rounded-full object-cover border-2 border-[#3bc24f]"
-                          onError={handleImageError}
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-[#3bc24f] flex items-center justify-center text-white font-semibold text-lg">
-                          {getInitials()}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#6B4F3A] truncate">{getDisplayName()}</p>
-                        <p className="text-xs text-[#8B6B4F] truncate mt-0.5">{user.email}</p>
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-[#3bc24f] text-white">
-                        {getRoleDisplay()}
-                      </span>
-                    </div>
-                  </div>
+            {/* Right Icons */}
+            <div className="flex items-center gap-3 lg:gap-4">
+              
+              {/* Mobile Search Button */}
+              <button
+                onClick={() => setSearchOpen(!searchOpen)}
+                className="lg:hidden p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all"
+              >
+                <Search className="w-4 h-4 text-white" />
+              </button>
 
-                  <Link
-                    href={getDashboardLink()}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#6B4F3A] hover:bg-[#F5E6D3] transition-colors"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <LayoutDashboard className="w-4 h-4 text-[#3bc24f]" />
-                    <span>Dashboard</span>
-                  </Link>
+              {/* Wishlist */}
+              <Link href="/wishlist" className="relative p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all group">
+                <Heart className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#FFD93D] text-[#FF7B54] text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
+                    {wishlistCount > 9 ? '9+' : wishlistCount}
+                  </span>
+                )}
+              </Link>
 
-                  <Link
-                    href={getSettingsLink()}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#6B4F3A] hover:bg-[#F5E6D3] transition-colors"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <Settings className="w-4 h-4 text-[#3bc24f]" />
-                    <span>Settings</span>
-                  </Link>
+              {/* Cart */}
+              <Link href="/inquiry-cart" className="relative p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all group">
+                <ShoppingCart className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#FFD93D] text-[#FF7B54] text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </Link>
 
+              {/* User Menu / Auth Buttons */}
+              {user ? (
+                <div className="relative">
                   <button
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      logout();
-                    }}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left border-t border-[#E8D5C0] mt-1 pt-2"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 hover:bg-white/30 transition-all"
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
+                    {getProfilePicture() && !profileImageError ? (
+                      <img 
+                        src={getProfilePicture()} 
+                        alt={getDisplayName()}
+                        className="w-6 h-6 rounded-full object-cover border border-[#FFD93D]"
+                        onError={() => setProfileImageError(true)}
+                      />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-[#FFD93D] flex items-center justify-center text-[#FF7B54] font-black text-xs">
+                        {getInitials()}
+                      </div>
+                    )}
+                    <span className="hidden md:inline text-white font-bold text-xs max-w-[80px] truncate">
+                      {getDisplayName()}
+                    </span>
+                    <ChevronDown className={`w-3 h-3 text-white transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
+
+                  {/* User Dropdown */}
+                  {userMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl overflow-hidden z-50">
+                        <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] px-3 py-2">
+                          <div className="flex items-center gap-2">
+                            {getProfilePicture() && !profileImageError ? (
+                              <img src={getProfilePicture()} alt={getDisplayName()} className="w-8 h-8 rounded-full object-cover border border-white" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white text-sm font-bold">
+                                {getInitials()}
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-white font-bold text-xs truncate">{getDisplayName()}</p>
+                              <p className="text-white/70 text-[10px] truncate">{user.email}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-1">
+                          <Link href={getDashboardLink()} className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 text-sm" onClick={() => setUserMenuOpen(false)}>
+                            <LayoutDashboard className="w-3.5 h-3.5 text-[#4F9DFF]" />
+                            <span>Dashboard</span>
+                          </Link>
+                          <button onClick={() => { setUserMenuOpen(false); logout(); }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 w-full text-sm">
+                            <LogOut className="w-3.5 h-3.5" />
+                            <span>Logout</span>
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
-              </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link href="/login" className="px-2 py-1 rounded-full font-bold text-white hover:text-[#FFD93D] transition-all text-xs">
+                    Sign In
+                  </Link>
+                  <Link href="/register" className="px-3 py-1 rounded-full font-bold bg-white text-[#4F9DFF] shadow-md hover:shadow-lg transition-all text-xs">
+                    Register
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========== BOTTOM NAVBAR - MOVES UP WHEN TOP NAVBAR HIDES ========== */}
+      <div className={`fixed z-40 w-full transition-all duration-500 bg-white shadow-md ${
+        hideTopNavbar ? 'top-0' : 'top-10 lg:top-12'
+      } ${scrolled ? 'shadow-lg' : ''}`}>
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-between h-14 lg:h-16">
+            
+            {/* Logo */}
+            <Link href="/" className="group flex items-center">
+              <div className="relative w-12 h-12 lg:w-28 lg:h-14 overflow-hidden transition-all duration-300 group-hover:scale-105">
+                <img 
+                  src="https://i.ibb.co.com/DPz8BcQm/favicon-ico.png"
+                  alt="ToyMart Logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </Link>
+
+            {/* Desktop Navigation - Text color #F28167 */}
+            <div className="hidden lg:flex items-center gap-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`relative px-4 py-1.5 rounded-full font-bold transition-all duration-300 ${
+                    isActive(item.href)
+                      ? 'text-[#F28167] bg-orange-50 shadow-sm'
+                      : 'text-[#F28167] hover:text-[#FF7B54] hover:bg-orange-50'
+                  }`}
+                  style={{ fontFamily: "'Comic Neue', 'Fredoka One', 'Poppins', cursive" }}
+                >
+                  <div className="flex items-center gap-2 text-sm">
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.name}</span>
+                    {item.badge && (
+                      <span className="absolute -top-2 -right-2 bg-[#FF7B54] text-white text-xs font-black px-1.5 py-0.5 rounded-full animate-bounce">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-all"
+            >
+              <Menu className="w-5 h-5 text-[#F28167]" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Search Overlay (Mobile) */}
+      {searchOpen && (
+        <div className={`fixed left-0 right-0 z-50 bg-white shadow-xl p-3 animate-slideDown ${
+          hideTopNavbar ? 'top-0' : 'top-10 lg:top-12'
+        }`} ref={searchRef}>
+          <div className="container mx-auto px-4">
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="🔍 Search for toys..."
+                className="w-full px-4 py-2 pr-20 text-gray-700 bg-gray-50 rounded-full border border-gray-200 focus:outline-none focus:border-[#4F9DFF]"
+                autoFocus
+              />
+              <button type="button" onClick={() => setSearchOpen(false)} className="absolute right-12 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                Cancel
+              </button>
+              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+                <Search className="w-4 h-4 text-gray-400" />
+              </button>
+            </form>
+
+            {/* Mobile Search Results */}
+            {showResults && searchResults.length > 0 && (
+              <div className="mt-3 bg-white rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                {searchResults.slice(0, 5).map((result) => (
+                  <button
+                    key={result._id || result.id}
+                    onClick={() => handleResultClick(result)}
+                    className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-b border-gray-100"
+                  >
+                    {(result.images || result.image) && (
+                      <img src={result.images?.[0] || result.image} alt={result.name} className="w-8 h-8 rounded object-cover" />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">{result.name || result.title}</p>
+                      {result.price && <p className="text-xs text-[#FF7B54]">BDT {result.price}</p>}
+                    </div>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
-        ) : (
-          <>
-            <Link 
-              href="/login" 
-              className="btn btn-outline btn-sm hidden lg:flex"
-              style={{
-                color: '#F5E6D3',
-                borderColor: '#F5E6D3',
-                backgroundColor: 'transparent'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#3bc24f';
-                e.currentTarget.style.borderColor = '#3bc24f';
-                e.currentTarget.style.color = 'white';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = '#F5E6D3';
-                e.currentTarget.style.color = '#F5E6D3';
-              }}
-            >
-              <User className="h-4 w-4 mr-2" />
-              Sign In
-            </Link>
+        </div>
+      )}
 
-            <Link 
-              href="/register" 
-              className="btn btn-sm hidden lg:flex"
-              style={{
-                backgroundColor: '#3bc24f',
-                color: 'white',
-                borderColor: '#3bc24f'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#2da63f';
-                e.currentTarget.style.borderColor = '#2da63f';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#3bc24f';
-                e.currentTarget.style.borderColor = '#3bc24f';
-              }}
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              Register
-            </Link>
-          </>
-        )}
+      {/* Mobile Sidebar Menu */}
+      <div className={`fixed inset-0 z-50 lg:hidden transition-all duration-500 ${isMenuOpen ? 'visible' : 'invisible'}`}>
+        <div className={`absolute inset-0 bg-black/60 transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setIsMenuOpen(false)} />
+        
+        <div className={`absolute right-0 top-0 h-full w-80 bg-white shadow-2xl transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="p-5">
+            <div className="flex items-center justify-between mb-6">
+              <div className="w-14 h-14">
+                <img src="https://i.ibb.co.com/DPz8BcQm/favicon-ico.png" alt="ToyMart Logo" className="w-full h-full object-contain" />
+              </div>
+              <button onClick={() => setIsMenuOpen(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {user && (
+              <div className="mb-5 p-3 bg-gradient-to-r from-[#4F9DFF]/10 to-[#FF7B54]/10 rounded-xl">
+                <div className="flex items-center gap-3">
+                  {getProfilePicture() && !profileImageError ? (
+                    <img src={getProfilePicture()} alt={getDisplayName()} className="w-12 h-12 rounded-full object-cover border-2 border-[#4F9DFF]" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-[#4F9DFF] flex items-center justify-center text-white text-xl font-bold">
+                      {getInitials()}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-bold text-gray-800 text-sm">{getDisplayName()}</p>
+                    <p className="text-gray-500 text-xs">{user.email}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all ${
+                    isActive(item.href) ? 'bg-[#F28167] text-white' : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span className="text-sm">{item.name}</span>
+                  {item.badge && <span className="ml-auto bg-[#FF7B54] text-white text-xs px-2 py-0.5 rounded-full">{item.badge}</span>}
+                </Link>
+              ))}
+            </div>
+
+            <div className="my-5 h-px bg-gray-200"></div>
+
+            {!user ? (
+              <div className="space-y-2">
+                <Link href="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold border-2 border-[#4F9DFF] text-[#4F9DFF] hover:bg-[#4F9DFF] hover:text-white transition-all">
+                  <User className="w-4 h-4" /> Sign In
+                </Link>
+                <Link href="/register" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-[#4F9DFF] text-white shadow-md">
+                  <UserCircle className="w-4 h-4" /> Register
+                </Link>
+              </div>
+            ) : (
+              <button onClick={() => { setIsMenuOpen(false); logout(); }} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-red-500 text-white">
+                <LogOut className="w-4 h-4" /> Logout
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Dynamic Spacer - Changes based on top navbar visibility */}
+      <div className={`transition-all duration-500 ${hideTopNavbar ? 'h-14 lg:h-16' : 'h-24 lg:h-28'}`}></div>
+
+      <style jsx>{`
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideDown { animation: slideDown 0.3s ease-out; }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+        .animate-bounce { animation: bounce 0.8s ease-in-out infinite; }
+      `}</style>
+    </>
   );
 }

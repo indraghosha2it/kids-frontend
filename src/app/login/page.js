@@ -757,7 +757,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowForgotPassword(true)}
-                    className="text-xs text-[#FF7B54] hover:text-[#4F9DFF] font-semibold transition-colors"
+                    className="text-xs text-[#4A8A90] hover:text-[#276167] font-semibold transition-colors"
                     style={{ fontFamily: "'Comic Neue', cursive" }}
                   >
                     Forgot password? 🤔
@@ -770,7 +770,7 @@ export default function LoginPage() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] text-white py-2.5 rounded-xl font-bold text-base hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70"
+                  className="w-full bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] text-white py-2.5 rounded-xl font-bold text-base hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70"
                   style={{ fontFamily: "'Fredoka One', cursive" }}
                 >
                   {isSubmitting ? (
@@ -814,7 +814,7 @@ export default function LoginPage() {
                 <div className="text-center mt-4">
                   <p className="text-xs text-gray-600" style={{ fontFamily: "'Comic Neue', cursive" }}>
                     New to ToyMart?{' '}
-                    <Link href="/register" className="font-bold text-[#FF7B54] hover:text-[#4F9DFF] transition-colors">
+                    <Link href="/register" className="font-bold text-[#4A8A90] hover:text-[#276167] transition-colors">
                       Create Account 🎁
                     </Link>
                   </p>

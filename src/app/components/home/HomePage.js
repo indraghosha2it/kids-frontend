@@ -1,39 +1,43 @@
 import React from 'react'
 import HeroBanner from './HeroBanner.js'
-import ScrollingLogos from './ScrollingLogos.js'
+
 import WhyChooseUs from './WhyChooseUs.js'
-import ManufacturingSupplyChain from './ManufacturingSupplyChain.js'
+
 import FeaturedProducts from './FeaturedProducts.js'
 import Newsletter from './Newsletter.js'
 import Categories from './Categories.js'
-import AlibabaTrustSection from './AlibabaTrustSection.js'
+import AlibabaTrustSection from './ParentTrustSection.js'
 
 import Navbar from '../layout/Navbar.js'
 import Footer from '../layout/Footer.js'
 
 import ReviewsSection from './ReviewsSection.js'
-import StatsSection from './StatsSection.js'
+
 import WhatsAppButton from '../layout/WhatsAppButton.js'
 import CTASection from './CTASection.js'
 import TrustCertifications from './TrustCertifications.js'
+import ParentsTrustSection from './ParentTrustSection.js'
 
 
 export default function HomePage() {
   return (
      <>
      <Navbar />
-      {/* <HeroBanner /> */}
+      <HeroBanner />
+       <Categories />
+        
+          <ParentsTrustSection />
 
-      {/* <ScrollingLogos /> */}
+  
       {/* <Categories />
       <FeaturedProducts />
       <WhyChooseUs />
-      <ManufacturingSupplyChain /> */}
+   
       
       
      
            {/* <AlibabaTrustSection />  */}
-           {/* <StatsSection/> */}
+         
       {/* <TrustCertifications />
             <ReviewsSection />
               <CTASection />

@@ -20,656 +20,6 @@
 //   Phone,
 //   Menu,
 //   UserCircle,
-// } from 'lucide-react';
-// import { toast } from 'sonner';
-
-// export default function Navbar() {
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-//   const [userMenuOpen, setUserMenuOpen] = useState(false);
-//   const [searchOpen, setSearchOpen] = useState(false);
-//   const [searchQuery, setSearchQuery] = useState('');
-//   const [searchResults, setSearchResults] = useState([]);
-//   const [searchLoading, setSearchLoading] = useState(false);
-//   const [showResults, setShowResults] = useState(false);
-//   const [user, setUser] = useState(null);
-//   const [cartCount, setCartCount] = useState(0);
-//   const [authLoading, setAuthLoading] = useState(true);
-//   const [scrolled, setScrolled] = useState(false);
-//   const [profileImageError, setProfileImageError] = useState(false);
-  
-//   const searchRef = useRef(null);
-//   const pathname = usePathname();
-//   const router = useRouter();
-
-//   // Handle scroll effect for navbar
-//   useEffect(() => {
-//     const handleScroll = () => {
-//       setScrolled(window.scrollY > 20);
-//     };
-//     window.addEventListener('scroll', handleScroll);
-//     return () => window.removeEventListener('scroll', handleScroll);
-//   }, []);
-
-//   // Close search on click outside
-//   useEffect(() => {
-//     const handleClickOutside = (event) => {
-//       if (searchRef.current && !searchRef.current.contains(event.target)) {
-//         setShowResults(false);
-//         setSearchOpen(false);
-//       }
-//     };
-//     document.addEventListener('mousedown', handleClickOutside);
-//     return () => document.removeEventListener('mousedown', handleClickOutside);
-//   }, []);
-
-//   // Check user state
-//   const checkUserState = () => {
-//     if (typeof window !== 'undefined') {
-//       const userData = localStorage.getItem('user');
-//       if (userData) {
-//         try {
-//           const parsedUser = JSON.parse(userData);
-//           setUser(parsedUser);
-//           setProfileImageError(false);
-//         } catch (error) {
-//           console.error('Error parsing user data:', error);
-//           setUser(null);
-//         }
-//       } else {
-//         setUser(null);
-//       }
-//       setAuthLoading(false);
-//     }
-//   };
-
-//   // Fetch cart count
-//   const fetchCartCount = async () => {
-//     const token = localStorage.getItem('token');
-//     if (!token) {
-//       setCartCount(0);
-//       return;
-//     }
-    
-//     try {
-//       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       });
-//       if (response.ok) {
-//         const data = await response.json();
-//         setCartCount(data.data?.items?.length || 0);
-//       } else {
-//         setCartCount(0);
-//       }
-//     } catch (error) {
-//       setCartCount(0);
-//     }
-//   };
-
-//   useEffect(() => {
-//     checkUserState();
-//     fetchCartCount();
-
-//     const handleAuthChange = () => {
-//       checkUserState();
-//       fetchCartCount();
-//     };
-
-//     window.addEventListener('auth-change', handleAuthChange);
-//     window.addEventListener('focus', handleAuthChange);
-//     window.addEventListener('cart-update', fetchCartCount);
-
-//     return () => {
-//       window.removeEventListener('auth-change', handleAuthChange);
-//       window.removeEventListener('focus', handleAuthChange);
-//       window.removeEventListener('cart-update', fetchCartCount);
-//     };
-//   }, []);
-
-//   useEffect(() => {
-//     fetchCartCount();
-//   }, [pathname]);
-
-//   // Navigation items with kids font styling
-//   const navItems = [
-//     { name: 'Home', href: '/', icon: Home },
-//     { name: 'Toys', href: '/products', icon: Gift, highlight: true },
-//     { name: 'Flash Sale', href: '/flash-sale', icon: Flame, badge: 'HOT' },
-//     { name: 'About', href: '/about', icon: Info },
-//     { name: 'Contact', href: '/contact', icon: Phone },
-//   ];
-
-//   const isActive = (path) => {
-//     if (path === '/') return pathname === '/';
-//     return pathname.startsWith(path);
-//   };
-
-//   // Search functionality
-//   const performSearch = async (query) => {
-//     if (!query.trim()) {
-//       setSearchResults([]);
-//       return;
-//     }
-//     setSearchLoading(true);
-//     try {
-//       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
-//       const data = await response.json();
-//       if (data.success) {
-//         setSearchResults(data.data);
-//         setShowResults(true);
-//       }
-//     } catch (error) {
-//       console.error('Search error:', error);
-//     } finally {
-//       setSearchLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     const timer = setTimeout(() => {
-//       if (searchQuery) performSearch(searchQuery);
-//       else {
-//         setSearchResults([]);
-//         setShowResults(false);
-//       }
-//     }, 300);
-//     return () => clearTimeout(timer);
-//   }, [searchQuery]);
-
-//   const handleSearchSubmit = (e) => {
-//     e.preventDefault();
-//     if (searchQuery.trim()) {
-//       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-//       setSearchOpen(false);
-//       setSearchQuery('');
-//       setShowResults(false);
-//     }
-//   };
-
-//   const logout = () => {
-//     localStorage.removeItem('token');
-//     localStorage.removeItem('user');
-//     setUser(null);
-//     setCartCount(0);
-//     setUserMenuOpen(false);
-//     window.dispatchEvent(new Event('auth-change'));
-//     toast.success('🎉 Logged out successfully! See you soon!');
-//     router.push('/');
-//   };
-
-//   const getDashboardLink = () => {
-//     if (!user) return '/';
-//     switch (user.role) {
-//       case 'admin': return '/admin/dashboard';
-//       case 'moderator': return '/moderator/dashboard';
-//       default: return '/customer/dashboard';
-//     }
-//   };
-
-//   const getDisplayName = () => {
-//     if (!user) return '';
-//     return user.companyName || user.contactPerson || user.email?.split('@')[0] || 'Toy Lover';
-//   };
-
-//   const getInitials = () => {
-//     if (!user) return '🎈';
-//     const name = getDisplayName();
-//     return name.charAt(0).toUpperCase();
-//   };
-
-//   const getProfilePicture = () => {
-//     return user?.profilePicture || user?.photoURL || null;
-//   };
-
-//   if (authLoading) {
-//     return (
-//       <div className="fixed top-0 z-50 w-full bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]">
-//         <div className="container mx-auto px-4 py-2">
-//           <div className="flex items-center justify-between">
-//             <div className="w-12 h-12 bg-white/20 rounded-xl animate-pulse"></div>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <>
-//       {/* Navbar - Fixed height, no extra space from search */}
-//       <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-//         scrolled 
-//           ? 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] shadow-md' 
-//           : 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]'
-//       }`}>
-        
-//         <div className="container mx-auto px-4 lg:px-8">
-//           <div className="flex items-center justify-between h-14 lg:h-16">
-            
-//             {/* Logo Only - No Text, No Background */}
-//             <Link href="/" className="group flex items-center">
-//               <div className="relative w-12 h-12 lg:w-20 lg:h-14 overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:rotate-6">
-//                 <img 
-//                   src="https://i.ibb.co.com/DPz8BcQm/favicon-ico.png"
-//                   alt="ToyMart Logo"
-//                   className="w-full h-full object-contain"
-//                 />
-//               </div>
-//             </Link>
-
-//             {/* Desktop Navigation - Kids Font */}
-//             <div className="hidden lg:flex items-center gap-1">
-//               {navItems.map((item) => (
-//                 <Link
-//                   key={item.name}
-//                   href={item.href}
-//                   className={`relative px-4 py-1.5 rounded-full font-bold transition-all duration-300 group ${
-//                     isActive(item.href)
-//                       ? 'text-[#4F9DFF] bg-white shadow-md'
-//                       : 'text-white hover:text-[#FFD93D] hover:bg-white/20'
-//                   }`}
-//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', 'Poppins', cursive" }}
-//                 >
-//                   <div className="flex items-center gap-2 text-sm">
-//                     <item.icon className="w-4 h-4" />
-//                     <span>{item.name}</span>
-//                     {item.badge && (
-//                       <span className="absolute -top-2 -right-2 bg-[#FFD93D] text-[#FF7B54] text-xs font-black px-1.5 py-0.5 rounded-full animate-bounce">
-//                         {item.badge}
-//                       </span>
-//                     )}
-//                   </div>
-//                 </Link>
-//               ))}
-//             </div>
-
-//             {/* Right Actions */}
-//             <div className="flex items-center gap-2 lg:gap-2">
-              
-//               {/* Search Button */}
-//               <button
-//                 onClick={() => setSearchOpen(!searchOpen)}
-//                 className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300"
-//               >
-//                 <Search className="w-4 h-4 text-white" />
-//               </button>
-
-//               {/* Cart */}
-//               <Link 
-//                 href="/inquiry-cart" 
-//                 className="relative p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300 group"
-//               >
-//                 <ShoppingCart className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
-//                 {cartCount > 0 && (
-//                   <span className="absolute -top-1 -right-1 bg-[#FFD93D] text-[#FF7B54] text-xs font-black rounded-full w-4 h-4 flex items-center justify-center animate-bounce">
-//                     {cartCount > 9 ? '9+' : cartCount}
-//                   </span>
-//                 )}
-//               </Link>
-
-//               {/* User Menu / Auth Buttons */}
-//               {user ? (
-//                 <div className="relative">
-//                   <button
-//                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-//                     className="flex items-center gap-1 px-2 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300"
-//                   >
-//                     {getProfilePicture() && !profileImageError ? (
-//                       <img 
-//                         src={getProfilePicture()} 
-//                         alt={getDisplayName()}
-//                         className="w-7 h-7 rounded-full object-cover border-2 border-[#FFD93D]"
-//                         onError={() => setProfileImageError(true)}
-//                       />
-//                     ) : (
-//                       <div className="w-7 h-7 rounded-full bg-[#FFD93D] flex items-center justify-center text-[#FF7B54] font-black text-xs">
-//                         {getInitials()}
-//                       </div>
-//                     )}
-//                     <span className="hidden lg:inline text-white font-bold text-xs max-w-[80px] truncate">
-//                       {getDisplayName()}
-//                     </span>
-//                     <ChevronDown className={`w-3 h-3 text-white transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
-//                   </button>
-
-//                   {/* User Dropdown */}
-//                   {userMenuOpen && (
-//                     <>
-//                       <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-//                       <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 border border-gray-100">
-//                         <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] px-4 py-3">
-//                           <div className="flex items-center gap-2">
-//                             {getProfilePicture() && !profileImageError ? (
-//                               <img 
-//                                 src={getProfilePicture()} 
-//                                 alt={getDisplayName()}
-//                                 className="w-10 h-10 rounded-full object-cover border-2 border-white"
-//                               />
-//                             ) : (
-//                               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white text-lg font-bold">
-//                                 {getInitials()}
-//                               </div>
-//                             )}
-//                             <div className="flex-1">
-//                               <p className="text-white font-bold text-sm truncate">{getDisplayName()}</p>
-//                               <p className="text-white/80 text-xs truncate">{user.email}</p>
-//                             </div>
-//                           </div>
-//                         </div>
-                        
-//                         <div className="p-1">
-//                           <Link
-//                             href={getDashboardLink()}
-//                             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gradient-to-r hover:from-[#4F9DFF]/10 hover:to-[#FF7B54]/10 transition-all text-sm"
-//                             onClick={() => setUserMenuOpen(false)}
-//                           >
-//                             <LayoutDashboard className="w-4 h-4 text-[#4F9DFF]" />
-//                             <span>Dashboard</span>
-//                           </Link>
-
-//                           <button
-//                             onClick={() => {
-//                               setUserMenuOpen(false);
-//                               logout();
-//                             }}
-//                             className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-all w-full text-sm"
-//                           >
-//                             <LogOut className="w-4 h-4" />
-//                             <span>Logout</span>
-//                           </button>
-//                         </div>
-//                       </div>
-//                     </>
-//                   )}
-//                 </div>
-//               ) : (
-//                 <div className="hidden lg:flex items-center gap-1">
-//                   <Link
-//                     href="/login"
-//                     className="px-3 py-1.5 rounded-full font-bold text-white hover:text-[#FFD93D] transition-all text-sm"
-//                     style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
-//                   >
-//                     Sign In
-//                   </Link>
-//                   <Link
-//                     href="/register"
-//                     className="px-4 py-1.5 rounded-full font-bold bg-white text-[#4F9DFF] shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm"
-//                     style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
-//                   >
-//                     Register
-//                   </Link>
-//                 </div>
-//               )}
-
-//               {/* Mobile Menu Button */}
-//               <button
-//                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-//                 className="lg:hidden p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all"
-//               >
-//                 <Menu className="w-5 h-5 text-white" />
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       </nav>
-
-//       {/* Search Overlay - Absolute positioned, doesn't affect layout */}
-//       {searchOpen && (
-//         <div className="fixed top-14 lg:top-16 left-0 right-0 z-50 animate-slideDown" ref={searchRef}>
-//           <div className="bg-white shadow-xl p-4">
-//             <div className="container mx-auto px-4 lg:px-8">
-//               <form onSubmit={handleSearchSubmit} className="max-w-2xl mx-auto">
-//                 <div className="relative">
-//                   <input
-//                     type="text"
-//                     value={searchQuery}
-//                     onChange={(e) => setSearchQuery(e.target.value)}
-//                     placeholder="🔍 Search for toys, gifts, and more..."
-//                     className="w-full px-5 py-3 pr-12 text-gray-700 bg-gray-50 rounded-full border-2 border-[#FFD93D] focus:outline-none focus:border-[#4F9DFF] focus:ring-2 focus:ring-[#4F9DFF]/20 text-base"
-//                     style={{ fontFamily: "'Comic Neue', 'Poppins', sans-serif" }}
-//                     autoFocus
-//                   />
-//                   <button
-//                     type="button"
-//                     onClick={() => setSearchOpen(false)}
-//                     className="absolute right-14 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-all"
-//                   >
-//                     <X className="w-4 h-4 text-gray-400" />
-//                   </button>
-//                   {searchLoading ? (
-//                     <div className="absolute right-4 top-1/2 -translate-y-1/2">
-//                       <div className="w-5 h-5 border-2 border-[#4F9DFF] border-t-transparent rounded-full animate-spin"></div>
-//                     </div>
-//                   ) : (
-//                     <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2">
-//                       <Search className="w-5 h-5 text-gray-400 hover:text-[#4F9DFF]" />
-//                     </button>
-//                   )}
-//                 </div>
-//               </form>
-
-//               {/* Search Results */}
-//               {showResults && searchResults.length > 0 && (
-//                 <div className="max-w-2xl mx-auto mt-3 bg-gray-50 rounded-xl shadow-lg max-h-80 overflow-y-auto">
-//                   {searchResults.slice(0, 5).map((result) => (
-//                     <button
-//                       key={result._id}
-//                       onClick={() => {
-//                         router.push(`/product/${result._id}`);
-//                         setSearchOpen(false);
-//                         setSearchQuery('');
-//                       }}
-//                       className="w-full px-4 py-3 text-left hover:bg-white transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
-//                     >
-//                       {result.image && (
-//                         <img src={result.image} alt={result.title} className="w-10 h-10 rounded-lg object-cover" />
-//                       )}
-//                       <div>
-//                         <p className="font-medium text-gray-800 text-sm">{result.title}</p>
-//                         <p className="text-xs text-[#FF7B54] font-semibold">BDT {result.price}</p>
-//                       </div>
-//                     </button>
-//                   ))}
-//                   {searchResults.length > 5 && (
-//                     <button
-//                       onClick={handleSearchSubmit}
-//                       className="w-full px-4 py-2 text-center text-sm text-[#4F9DFF] hover:bg-white font-medium"
-//                     >
-//                       View all {searchResults.length} results
-//                     </button>
-//                   )}
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Mobile Sidebar Menu */}
-//       <div className={`fixed inset-0 z-50 lg:hidden transition-all duration-500 ${isMenuOpen ? 'visible' : 'invisible'}`}>
-//         <div className={`absolute inset-0 bg-black/60 transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setIsMenuOpen(false)} />
-        
-//         <div className={`absolute right-0 top-0 h-full w-80 bg-gradient-to-b from-[#4F9DFF] to-[#FF7B54] shadow-2xl transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-//           <div className="p-5">
-//             {/* Logo in sidebar */}
-//             <div className="flex items-center justify-between mb-6">
-//               <div className="w-14 h-14 transition-all duration-300 hover:scale-110">
-//                 <img 
-//                   src="https://i.ibb.co.com/DPz8BcQm/favicon-ico.png"
-//                   alt="ToyMart Logo"
-//                   className="w-full h-full object-contain"
-//                 />
-//               </div>
-//               <button 
-//                 onClick={() => setIsMenuOpen(false)} 
-//                 className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all"
-//               >
-//                 <X className="w-4 h-4 text-white" />
-//               </button>
-//             </div>
-
-//             {/* Mobile User Info */}
-//             {user && (
-//               <div className="mb-5 p-3 bg-white/20 backdrop-blur-sm rounded-xl">
-//                 <div className="flex items-center gap-3">
-//                   {getProfilePicture() && !profileImageError ? (
-//                     <img 
-//                       src={getProfilePicture()} 
-//                       alt={getDisplayName()} 
-//                       className="w-12 h-12 rounded-full object-cover border-2 border-[#FFD93D]" 
-//                     />
-//                   ) : (
-//                     <div className="w-12 h-12 rounded-full bg-[#FFD93D] flex items-center justify-center text-[#FF7B54] text-xl font-black">
-//                       {getInitials()}
-//                     </div>
-//                   )}
-//                   <div className="flex-1">
-//                     <p className="text-white font-bold text-sm truncate">{getDisplayName()}</p>
-//                     <p className="text-white/80 text-xs truncate">{user.email}</p>
-//                     <span className="inline-block mt-1 px-2 py-0.5 bg-white/20 rounded-full text-white text-xs font-bold">
-//                       {user.role === 'admin' ? '👑 Admin' : user.role === 'moderator' ? '⭐ Moderator' : '🎮 Customer'}
-//                     </span>
-//                   </div>
-//                 </div>
-//               </div>
-//             )}
-
-//             {/* Mobile Navigation Links - Kids Font */}
-//             <div className="space-y-1">
-//               {navItems.map((item) => (
-//                 <Link
-//                   key={item.name}
-//                   href={item.href}
-//                   onClick={() => setIsMenuOpen(false)}
-//                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all ${
-//                     isActive(item.href)
-//                       ? 'bg-white text-[#4F9DFF] shadow-md'
-//                       : 'text-white hover:bg-white/20'
-//                   }`}
-//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
-//                 >
-//                   <item.icon className="w-4 h-4" />
-//                   <span className="text-sm">{item.name}</span>
-//                   {item.badge && (
-//                     <span className="ml-auto bg-[#FFD93D] text-[#FF7B54] text-xs font-black px-2 py-0.5 rounded-full animate-pulse">
-//                       {item.badge}
-//                     </span>
-//                   )}
-//                 </Link>
-//               ))}
-//             </div>
-
-//             <div className="my-5 h-px bg-white/30"></div>
-
-//             {/* Mobile Auth Section */}
-//             {!user ? (
-//               <div className="space-y-2">
-//                 <Link
-//                   href="/login"
-//                   onClick={() => setIsMenuOpen(false)}
-//                   className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold border-2 border-white text-white hover:bg-white hover:text-[#4F9DFF] transition-all text-sm"
-//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
-//                 >
-//                   <User className="w-4 h-4" />
-//                   Sign In
-//                 </Link>
-//                 <Link
-//                   href="/register"
-//                   onClick={() => setIsMenuOpen(false)}
-//                   className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-white text-[#4F9DFF] shadow-md hover:shadow-lg transition-all duration-300 text-sm"
-//                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
-//                 >
-//                   <UserCircle className="w-4 h-4" />
-//                   Register
-//                 </Link>
-//               </div>
-//             ) : (
-//               <button
-//                 onClick={() => {
-//                   setIsMenuOpen(false);
-//                   logout();
-//                 }}
-//                 className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-red-500/80 backdrop-blur text-white hover:bg-red-600 transition-all text-sm"
-//                 style={{ fontFamily: "'Comic Neue', 'Fredoka One', cursive" }}
-//               >
-//                 <LogOut className="w-4 h-4" />
-//                 Logout
-//               </button>
-//             )}
-
-//             {/* Fun Decorative Elements */}
-//             <div className="absolute bottom-5 left-0 right-0 text-center">
-//               <p className="text-white/40 text-xs" style={{ fontFamily: "'Comic Neue', cursive" }}>
-//                 🎈 Play & Learn 🎨
-//               </p>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Spacer - Reduced */}
-//       <div className="h-14 lg:h-16"></div>
-
-//       {/* Google Fonts for Kids Style */}
-//       <style jsx global>{`
-//         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&family=Poppins:wght@400;600&display=swap');
-        
-//         body {
-//           font-family: 'Comic Neue', 'Fredoka One', 'Poppins', cursive;
-//         }
-//       `}</style>
-
-//       <style jsx>{`
-//         @keyframes slideDown {
-//           from {
-//             opacity: 0;
-//             transform: translateY(-10px);
-//           }
-//           to {
-//             opacity: 1;
-//             transform: translateY(0);
-//           }
-//         }
-//         .animate-slideDown {
-//           animation: slideDown 0.3s ease-out;
-//         }
-//         @keyframes bounce {
-//           0%, 100% { transform: translateY(0); }
-//           50% { transform: translateY(-3px); }
-//         }
-//         .animate-bounce {
-//           animation: bounce 0.8s ease-in-out infinite;
-//         }
-//       `}</style>
-//     </>
-//   );
-// }
-
-
-
-
-// 2 navabar
-
-
-// 'use client';
-
-// import Link from 'next/link';
-// import { useState, useEffect, useRef } from 'react';
-// import { usePathname, useRouter } from 'next/navigation';
-// import { 
-//   ChevronDown, 
-//   LogOut, 
-//   Settings, 
-//   User, 
-//   LayoutDashboard, 
-//   ShoppingCart,
-//   Search,
-//   X,
-//   Gift,
-//   Flame,
-//   Home,
-//   Info,
-//   Phone,
-//   Menu,
-//   UserCircle,
 //   Heart,
 //   Headphones,
 // } from 'lucide-react';
@@ -689,16 +39,28 @@
 //   const [authLoading, setAuthLoading] = useState(true);
 //   const [scrolled, setScrolled] = useState(false);
 //   const [profileImageError, setProfileImageError] = useState(false);
-  
+//   const [hideTopNavbar, setHideTopNavbar] = useState(false);
+//   const lastScrollY = useRef(0);
+
 //   const searchRef = useRef(null);
 //   const pathname = usePathname();
 //   const router = useRouter();
 
-//   // Handle scroll effect for navbar
+//   // Handle scroll effect for navbars
 //   useEffect(() => {
 //     const handleScroll = () => {
-//       setScrolled(window.scrollY > 20);
+//       const currentScrollY = window.scrollY;
+//       setScrolled(currentScrollY > 20);
+      
+//       // Hide top navbar when scrolling down, show when scrolling up
+//       if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
+//         setHideTopNavbar(true);
+//       } else {
+//         setHideTopNavbar(false);
+//       }
+//       lastScrollY.current = currentScrollY;
 //     };
+    
 //     window.addEventListener('scroll', handleScroll);
 //     return () => window.removeEventListener('scroll', handleScroll);
 //   }, []);
@@ -836,7 +198,7 @@
 //       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
 //       const data = await response.json();
       
-//       console.log('Search API response:', data); // Debug log
+//       console.log('Search API response:', data);
       
 //       if (data.success && data.data && data.data.length > 0) {
 //         setSearchResults(data.data);
@@ -878,7 +240,6 @@
 //   };
 
 //   const handleResultClick = (result) => {
-//     // Handle different product ID field names
 //     const productId = result._id || result.id || result.productId;
 //     if (productId) {
 //       router.push(`/product/${productId}`);
@@ -940,7 +301,7 @@
 //             </div>
 //           </div>
 //         </div>
-//         <div className="bg-transparent py-3">
+//         <div className="bg-white shadow-md py-3">
 //           <div className="container mx-auto px-4">
 //             <div className="flex items-center justify-between">
 //               <div className="w-32 h-10 bg-gray-200 rounded animate-pulse"></div>
@@ -958,10 +319,10 @@
 
 //   return (
 //     <>
-//       {/* ========== TOP NAVBAR - GRADIENT ========== */}
-//       <div className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-//         scrolled ? 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] shadow-md' : 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]'
-//       }`}>
+//       {/* ========== TOP NAVBAR - SCROLLS AWAY ========== */}
+//       <div className={`fixed top-0 z-50 w-full transition-all duration-500 transform ${
+//         hideTopNavbar ? '-translate-y-full' : 'translate-y-0'
+//       } ${scrolled ? 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] shadow-md' : 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]'}`}>
 //         <div className="container mx-auto px-4 lg:px-8">
 //           <div className="flex items-center justify-between h-10 lg:h-12">
             
@@ -1002,7 +363,6 @@
 //                       onClick={() => handleResultClick(result)}
 //                       className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
 //                     >
-//                       {/* Product Image */}
 //                       {(result.images || result.image) && (
 //                         <img 
 //                           src={result.images?.[0] || result.image} 
@@ -1140,10 +500,10 @@
 //         </div>
 //       </div>
 
-//       {/* ========== BOTTOM NAVBAR - TRANSPARENT ========== */}
-//       <div className={`fixed top-10 lg:top-12 z-40 w-full transition-all duration-500 bg-transparent ${
-//         scrolled ? 'backdrop-blur-md' : ''
-//       }`}>
+//       {/* ========== BOTTOM NAVBAR - MOVES UP WHEN TOP NAVBAR HIDES ========== */}
+//       <div className={`fixed z-40 w-full transition-all duration-500 bg-white shadow-md ${
+//         hideTopNavbar ? 'top-0' : 'top-10 lg:top-12'
+//       } ${scrolled ? 'shadow-lg' : ''}`}>
 //         <div className="container mx-auto px-4 lg:px-8">
 //           <div className="flex items-center justify-between h-14 lg:h-16">
             
@@ -1158,7 +518,7 @@
 //               </div>
 //             </Link>
 
-//             {/* Desktop Navigation - Transparent background */}
+//             {/* Desktop Navigation - Text color #F28167 */}
 //             <div className="hidden lg:flex items-center gap-1">
 //               {navItems.map((item) => (
 //                 <Link
@@ -1166,8 +526,8 @@
 //                   href={item.href}
 //                   className={`relative px-4 py-1.5 rounded-full font-bold transition-all duration-300 ${
 //                     isActive(item.href)
-//                       ? 'text-[#4F9DFF] bg-white shadow-md'
-//                       : 'text-[#F2826B] hover:text-[#FFD93D] hover:bg-white/20'
+//                       ? 'text-[#F28167] bg-orange-50 shadow-sm'
+//                       : 'text-[#F28167] hover:text-[#FF7B54] hover:bg-orange-50'
 //                   }`}
 //                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', 'Poppins', cursive" }}
 //                 >
@@ -1175,7 +535,7 @@
 //                     <item.icon className="w-4 h-4" />
 //                     <span>{item.name}</span>
 //                     {item.badge && (
-//                       <span className="absolute -top-2 -right-2 bg-[#FFD93D] text-[#FF7B54] text-xs font-black px-1.5 py-0.5 rounded-full animate-bounce">
+//                       <span className="absolute -top-2 -right-2 bg-[#FF7B54] text-white text-xs font-black px-1.5 py-0.5 rounded-full animate-bounce">
 //                         {item.badge}
 //                       </span>
 //                     )}
@@ -1187,9 +547,9 @@
 //             {/* Mobile Menu Button */}
 //             <button
 //               onClick={() => setIsMenuOpen(!isMenuOpen)}
-//               className="lg:hidden p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-all"
+//               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-all"
 //             >
-//               <Menu className="w-5 h-5 text-white" />
+//               <Menu className="w-5 h-5 text-[#F28167]" />
 //             </button>
 //           </div>
 //         </div>
@@ -1197,7 +557,9 @@
 
 //       {/* Search Overlay (Mobile) */}
 //       {searchOpen && (
-//         <div className="fixed top-10 left-0 right-0 z-50 bg-white shadow-xl p-3 animate-slideDown" ref={searchRef}>
+//         <div className={`fixed left-0 right-0 z-50 bg-white shadow-xl p-3 animate-slideDown ${
+//           hideTopNavbar ? 'top-0' : 'top-10 lg:top-12'
+//         }`} ref={searchRef}>
 //           <div className="container mx-auto px-4">
 //             <form onSubmit={handleSearchSubmit} className="relative">
 //               <input
@@ -1280,7 +642,7 @@
 //                   href={item.href}
 //                   onClick={() => setIsMenuOpen(false)}
 //                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all ${
-//                     isActive(item.href) ? 'bg-[#4F9DFF] text-white' : 'text-gray-700 hover:bg-gray-100'
+//                     isActive(item.href) ? 'bg-[#F28167] text-white' : 'text-gray-700 hover:bg-gray-100'
 //                   }`}
 //                 >
 //                   <item.icon className="w-4 h-4" />
@@ -1310,8 +672,8 @@
 //         </div>
 //       </div>
 
-//       {/* Spacer for both navbars */}
-//       <div className="h-24 lg:h-28"></div>
+//       {/* Dynamic Spacer - Changes based on top navbar visibility */}
+//       <div className={`transition-all duration-500 ${hideTopNavbar ? 'h-14 lg:h-16' : 'h-24 lg:h-28'}`}></div>
 
 //       <style jsx>{`
 //         @keyframes slideDown {
@@ -1328,7 +690,6 @@
 //     </>
 //   );
 // }
-
 
 
 'use client';
@@ -1622,7 +983,7 @@ export default function Navbar() {
   if (authLoading) {
     return (
       <div className="fixed top-0 z-50 w-full">
-        <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] py-2">
+        <div className="bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] py-2">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between">
               <div className="w-32 h-6 bg-white/20 rounded animate-pulse"></div>
@@ -1654,7 +1015,7 @@ export default function Navbar() {
       {/* ========== TOP NAVBAR - SCROLLS AWAY ========== */}
       <div className={`fixed top-0 z-50 w-full transition-all duration-500 transform ${
         hideTopNavbar ? '-translate-y-full' : 'translate-y-0'
-      } ${scrolled ? 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] shadow-md' : 'bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54]'}`}>
+      } ${scrolled ? 'bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] shadow-md' : 'bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1]'}`}>
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex items-center justify-between h-10 lg:h-12">
             
@@ -1672,12 +1033,12 @@ export default function Navbar() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="🔍 Search for toys..."
-                  className="w-full px-4 py-1.5 pr-8 text-sm text-gray-700 bg-white/90 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFD93D]"
+                  className="w-full px-4 py-1.5 pr-8 text-sm text-gray-700 bg-white/90 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFB6C1]"
                   style={{ fontFamily: "'Comic Neue', 'Poppins', sans-serif" }}
                 />
                 {searchLoading ? (
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <div className="w-3.5 h-3.5 border-2 border-[#4F9DFF] border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-3.5 h-3.5 border-2 border-[#4A8A90] border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 ) : (
                   <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -1705,14 +1066,14 @@ export default function Navbar() {
                       <div className="flex-1">
                         <p className="font-medium text-gray-800 text-sm">{result.name || result.title}</p>
                         {result.price && (
-                          <p className="text-xs text-[#FF7B54] font-semibold">BDT {result.price}</p>
+                          <p className="text-xs text-[#FFB6C1] font-semibold">BDT {result.price}</p>
                         )}
                       </div>
                     </button>
                   ))}
                   <button
                     onClick={handleSearchSubmit}
-                    className="w-full px-4 py-2 text-center text-sm text-[#4F9DFF] hover:bg-gray-50 font-medium border-t border-gray-100"
+                    className="w-full px-4 py-2 text-center text-sm text-[#4A8A90] hover:bg-gray-50 font-medium border-t border-gray-100"
                   >
                     View all results for "{searchQuery}"
                   </button>
@@ -1740,9 +1101,9 @@ export default function Navbar() {
 
               {/* Wishlist */}
               <Link href="/wishlist" className="relative p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all group">
-                <Heart className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                <Heart className="w-4 h-4 text-[#4A8A90] group-hover:scale-110 transition-transform" />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#FFD93D] text-[#FF7B54] text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-[#FFB6C1] text-[#4A8A90] text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
                     {wishlistCount > 9 ? '9+' : wishlistCount}
                   </span>
                 )}
@@ -1750,9 +1111,9 @@ export default function Navbar() {
 
               {/* Cart */}
               <Link href="/inquiry-cart" className="relative p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all group">
-                <ShoppingCart className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                <ShoppingCart className="w-4 h-4 text-[#4A8A90] group-hover:scale-110 transition-transform" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#FFD93D] text-[#FF7B54] text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-[#FFB6C1] text-[#4A8A90] text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
                     {cartCount > 9 ? '9+' : cartCount}
                   </span>
                 )}
@@ -1769,11 +1130,11 @@ export default function Navbar() {
                       <img 
                         src={getProfilePicture()} 
                         alt={getDisplayName()}
-                        className="w-6 h-6 rounded-full object-cover border border-[#FFD93D]"
+                        className="w-6 h-6 rounded-full object-cover border border-[#FFB6C1]"
                         onError={() => setProfileImageError(true)}
                       />
                     ) : (
-                      <div className="w-6 h-6 rounded-full bg-[#FFD93D] flex items-center justify-center text-[#FF7B54] font-black text-xs">
+                      <div className="w-6 h-6 rounded-full bg-[#FFB6C1] flex items-center justify-center text-[#4A8A90] font-black text-xs">
                         {getInitials()}
                       </div>
                     )}
@@ -1788,7 +1149,7 @@ export default function Navbar() {
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
                       <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl overflow-hidden z-50">
-                        <div className="bg-gradient-to-r from-[#4F9DFF] to-[#FF7B54] px-3 py-2">
+                        <div className="bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] px-3 py-2">
                           <div className="flex items-center gap-2">
                             {getProfilePicture() && !profileImageError ? (
                               <img src={getProfilePicture()} alt={getDisplayName()} className="w-8 h-8 rounded-full object-cover border border-white" />
@@ -1805,7 +1166,7 @@ export default function Navbar() {
                         </div>
                         <div className="p-1">
                           <Link href={getDashboardLink()} className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 text-sm" onClick={() => setUserMenuOpen(false)}>
-                            <LayoutDashboard className="w-3.5 h-3.5 text-[#4F9DFF]" />
+                            <LayoutDashboard className="w-3.5 h-3.5 text-[#4A8A90]" />
                             <span>Dashboard</span>
                           </Link>
                           <button onClick={() => { setUserMenuOpen(false); logout(); }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 w-full text-sm">
@@ -1819,10 +1180,10 @@ export default function Navbar() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link href="/login" className="px-2 py-1 rounded-full font-bold text-white hover:text-[#FFD93D] transition-all text-xs">
+                  <Link href="/login" className="px-2 py-1 rounded-full font-bold text-[#4A8A90] hover:text-white transition-all text-xs">
                     Sign In
                   </Link>
-                  <Link href="/register" className="px-3 py-1 rounded-full font-bold bg-white text-[#4F9DFF] shadow-md hover:shadow-lg transition-all text-xs">
+                  <Link href="/register" className="px-3 py-1 rounded-full font-bold bg-white text-[#4A8A90] shadow-md hover:shadow-lg transition-all text-xs">
                     Register
                   </Link>
                 </div>
@@ -1850,7 +1211,7 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Desktop Navigation - Text color #F28167 */}
+            {/* Desktop Navigation - New colors */}
             <div className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => (
                 <Link
@@ -1858,8 +1219,8 @@ export default function Navbar() {
                   href={item.href}
                   className={`relative px-4 py-1.5 rounded-full font-bold transition-all duration-300 ${
                     isActive(item.href)
-                      ? 'text-[#F28167] bg-orange-50 shadow-sm'
-                      : 'text-[#F28167] hover:text-[#FF7B54] hover:bg-orange-50'
+                      ? 'text-[#4A8A90] bg-[#D4EDEE] shadow-sm'
+                      : 'text-[#4A8A90] hover:text-[#FFB6C1] hover:bg-[#D4EDEE]/50'
                   }`}
                   style={{ fontFamily: "'Comic Neue', 'Fredoka One', 'Poppins', cursive" }}
                 >
@@ -1867,7 +1228,7 @@ export default function Navbar() {
                     <item.icon className="w-4 h-4" />
                     <span>{item.name}</span>
                     {item.badge && (
-                      <span className="absolute -top-2 -right-2 bg-[#FF7B54] text-white text-xs font-black px-1.5 py-0.5 rounded-full animate-bounce">
+                      <span className="absolute -top-2 -right-2 bg-[#FFB6C1] text-white text-xs font-black px-1.5 py-0.5 rounded-full animate-bounce">
                         {item.badge}
                       </span>
                     )}
@@ -1881,7 +1242,7 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-all"
             >
-              <Menu className="w-5 h-5 text-[#F28167]" />
+              <Menu className="w-5 h-5 text-[#4A8A90]" />
             </button>
           </div>
         </div>
@@ -1899,7 +1260,7 @@ export default function Navbar() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="🔍 Search for toys..."
-                className="w-full px-4 py-2 pr-20 text-gray-700 bg-gray-50 rounded-full border border-gray-200 focus:outline-none focus:border-[#4F9DFF]"
+                className="w-full px-4 py-2 pr-20 text-gray-700 bg-gray-50 rounded-full border border-gray-200 focus:outline-none focus:border-[#4A8A90]"
                 autoFocus
               />
               <button type="button" onClick={() => setSearchOpen(false)} className="absolute right-12 top-1/2 -translate-y-1/2 text-xs text-gray-500">
@@ -1924,7 +1285,7 @@ export default function Navbar() {
                     )}
                     <div>
                       <p className="text-sm font-medium text-gray-800">{result.name || result.title}</p>
-                      {result.price && <p className="text-xs text-[#FF7B54]">BDT {result.price}</p>}
+                      {result.price && <p className="text-xs text-[#FFB6C1]">BDT {result.price}</p>}
                     </div>
                   </button>
                 ))}
@@ -1950,12 +1311,12 @@ export default function Navbar() {
             </div>
 
             {user && (
-              <div className="mb-5 p-3 bg-gradient-to-r from-[#4F9DFF]/10 to-[#FF7B54]/10 rounded-xl">
+              <div className="mb-5 p-3 bg-gradient-to-r from-[#4A8A90]/10 to-[#FFB6C1]/10 rounded-xl">
                 <div className="flex items-center gap-3">
                   {getProfilePicture() && !profileImageError ? (
-                    <img src={getProfilePicture()} alt={getDisplayName()} className="w-12 h-12 rounded-full object-cover border-2 border-[#4F9DFF]" />
+                    <img src={getProfilePicture()} alt={getDisplayName()} className="w-12 h-12 rounded-full object-cover border-2 border-[#4A8A90]" />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-[#4F9DFF] flex items-center justify-center text-white text-xl font-bold">
+                    <div className="w-12 h-12 rounded-full bg-[#4A8A90] flex items-center justify-center text-white text-xl font-bold">
                       {getInitials()}
                     </div>
                   )}
@@ -1974,12 +1335,12 @@ export default function Navbar() {
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all ${
-                    isActive(item.href) ? 'bg-[#F28167] text-white' : 'text-gray-700 hover:bg-gray-100'
+                    isActive(item.href) ? 'bg-[#4A8A90] text-white' : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
                   <item.icon className="w-4 h-4" />
                   <span className="text-sm">{item.name}</span>
-                  {item.badge && <span className="ml-auto bg-[#FF7B54] text-white text-xs px-2 py-0.5 rounded-full">{item.badge}</span>}
+                  {item.badge && <span className="ml-auto bg-[#FFB6C1] text-white text-xs px-2 py-0.5 rounded-full">{item.badge}</span>}
                 </Link>
               ))}
             </div>
@@ -1988,10 +1349,10 @@ export default function Navbar() {
 
             {!user ? (
               <div className="space-y-2">
-                <Link href="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold border-2 border-[#4F9DFF] text-[#4F9DFF] hover:bg-[#4F9DFF] hover:text-white transition-all">
+                <Link href="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold border-2 border-[#4A8A90] text-[#4A8A90] hover:bg-[#4A8A90] hover:text-white transition-all">
                   <User className="w-4 h-4" /> Sign In
                 </Link>
-                <Link href="/register" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-[#4F9DFF] text-white shadow-md">
+                <Link href="/register" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl font-bold bg-[#4A8A90] text-white shadow-md">
                   <UserCircle className="w-4 h-4" /> Register
                 </Link>
               </div>

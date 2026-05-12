@@ -369,6 +369,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 const slidesData = [
   {
@@ -376,7 +377,7 @@ const slidesData = [
     label: "TOP TOYS PRODUCTS",
     title: "All Your Baby Needs In Place",
     subtitle: "Find Latest Collection",
-    childImage: "https://images.unsplash.com/photo-1595433707802-2b1382c9b9a9?w=400&h=400&fit=crop",
+    childImage: "https://i.ibb.co.com/21N6KYVn/water-smartphone-adult-doing-girl-machine.jpg",
     toys: [
       { src: "https://i.ibb.co.com/G4Jvj6DR/DAZZALING-WINNER-Horse-Rocking-Ride-On-T-Non-Brand-626b8-434507.png", alt: "Car Seat" },
       { src: "https://i.ibb.co.com/99xZp1NT/stroller-c3-removebg-preview.png", alt: "Baby Stroller" },
@@ -620,18 +621,21 @@ useEffect(() => {
                   {currentData.subtitle}
                 </motion.p>
 
-                {/* Shop Now Button */}
-                <motion.button
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="mt-1 px-4 py-1.5 bg-[#5b9aa0] hover:bg-[#4a8a90] text-white text-xs md:text-sm font-medium rounded-full transition-all shadow-md"
-                  style={{ fontFamily: "'Fredoka One', 'Comic Neue', 'Quicksand', cursive" }}
-                >
-                  Shop Now →
-                </motion.button>
+             {/* Shop Now Button */}
+{/* Shop Now Button - Fixed Version */}
+<Link href="/products">
+  <motion.button
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.4 }}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.98 }}
+    className="mt-1 px-4 py-1.5 bg-[#5b9aa0] hover:bg-[#4a8a90] text-white text-xs md:text-sm font-medium rounded-full transition-all shadow-md cursor-pointer"
+    style={{ fontFamily: "'Fredoka One', 'Comic Neue', 'Quicksand', cursive" }}
+  >
+    Shop Now →
+  </motion.button>
+</Link>
               </motion.div>
             </AnimatePresence>
           </div>

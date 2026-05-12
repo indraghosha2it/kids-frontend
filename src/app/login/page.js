@@ -484,107 +484,260 @@ export default function LoginPage() {
     }));
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setIsSubmitting(true);
+
+  //   const loadingToast = toast.loading('🎈 Logging in...');
+
+  //   try {
+  //     const response = await fetch('http://localhost:5000/api/auth/login', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         email: formData.email,
+  //         password: formData.password
+  //       }),
+  //     });
+
+  //     const data = await response.json();
+  //     toast.dismiss(loadingToast);
+
+  //     if (!response.ok) {
+  //       if (data.requiresVerification) {
+  //         toast.info('📧 Verify Your Email', {
+  //           description: 'Please check your email for verification code.',
+  //           duration: 5000,
+  //         });
+  //         setIsSubmitting(false);
+  //         return;
+  //       }
+  //       toast.error('Oops! ' + (data.error || 'Login failed'), {
+  //         description: 'Please check your credentials and try again.',
+  //         duration: 5000,
+  //       });
+  //       setIsSubmitting(false);
+  //       return;
+  //     }
+
+  //     toast.success('🎉 Welcome back!', {
+  //       description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
+  //       duration: 4000,
+  //     });
+
+  //     if (typeof window !== 'undefined') {
+  //       localStorage.setItem('token', data.token);
+  //       localStorage.setItem('user', JSON.stringify(data.user));
+  //       if (formData.rememberMe) {
+  //         localStorage.setItem('rememberedEmail', formData.email);
+  //       } else {
+  //         localStorage.removeItem('rememberedEmail');
+  //       }
+  //     }
+
+  //     // FIXED: Role-based redirect for manual login
+  //     setTimeout(() => {
+  //       let dashboardPath = '/';
+  //       switch(data.user.role) {
+  //         case 'admin':
+  //           dashboardPath = '/admin/dashboard';
+  //           break;
+  //         case 'moderator':
+  //           dashboardPath = '/moderator/dashboard';
+  //           break;
+  //         default:
+  //           dashboardPath = '/customer/dashboard';
+  //       }
+  //       window.location.href = dashboardPath;
+  //     }, 1500);
+
+  //   } catch (error) {
+  //     console.error('Login error:', error);
+  //     toast.error('Connection Error', {
+  //       description: 'Unable to connect. Please try again!',
+  //       duration: 5000,
+  //     });
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  // Google Sign In Success Handler
+  
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    const loadingToast = toast.loading('🎈 Logging in...');
+  const loadingToast = toast.loading('🎈 Logging in...');
 
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
-      });
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password
+      }),
+    });
 
-      const data = await response.json();
-      toast.dismiss(loadingToast);
+    const data = await response.json();
+    toast.dismiss(loadingToast);
 
-      if (!response.ok) {
-        if (data.requiresVerification) {
-          toast.info('📧 Verify Your Email', {
-            description: 'Please check your email for verification code.',
-            duration: 5000,
-          });
-          setIsSubmitting(false);
-          return;
-        }
-        toast.error('Oops! ' + (data.error || 'Login failed'), {
-          description: 'Please check your credentials and try again.',
+    if (!response.ok) {
+      if (data.requiresVerification) {
+        toast.info('📧 Verify Your Email', {
+          description: 'Please check your email for verification code.',
           duration: 5000,
         });
         setIsSubmitting(false);
         return;
       }
+      toast.error('Oops! ' + (data.error || 'Login failed'), {
+        description: 'Please check your credentials and try again.',
+        duration: 5000,
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
+    toast.success('🎉 Welcome back!', {
+      description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
+      duration: 4000,
+    });
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      if (formData.rememberMe) {
+        localStorage.setItem('rememberedEmail', formData.email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
+    }
+
+    // Merge guest cart after login
+    const guestSessionId = localStorage.getItem('cartSessionId');
+    if (guestSessionId && data.token) {
+      try {
+        const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${data.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sessionId: guestSessionId })
+        });
+        
+        const mergeData = await mergeResponse.json();
+        if (mergeData.success) {
+          localStorage.removeItem('cartSessionId');
+          window.dispatchEvent(new Event('cart-update'));
+          console.log('Guest cart merged successfully');
+        }
+      } catch (mergeError) {
+        console.error('Merge cart error:', mergeError);
+      }
+    }
+
+    // Role-based redirect
+    setTimeout(() => {
+      let dashboardPath = '/';
+      switch(data.user.role) {
+        case 'admin':
+          dashboardPath = '/admin/dashboard';
+          break;
+        case 'moderator':
+          dashboardPath = '/moderator/dashboard';
+          break;
+        default:
+          dashboardPath = '/customer/dashboard';
+      }
+      window.location.href = dashboardPath;
+    }, 1500);
+
+  } catch (error) {
+    console.error('Login error:', error);
+    toast.error('Connection Error', {
+      description: 'Unable to connect. Please try again!',
+      duration: 5000,
+    });
+    setIsSubmitting(false);
+  }
+};
+  
+  
+  // const handleGoogleSuccess = (data) => {
+  //   console.log('Google sign in success:', data);
+    
+  //   if (data.token) {
+  //     localStorage.setItem('token', data.token);
+  //     localStorage.setItem('user', JSON.stringify(data.user));
+      
+  //     if (data.requiresAdditionalInfo) {
+  //       toast.success('🎉 Google Sign In Successful!', {
+  //         description: 'Please complete your profile to continue.',
+  //         duration: 4000,
+  //       });
+  //     } else {
+  //       toast.success('🎉 Welcome back!', {
+  //         description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
+  //         duration: 4000,
+  //       });
+  //     }
+  //     // GoogleLoginButton handles redirect based on requiresAdditionalInfo
+  //   }
+  // };
+
+  // Google Sign In Error Handler
+  
+  // Google Sign In Success Handler
+const handleGoogleSuccess = async (data) => {
+  console.log('Google sign in success:', data);
+  
+  if (data.token) {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    // ========== ADD THIS CART MERGE CODE FOR GOOGLE LOGIN ==========
+    // Merge guest cart after successful Google login
+    const guestSessionId = localStorage.getItem('cartSessionId');
+    if (guestSessionId && data.token) {
+      try {
+        const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${data.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sessionId: guestSessionId })
+        });
+        
+        const mergeData = await mergeResponse.json();
+        if (mergeData.success) {
+          localStorage.removeItem('cartSessionId');
+          window.dispatchEvent(new Event('cart-update'));
+          console.log('Guest cart merged successfully');
+        }
+      } catch (mergeError) {
+        console.error('Merge cart error:', mergeError);
+      }
+    }
+    // ========== END OF CART MERGE CODE ==========
+    
+    if (data.requiresAdditionalInfo) {
+      toast.success('🎉 Google Sign In Successful!', {
+        description: 'Please complete your profile to continue.',
+        duration: 4000,
+      });
+    } else {
       toast.success('🎉 Welcome back!', {
         description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
         duration: 4000,
       });
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        if (formData.rememberMe) {
-          localStorage.setItem('rememberedEmail', formData.email);
-        } else {
-          localStorage.removeItem('rememberedEmail');
-        }
-      }
-
-      // FIXED: Role-based redirect for manual login
-      setTimeout(() => {
-        let dashboardPath = '/';
-        switch(data.user.role) {
-          case 'admin':
-            dashboardPath = '/admin/dashboard';
-            break;
-          case 'moderator':
-            dashboardPath = '/moderator/dashboard';
-            break;
-          default:
-            dashboardPath = '/customer/dashboard';
-        }
-        window.location.href = dashboardPath;
-      }, 1500);
-
-    } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Connection Error', {
-        description: 'Unable to connect. Please try again!',
-        duration: 5000,
-      });
-      setIsSubmitting(false);
     }
-  };
-
-  // Google Sign In Success Handler
-  const handleGoogleSuccess = (data) => {
-    console.log('Google sign in success:', data);
-    
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      if (data.requiresAdditionalInfo) {
-        toast.success('🎉 Google Sign In Successful!', {
-          description: 'Please complete your profile to continue.',
-          duration: 4000,
-        });
-      } else {
-        toast.success('🎉 Welcome back!', {
-          description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
-          duration: 4000,
-        });
-      }
-      // GoogleLoginButton handles redirect based on requiresAdditionalInfo
-    }
-  };
-
-  // Google Sign In Error Handler
+    // GoogleLoginButton handles redirect based on requiresAdditionalInfo
+  }
+};
+  
   const handleGoogleError = (error) => {
     console.error('Google sign in error:', error);
     toast.error('Google Sign In Failed', {

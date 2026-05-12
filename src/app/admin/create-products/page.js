@@ -2442,6 +2442,7 @@ export default function AdminCreateToyProduct() {
     regularPrice: 0,
     discountPrice: 0,
     deliveryInfo: '',
+    codAvailable: false,
     tags: [],
     promotion: '',
     isFeatured: false,
@@ -2481,6 +2482,8 @@ export default function AdminCreateToyProduct() {
   // Add these state variables near your other useState declarations
 const [isEditorReady, setIsEditorReady] = useState(false);
 const [isInstructionEditorReady, setIsInstructionEditorReady] = useState(false);
+const [isDeliveryEditorReady, setIsDeliveryEditorReady] = useState(false);
+
   const [additionalInfoInput, setAdditionalInfoInput] = useState({ fieldName: '', fieldValue: '' });
   const [ratingHover, setRatingHover] = useState(0);
 
@@ -2524,8 +2527,25 @@ const fullDescEditor = useEditor({
   },
   immediatelyRender: false,
 });
+const deliveryInfoEditor = useEditor({
+  extensions: [
+    StarterKit,
+    TiptapLink.configure({ openOnClick: false }),
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  ],
+  content: formData.deliveryInfo,
+  onUpdate: ({ editor }) => {
+    setFormData(prev => ({ ...prev, deliveryInfo: editor.getHTML() }));
+  },
+  onReady: () => {
+    setIsDeliveryEditorReady(true);
+  },
+  immediatelyRender: false,
+});
+
 
   // Load draft from localStorage on mount
+// Load draft from localStorage on mount
 useEffect(() => {
   const loadDraft = () => {
     try {
@@ -2533,11 +2553,29 @@ useEffect(() => {
       if (savedDraft) {
         const draft = JSON.parse(savedDraft);
         
-        // Check if the user has already chosen to discard drafts in this session
-        const draftDiscarded = sessionStorage.getItem('draft_discarded');
-        if (draftDiscarded === 'true') {
+        // Check if draft has any meaningful data - MORE LENIENT
+        const hasData = (draft.formData?.productName && draft.formData.productName.trim() !== '') || 
+                       (draft.formData?.shortDescription && draft.formData.shortDescription !== '<p></p>') ||
+                       (draft.formData?.fullDescription && draft.formData.fullDescription !== '<p></p>') ||
+                       (draft.productImages && draft.productImages.some(img => img.url)) ||
+                       (draft.videoUpload?.url);
+        
+        if (!hasData) {
+          console.log('No meaningful data in draft');
+          localStorage.removeItem(DRAFT_KEY);
+          sessionStorage.removeItem('draft_discarded');
           return;
         }
+        
+        // Check if draft was discarded in this session
+        const draftDiscarded = sessionStorage.getItem('draft_discarded');
+        if (draftDiscarded === 'true') {
+          console.log('Draft was discarded in this session, not showing modal');
+          sessionStorage.removeItem('draft_discarded');
+          return;
+        }
+        
+        console.log('Found draft with data, showing restore modal');
         
         if (draft.formData) {
           setFormData(draft.formData);
@@ -2568,14 +2606,11 @@ useEffect(() => {
           setLastSaved(new Date(draft.lastSaved));
         }
         
-        // Show restore modal if there's meaningful data
-        const hasData = draft.formData?.productName || 
-                       draft.productImages?.some(img => img.url) ||
-                       draft.videoUpload?.url;
-        if (hasData) {
-          setPendingDraft(draft);
-          setShowRestoreModal(true);
-        }
+        setPendingDraft(draft);
+        setShowRestoreModal(true);
+      } else {
+        console.log('No draft found in localStorage');
+        sessionStorage.removeItem('draft_discarded');
       }
     } catch (error) {
       console.error('Error loading draft:', error);
@@ -2604,6 +2639,7 @@ const handleRestoreDraft = () => {
             : [{ code: '#FF0000' }, { code: '#0000FF' }, { code: '#000000' }],
           tags: Array.isArray(pendingDraft.formData.tags) ? pendingDraft.formData.tags : [],
           additionalInfo: Array.isArray(pendingDraft.formData.additionalInfo) ? pendingDraft.formData.additionalInfo : [],
+          codAvailable: pendingDraft.formData.codAvailable || false,
           metaSettings: pendingDraft.formData.metaSettings || {
             metaTitle: '',
             metaDescription: '',
@@ -2621,6 +2657,9 @@ const handleRestoreDraft = () => {
           if (fullDescEditor && pendingDraft.formData.fullDescription) {
             fullDescEditor.commands.setContent(pendingDraft.formData.fullDescription);
           }
+          if (deliveryInfoEditor && pendingDraft.formData.deliveryInfo) {
+    deliveryInfoEditor.commands.setContent(pendingDraft.formData.deliveryInfo);
+  }
         }, 200);
         
         // Restore video type and URL
@@ -2696,6 +2735,7 @@ const handleDiscardDraft = () => {
     regularPrice: 0,
     discountPrice: 0,
     deliveryInfo: '',
+    codAvailable: false,
     tags: [],
     promotion: '',
     isFeatured: false,
@@ -3353,6 +3393,7 @@ const addAdditionalInfo = () => {
         regularPrice: 0,
         discountPrice: 0,
         deliveryInfo: '',
+        codAvailable: false,
         tags: [],
         promotion: '',
         isFeatured: false,
@@ -3361,11 +3402,11 @@ const addAdditionalInfo = () => {
         videoUrl: '',
         videoPublicId: '',
         videoType: 'upload',
-        metaSettings: {
-          metaTitle: '',
-          metaDescription: '',
-          metaKeywords: []
-        }
+       metaSettings: {
+  metaTitle: '',
+  metaDescription: '',
+  metaKeywords: []
+}
       });
       setProductImages([
         { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
@@ -3472,7 +3513,6 @@ const handleSubmit = async (e) => {
     
     const finalVideoUrl = videoUpload.url || (youtubeUrl ? `https://www.youtube.com/embed/${getYouTubeVideoId(youtubeUrl)}` : '');
     
-    // Create payload WITHOUT skuCode (let backend generate it)
     const payload = {
       productName: formData.productName,
       shortDescription: formData.shortDescription,
@@ -3486,6 +3526,7 @@ const handleSubmit = async (e) => {
       regularPrice: Number(formData.regularPrice),
       discountPrice: Number(formData.discountPrice),
       deliveryInfo: formData.deliveryInfo,
+      codAvailable: formData.codAvailable,
       tags: formData.tags,
       promotion: formData.promotion,
       isFeatured: formData.isFeatured,
@@ -3501,8 +3542,6 @@ const handleSubmit = async (e) => {
       },
       images: imageUrls
     };
-    console.log('Additional Info being sent:', payload.additionalInfo);
-console.log('Full payload:', payload);
 
     const response = await fetch('http://localhost:5000/api/products', {
       method: 'POST',
@@ -3516,14 +3555,24 @@ console.log('Full payload:', payload);
     const data = await response.json();
 
     if (data.success) {
-      // Show the generated SKU from backend
       const generatedSku = data.data.skuCode;
-      toast.success(`Product created successfully! SKU: ${generatedSku}`);
-      
+      toast.success(`✅ Product created successfully! SKU: ${generatedSku}`);
       localStorage.removeItem(DRAFT_KEY);
       router.push('/admin/all-products');
     } else {
-      toast.error(data.error || 'Failed to create product');
+      // Display the error message from backend
+      const errorMessage = data.error || 'Failed to create product';
+      toast.error(errorMessage);
+      
+      // If it's a duplicate product name error, focus on the product name field
+      if (errorMessage.includes('already exists')) {
+        setErrors(prev => ({ ...prev, productName: errorMessage }));
+        // Scroll to product name field
+        document.querySelector('input[name="productName"]')?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
     }
   } catch (error) {
     console.error('Error creating product:', error);
@@ -3586,7 +3635,7 @@ console.log('Full payload:', payload);
         
         {/* Header */}
         <div className="bg-white border-b shadow-sm sticky top-0 z-10" style={{ borderBottomColor: '#FFB6C1' }}>
-          <div className="px-6 py-4">
+          <div className="px-2 py-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <NextLink href="/admin/all-products" className="p-2 hover:bg-pink-50 rounded-lg transition-colors">
@@ -3595,7 +3644,7 @@ console.log('Full payload:', payload);
                 <div>
                   <div className="flex items-center gap-2">
                     <Gift className="w-6 h-6" style={{ color: '#4A8A90' }} />
-                    <h1 className="text-2xl font-bold" style={{ color: '#2D3A5C', fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+                    <h1 className="text-xl font-bold" style={{ color: '#2D3A5C', fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
                       Create New Toy Product
                     </h1>
                     <span className="px-2 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}>
@@ -3885,6 +3934,7 @@ console.log('Full payload:', payload);
                           name="stockQuantity"
                           value={formData.stockQuantity}
                           onChange={handleNumberChange}
+                          onWheel={(e) => e.target.blur()}
                           min="0"
                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
                             errors.stockQuantity ? 'border-red-500' : 'border-gray-300'
@@ -3901,6 +3951,7 @@ console.log('Full payload:', payload);
                           name="regularPrice"
                           value={formData.regularPrice || ''}
                           onChange={handleNumberChange}
+                          onWheel={(e) => e.target.blur()}
                           min="0"
                           step="1"
                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
@@ -3918,6 +3969,7 @@ console.log('Full payload:', payload);
                             name="discountPrice"
                             value={formData.discountPrice || ''}
                             onChange={handleNumberChange}
+                            onWheel={(e) => e.target.blur()}
                             min="0"
                             step="1"
                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
@@ -3936,22 +3988,55 @@ console.log('Full payload:', payload);
                       </div>
                     </div>
 
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Delivery Information <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        name="deliveryInfo"
-                        value={formData.deliveryInfo}
-                        onChange={handleChange}
-                        rows="2"
-                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition resize-none ${
-                          errors.deliveryInfo ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="e.g., Free shipping on orders over ৳2000, Delivery within 3-5 business days"
-                      />
-                      {errors.deliveryInfo && <p className="text-xs text-red-600 mt-1">{errors.deliveryInfo}</p>}
-                    </div>
+                   {/* Delivery Details - Rich Text Editor */}
+<div className="mt-4">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Delivery Details <span className="text-red-500">*</span>
+  </label>
+  {isMounted && deliveryInfoEditor && (
+    <div className={`border rounded-lg overflow-hidden ${errors.deliveryInfo ? 'border-red-500' : 'border-gray-300'}`}>
+      <RichTextEditor editor={deliveryInfoEditor}>
+        <RichTextEditor.Toolbar>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Bold />
+            <RichTextEditor.Italic />
+            <RichTextEditor.Underline />
+          </RichTextEditor.ControlsGroup>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.BulletList />
+            <RichTextEditor.OrderedList />
+          </RichTextEditor.ControlsGroup>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.AlignLeft />
+            <RichTextEditor.AlignCenter />
+            <RichTextEditor.AlignRight />
+          </RichTextEditor.ControlsGroup>
+        </RichTextEditor.Toolbar>
+        <RichTextEditor.Content />
+      </RichTextEditor>
+    </div>
+  )}
+  <p className="text-xs text-gray-500 mt-1">
+    Include shipping information, delivery time, and other delivery-related details
+  </p>
+</div>
+
+{/* Cash on Delivery Checkbox */}
+<div className="mt-4">
+  <label className="flex items-center gap-3 cursor-pointer">
+    <input
+      type="checkbox"
+      checked={formData.codAvailable}
+      onChange={(e) => setFormData(prev => ({ ...prev, codAvailable: e.target.checked }))}
+      className="w-5 h-5 rounded border-gray-300 text-[#4A8A90] focus:ring-[#4A8A90]"
+      style={{ accentColor: '#4A8A90' }}
+    />
+    <div>
+      <span className="text-sm font-medium text-gray-700">Cash on Delivery Available</span>
+      <p className="text-xs text-gray-500">Enable COD payment option for this product</p>
+    </div>
+  </label>
+</div>
                   </div>
                 </div>
 
@@ -4008,6 +4093,149 @@ console.log('Full payload:', payload);
                     </div>
                   )}
                 </div>
+
+                {/* Meta Settings for SEO */}
+<div className="bg-white rounded-xl shadow-sm border border-gray-200">
+  <div className="p-5 border-b border-gray-200">
+    <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowMeta(!showMeta)}>
+      <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+        <Hash className="w-5 h-5" style={{ color: '#4A8A90' }} />
+        SEO & Meta Settings
+      </h2>
+      <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
+    </div>
+    <p className="text-xs text-gray-500 mt-1">Optimize your product for search engines</p>
+  </div>
+  
+  {showMeta && (
+    <div className="p-5">
+      <div className="space-y-4">
+        {/* Meta Title */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Meta Title
+            <span className="text-xs text-gray-400 ml-2">(70 characters max)</span>
+          </label>
+          <input
+            type="text"
+            value={formData.metaSettings.metaTitle}
+            onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
+            maxLength="70"
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition"
+            placeholder="e.g., Buy Educational STEM Toys for Kids | Toy Store Bangladesh"
+          />
+          <div className="flex justify-end mt-1">
+            <span className={`text-xs ${formData.metaSettings.metaTitle?.length > 70 ? 'text-red-500' : 'text-gray-400'}`}>
+              {formData.metaSettings.metaTitle?.length || 0}/70
+            </span>
+          </div>
+        </div>
+
+        {/* Meta Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Meta Description
+            <span className="text-xs text-gray-400 ml-2">(160 characters max)</span>
+          </label>
+          <textarea
+            value={formData.metaSettings.metaDescription}
+            onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
+            maxLength="160"
+            rows="3"
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition resize-none"
+            placeholder="Write a compelling description that appears in search engine results..."
+          />
+          <div className="flex justify-end mt-1">
+            <span className={`text-xs ${formData.metaSettings.metaDescription?.length > 160 ? 'text-red-500' : 'text-gray-400'}`}>
+              {formData.metaSettings.metaDescription?.length || 0}/160
+            </span>
+          </div>
+        </div>
+
+        {/* Meta Keywords */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Meta Keywords
+            <span className="text-xs text-gray-400 ml-2">(Comma separated)</span>
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={keywordInput}
+              onChange={(e) => setKeywordInput(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addKeyword();
+                }
+              }}
+              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition"
+              placeholder="e.g., educational toys, STEM kit, learning games"
+            />
+            <button
+              type="button"
+              onClick={addKeyword}
+              className="px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2"
+              style={{ backgroundColor: '#4A8A90' }}
+            >
+              <Plus className="w-4 h-4" />
+              Add
+            </button>
+          </div>
+          
+          {/* Display Keywords */}
+          {formData.metaSettings.metaKeywords && formData.metaSettings.metaKeywords.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {formData.metaSettings.metaKeywords.map((keyword, index) => (
+                <div
+                  key={index}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full"
+                  style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}
+                >
+                  <span>{keyword}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeKeyword(index)}
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-gray-500 mt-2">
+            Keywords help search engines understand your product. Add relevant terms separated by commas.
+          </p>
+        </div>
+
+        {/* SEO Preview */}
+        {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (
+          <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50">
+            <p className="text-xs font-medium text-gray-500 mb-2">Search Engine Preview:</p>
+            <div className="space-y-1">
+              {formData.metaSettings.metaTitle && (
+                <p className="text-base font-medium text-blue-700 line-clamp-1">
+                  {formData.metaSettings.metaTitle}
+                </p>
+              )}
+              {formData.metaSettings.metaTitle && (
+                <p className="text-xs text-green-700">
+                  https://yourstore.com/product/{formData.productName?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'product-slug'}
+                </p>
+              )}
+              {formData.metaSettings.metaDescription && (
+                <p className="text-xs text-gray-600 line-clamp-2">
+                  {formData.metaSettings.metaDescription}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+</div>
                 
 
                 

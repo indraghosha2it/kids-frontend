@@ -591,7 +591,8 @@ import {
   ShoppingBag,
   Rocket,
   Award,
-  Bell
+  Bell,
+  Ticket
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -729,6 +730,7 @@ export default function AdminLayout({ children }) {
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard, color: '#4A8A90' },
     { name: 'All Orders', href: '/admin/orders', icon: MessageSquare, color: '#4A8A90' },
     { name: 'Create Products', href: '/admin/create-products', icon: Gift, color: '#4A8A90' },
+    { name: 'Create Coupon', href: '/admin/coupon', icon: Ticket, color: '#4A8A90' },
     { name: 'All Products', href: '/admin/all-products', icon: ShoppingBag, color: '#4A8A90' },
     { name: 'Create Category', href: '/admin/create-categories', icon: FolderPlus, color: '#4A8A90' },
     { name: 'Manage Certifications', href: '/admin/certifications', icon: Award, color: '#4A8A90' },

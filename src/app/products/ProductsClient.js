@@ -2389,66 +2389,133 @@ const ProductListCard = ({ product, router, isInCart: propIsInCart }) => {
     toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
   };
 
-  const addToCart = async (e) => {
-    e.stopPropagation();
+  // const addToCart = async (e) => {
+  //   e.stopPropagation();
     
-    if (isInCart) {
-      toast.info('Product already in cart!', {
-        description: 'View your cart to proceed with checkout.'
-      });
-      return;
-    }
+  //   if (isInCart) {
+  //     toast.info('Product already in cart!', {
+  //       description: 'View your cart to proceed with checkout.'
+  //     });
+  //     return;
+  //   }
     
-    setCartStatusLoading(true);
-    const toastId = toast.loading('Adding to cart...');
+  //   setCartStatusLoading(true);
+  //   const toastId = toast.loading('Adding to cart...');
     
-    try {
-      const token = localStorage.getItem('token');
-      const sessionId = localStorage.getItem('cartSessionId');
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     const sessionId = localStorage.getItem('cartSessionId');
       
-      const headers = {
-        'Content-Type': 'application/json'
-      };
+  //     const headers = {
+  //       'Content-Type': 'application/json'
+  //     };
       
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      } else if (sessionId) {
-        headers['x-session-id'] = sessionId;
-      }
+  //     if (token) {
+  //       headers['Authorization'] = `Bearer ${token}`;
+  //     } else if (sessionId) {
+  //       headers['x-session-id'] = sessionId;
+  //     }
       
-      const response = await fetch('http://localhost:5000/api/cart', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({
-          productId: product._id,
-          quantity: 1
-        })
-      });
+  //     const response = await fetch('http://localhost:5000/api/cart', {
+  //       method: 'POST',
+  //       headers: headers,
+  //       body: JSON.stringify({
+  //         productId: product._id,
+  //         quantity: 1
+  //       })
+  //     });
       
-      const data = await response.json();
+  //     const data = await response.json();
       
-      if (data.success) {
-        if (data.sessionId && !token) {
-          localStorage.setItem('cartSessionId', data.sessionId);
-        }
+  //     if (data.success) {
+  //       if (data.sessionId && !token) {
+  //         localStorage.setItem('cartSessionId', data.sessionId);
+  //       }
         
-        toast.success('Added to cart!', { id: toastId });
-        window.dispatchEvent(new Event('cart-update'));
+  //       toast.success('Added to cart!', { id: toastId });
+  //       window.dispatchEvent(new Event('cart-update'));
         
-        setTimeout(() => {
-          window.dispatchEvent(new Event('cart-update'));
-        }, 500);
-      } else {
-        toast.error(data.error || 'Failed to add to cart', { id: toastId });
-      }
-    } catch (error) {
-      console.error('Add to cart error:', error);
-      toast.error('Network error. Please try again.', { id: toastId });
-    } finally {
-      setCartStatusLoading(false);
-    }
-  };
+  //       setTimeout(() => {
+  //         window.dispatchEvent(new Event('cart-update'));
+  //       }, 500);
+  //     } else {
+  //       toast.error(data.error || 'Failed to add to cart', { id: toastId });
+  //     }
+  //   } catch (error) {
+  //     console.error('Add to cart error:', error);
+  //     toast.error('Network error. Please try again.', { id: toastId });
+  //   } finally {
+  //     setCartStatusLoading(false);
+  //   }
+  // };
 
+
+  const addToCart = async (e) => {
+  e.stopPropagation();
+  
+  // Don't allow adding if already in cart (checked from prop)
+  if (isInCart) {
+    toast.info('Product already in cart!', {
+      description: 'View your cart to proceed with checkout.'
+    });
+    return;
+  }
+  
+  setCartStatusLoading(true);
+  const toastId = toast.loading('Adding to cart...');
+  
+  try {
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('cartSessionId');
+    
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (sessionId) {
+      headers['x-session-id'] = sessionId;
+    }
+    
+    const response = await fetch('http://localhost:5000/api/cart', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        productId: product._id,
+        quantity: 1
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      if (data.sessionId && !token) {
+        localStorage.setItem('cartSessionId', data.sessionId);
+      }
+      
+      // Check if product was already in cart
+      if (data.alreadyInCart) {
+        toast.info('Product already in cart!', { id: toastId });
+      } else {
+        toast.success('Added to cart!', { id: toastId });
+      }
+      
+      window.dispatchEvent(new Event('cart-update'));
+      
+      setTimeout(() => {
+        window.dispatchEvent(new Event('cart-update'));
+      }, 500);
+    } else {
+      toast.error(data.error || 'Failed to add to cart', { id: toastId });
+    }
+  } catch (error) {
+    console.error('Add to cart error:', error);
+    toast.error('Network error. Please try again.', { id: toastId });
+  } finally {
+    setCartStatusLoading(false);
+  }
+};
   const viewCart = (e) => {
     e.stopPropagation();
     router.push('/cart');

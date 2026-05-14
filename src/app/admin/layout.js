@@ -643,6 +643,12 @@ export default function AdminLayout({ children }) {
       if (matches) return true;
       return false;
     }
+
+      if (href === '/admin/coupon') {
+      const matches = ['/admin/coupon', '/admin/coupon'].some(route => currentPath === route);
+      if (matches) return true;
+      return false;
+    }
     
     if (href === '/admin/create-users') {
       const matches = ['/admin/create-users', '/admin/createUser'].some(route => currentPath === route);
@@ -730,9 +736,10 @@ export default function AdminLayout({ children }) {
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard, color: '#4A8A90' },
     { name: 'All Orders', href: '/admin/orders', icon: MessageSquare, color: '#4A8A90' },
     { name: 'Create Products', href: '/admin/create-products', icon: Gift, color: '#4A8A90' },
-    { name: 'Create Coupon', href: '/admin/coupon', icon: Ticket, color: '#4A8A90' },
     { name: 'All Products', href: '/admin/all-products', icon: ShoppingBag, color: '#4A8A90' },
     { name: 'Create Category', href: '/admin/create-categories', icon: FolderPlus, color: '#4A8A90' },
+    { name: 'Create Coupon', href: '/admin/coupon', icon: Ticket, color: '#4A8A90' },
+
     { name: 'Manage Certifications', href: '/admin/certifications', icon: Award, color: '#4A8A90' },
     { name: 'Create Users', href: '/admin/create-users', icon: UserPlus, color: '#4A8A90' },
     { name: 'Manage Users', href: '/admin/manage-users', icon: UserCog, color: '#4A8A90' },

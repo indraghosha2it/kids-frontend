@@ -1130,80 +1130,64 @@ export default function CartPage() {
                 </button>
               </div>
               
-              {/* Order Summary */}
-              <div className="lg:col-span-1">
-                <motion.div 
-                  key={`${cart.totalItems}-${Date.now()}`}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-white rounded-xl border-2 border-[#FFE0E6] p-6 sticky top-24 shadow-md"
-                >
-                  <h2 className="text-lg font-bold text-[#2D3A5C] mb-4">Order Summary</h2>
-                  
-                  <div className="space-y-3 border-b border-[#FFE0E6] pb-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Subtotal</span>
-                      <div className="text-right">
-                        <span className="font-medium">৳{(cart.subtotal || 0).toFixed(2)}</span>
-                        <p className="text-xs text-gray-400">({cart.totalItems || 0} {cart.totalItems === 1 ? 'item' : 'items'})</p>
-                      </div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Shipping</span>
-                      <span className="text-green-600 font-medium">Free</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Tax</span>
-                      <span className="font-medium">৳0.00</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center mt-4 pb-4 border-b border-[#FFE0E6]">
-                    <span className="text-lg font-bold text-[#2D3A5C]">Total</span>
-                    <div className="text-right">
-                      <span className="text-2xl font-bold text-[#4A8A90]">
-                        ৳{(cart.subtotal || 0).toFixed(2)}
-                      </span>
-                      <p className="text-xs text-gray-400">Including all taxes</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-green-600">
-                      <Truck className="w-4 h-4" />
-                      <span>Free delivery on all orders</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <ShieldCheck className="w-4 h-4" />
-                      <span>Safe & Secure Shopping</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <RefreshCw className="w-4 h-4" />
-                      <span>7-Day Return Policy</span>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={proceedToCheckout}
-                    className="w-full mt-6 py-3 bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white font-bold rounded-full hover:from-[#3A7A80] hover:to-[#5B9399] transition-all flex items-center justify-center gap-2 shadow-md"
-                  >
-                    <CreditCard className="w-4 h-4" />
-                    Proceed to Checkout
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                  
-                  <div className="mt-4 p-3 bg-[#FFF9F0] rounded-lg border border-[#FFE0E6]">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">💰</span>
-                      <div>
-                        <p className="text-xs font-medium text-gray-700">Cash on Delivery Available</p>
-                        <p className="text-xs text-gray-500">Pay when you receive your toys</p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
+           {/* Order Summary */}
+<div className="lg:col-span-1">
+  <motion.div 
+    key={`${cart.totalItems}-${Date.now()}`}
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.3 }}
+    className="bg-white rounded-xl border-2 border-[#FFE0E6] p-6 sticky top-24 shadow-md"
+  >
+    <h2 className="text-lg font-bold text-[#2D3A5C] mb-4">Order Summary</h2>
+    
+    <div className="space-y-3 border-b border-[#FFE0E6] pb-4">
+      <div className="flex justify-between items-center">
+        <span className="text-gray-600">Total Amount</span>
+        <div className="text-right">
+          <span className="text-2xl font-bold text-[#4A8A90]">
+            ৳{(cart.subtotal || 0).toFixed(2)}
+          </span>
+          <p className="text-xs text-gray-400">({cart.totalItems || 0} {cart.totalItems === 1 ? 'item' : 'items'})</p>
+        </div>
+      </div>
+    </div>
+    
+    <div className="mt-4 space-y-2 text-sm">
+      <div className="flex items-center gap-2 text-green-600">
+        <Truck className="w-4 h-4" />
+        <span>Free delivery on First orders</span>
+      </div>
+      <div className="flex items-center gap-2 text-gray-500">
+        <ShieldCheck className="w-4 h-4" />
+        <span>Safe & Secure Shopping</span>
+      </div>
+      <div className="flex items-center gap-2 text-gray-500">
+        <RefreshCw className="w-4 h-4" />
+        <span>7-Day Return Policy</span>
+      </div>
+    </div>
+    
+    <button
+      onClick={proceedToCheckout}
+      className="w-full mt-6 py-3 bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white font-bold rounded-full hover:from-[#3A7A80] hover:to-[#5B9399] transition-all flex items-center justify-center gap-2 shadow-md"
+    >
+      <CreditCard className="w-4 h-4" />
+      Proceed to Checkout
+      <ChevronRight className="w-4 h-4" />
+    </button>
+    
+    <div className="mt-4 p-3 bg-[#FFF9F0] rounded-lg border border-[#FFE0E6]">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">💰</span>
+        <div>
+          <p className="text-xs font-medium text-gray-700">Cash on Delivery Available</p>
+          <p className="text-xs text-gray-500">Pay when you receive your toys</p>
+        </div>
+      </div>
+    </div>
+  </motion.div>
+</div>
             </div>
           )}
         </div>

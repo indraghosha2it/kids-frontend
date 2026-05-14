@@ -484,86 +484,159 @@ export default function LoginPage() {
     }));
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setIsSubmitting(true);
 
-  //   const loadingToast = toast.loading('🎈 Logging in...');
+//   const handleSubmit = async (e) => {
+//   e.preventDefault();
+//   setIsSubmitting(true);
 
-  //   try {
-  //     const response = await fetch('http://localhost:5000/api/auth/login', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         email: formData.email,
-  //         password: formData.password
-  //       }),
-  //     });
+//   const loadingToast = toast.loading('🎈 Logging in...');
 
-  //     const data = await response.json();
-  //     toast.dismiss(loadingToast);
+//   try {
+//     const response = await fetch('http://localhost:5000/api/auth/login', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({
+//         email: formData.email,
+//         password: formData.password
+//       }),
+//     });
 
-  //     if (!response.ok) {
-  //       if (data.requiresVerification) {
-  //         toast.info('📧 Verify Your Email', {
-  //           description: 'Please check your email for verification code.',
-  //           duration: 5000,
-  //         });
-  //         setIsSubmitting(false);
-  //         return;
-  //       }
-  //       toast.error('Oops! ' + (data.error || 'Login failed'), {
-  //         description: 'Please check your credentials and try again.',
-  //         duration: 5000,
+//     const data = await response.json();
+//     toast.dismiss(loadingToast);
+
+//     if (!response.ok) {
+//       if (data.requiresVerification) {
+//         toast.info('📧 Verify Your Email', {
+//           description: 'Please check your email for verification code.',
+//           duration: 5000,
+//         });
+//         setIsSubmitting(false);
+//         return;
+//       }
+//       toast.error('Oops! ' + (data.error || 'Login failed'), {
+//         description: 'Please check your credentials and try again.',
+//         duration: 5000,
+//       });
+//       setIsSubmitting(false);
+//       return;
+//     }
+
+//     toast.success('🎉 Welcome back!', {
+//       description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
+//       duration: 4000,
+//     });
+
+//     if (typeof window !== 'undefined') {
+//       localStorage.setItem('token', data.token);
+//       localStorage.setItem('user', JSON.stringify(data.user));
+//       if (formData.rememberMe) {
+//         localStorage.setItem('rememberedEmail', formData.email);
+//       } else {
+//         localStorage.removeItem('rememberedEmail');
+//       }
+//     }
+
+//     // Merge guest cart after login
+//     const guestSessionId = localStorage.getItem('cartSessionId');
+//     if (guestSessionId && data.token) {
+//       try {
+//         const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
+//           method: 'POST',
+//           headers: {
+//             'Authorization': `Bearer ${data.token}`,
+//             'Content-Type': 'application/json'
+//           },
+//           body: JSON.stringify({ sessionId: guestSessionId })
+//         });
+        
+//         const mergeData = await mergeResponse.json();
+//         if (mergeData.success) {
+//           localStorage.removeItem('cartSessionId');
+//           window.dispatchEvent(new Event('cart-update'));
+//           console.log('Guest cart merged successfully');
+//         }
+//       } catch (mergeError) {
+//         console.error('Merge cart error:', mergeError);
+//       }
+//     }
+
+
+//     const guestWishlistSessionId = localStorage.getItem('wishlistSessionId');
+// if (guestWishlistSessionId && data.token) {
+//   try {
+//     const mergeResponse = await fetch('http://localhost:5000/api/wishlist/merge', {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${data.token}`,
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({ sessionId: guestWishlistSessionId })
+//     });
+    
+//     const mergeData = await mergeResponse.json();
+//     if (mergeData.success) {
+//       localStorage.removeItem('wishlistSessionId');
+//       window.dispatchEvent(new Event('wishlist-update'));
+//       console.log('Guest wishlist merged successfully');
+//     }
+//   } catch (mergeError) {
+//     console.error('Merge wishlist error:', mergeError);
+//   }
+// }
+
+//     // Role-based redirect
+//     setTimeout(() => {
+//       let dashboardPath = '/';
+//       switch(data.user.role) {
+//         case 'admin':
+//           dashboardPath = '/admin/dashboard';
+//           break;
+//         case 'moderator':
+//           dashboardPath = '/moderator/dashboard';
+//           break;
+//         default:
+//           dashboardPath = '/customer/dashboard';
+//       }
+//       window.location.href = dashboardPath;
+//     }, 1500);
+
+//   } catch (error) {
+//     console.error('Login error:', error);
+//     toast.error('Connection Error', {
+//       description: 'Unable to connect. Please try again!',
+//       duration: 5000,
+//     });
+//     setIsSubmitting(false);
+//   }
+// };
+  
+  
+  // const handleGoogleSuccess = (data) => {
+  //   console.log('Google sign in success:', data);
+    
+  //   if (data.token) {
+  //     localStorage.setItem('token', data.token);
+  //     localStorage.setItem('user', JSON.stringify(data.user));
+      
+  //     if (data.requiresAdditionalInfo) {
+  //       toast.success('🎉 Google Sign In Successful!', {
+  //         description: 'Please complete your profile to continue.',
+  //         duration: 4000,
   //       });
-  //       setIsSubmitting(false);
-  //       return;
+  //     } else {
+  //       toast.success('🎉 Welcome back!', {
+  //         description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
+  //         duration: 4000,
+  //       });
   //     }
-
-  //     toast.success('🎉 Welcome back!', {
-  //       description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
-  //       duration: 4000,
-  //     });
-
-  //     if (typeof window !== 'undefined') {
-  //       localStorage.setItem('token', data.token);
-  //       localStorage.setItem('user', JSON.stringify(data.user));
-  //       if (formData.rememberMe) {
-  //         localStorage.setItem('rememberedEmail', formData.email);
-  //       } else {
-  //         localStorage.removeItem('rememberedEmail');
-  //       }
-  //     }
-
-  //     // FIXED: Role-based redirect for manual login
-  //     setTimeout(() => {
-  //       let dashboardPath = '/';
-  //       switch(data.user.role) {
-  //         case 'admin':
-  //           dashboardPath = '/admin/dashboard';
-  //           break;
-  //         case 'moderator':
-  //           dashboardPath = '/moderator/dashboard';
-  //           break;
-  //         default:
-  //           dashboardPath = '/customer/dashboard';
-  //       }
-  //       window.location.href = dashboardPath;
-  //     }, 1500);
-
-  //   } catch (error) {
-  //     console.error('Login error:', error);
-  //     toast.error('Connection Error', {
-  //       description: 'Unable to connect. Please try again!',
-  //       duration: 5000,
-  //     });
-  //     setIsSubmitting(false);
+  //     // GoogleLoginButton handles redirect based on requiresAdditionalInfo
   //   }
   // };
 
-  // Google Sign In Success Handler
+  // Google Sign In Error Handler
   
-  const handleSubmit = async (e) => {
+  // Google Sign In Success Handler
+const handleSubmit = async (e) => {
   e.preventDefault();
   setIsSubmitting(true);
 
@@ -614,9 +687,9 @@ export default function LoginPage() {
       }
     }
 
-    // Merge guest cart after login
-    const guestSessionId = localStorage.getItem('cartSessionId');
-    if (guestSessionId && data.token) {
+    // ========== MERGE GUEST CART ==========
+    const guestCartSessionId = localStorage.getItem('cartSessionId');
+    if (guestCartSessionId && data.token) {
       try {
         const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
           method: 'POST',
@@ -624,7 +697,7 @@ export default function LoginPage() {
             'Authorization': `Bearer ${data.token}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ sessionId: guestSessionId })
+          body: JSON.stringify({ sessionId: guestCartSessionId })
         });
         
         const mergeData = await mergeResponse.json();
@@ -637,6 +710,31 @@ export default function LoginPage() {
         console.error('Merge cart error:', mergeError);
       }
     }
+
+    // ========== ADD THIS - MERGE GUEST WISHLIST ==========
+    const guestWishlistSessionId = localStorage.getItem('wishlistSessionId');
+    if (guestWishlistSessionId && data.token) {
+      try {
+        const mergeResponse = await fetch('http://localhost:5000/api/wishlist/merge', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${data.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sessionId: guestWishlistSessionId })
+        });
+        
+        const mergeData = await mergeResponse.json();
+        if (mergeData.success) {
+          localStorage.removeItem('wishlistSessionId');
+          window.dispatchEvent(new Event('wishlist-update'));
+          console.log('Guest wishlist merged successfully');
+        }
+      } catch (mergeError) {
+        console.error('Merge wishlist error:', mergeError);
+      }
+    }
+    // ========== END OF WISHLIST MERGE ==========
 
     // Role-based redirect
     setTimeout(() => {
@@ -663,33 +761,56 @@ export default function LoginPage() {
     setIsSubmitting(false);
   }
 };
-  
-  
-  // const handleGoogleSuccess = (data) => {
-  //   console.log('Google sign in success:', data);
-    
-  //   if (data.token) {
-  //     localStorage.setItem('token', data.token);
-  //     localStorage.setItem('user', JSON.stringify(data.user));
-      
-  //     if (data.requiresAdditionalInfo) {
-  //       toast.success('🎉 Google Sign In Successful!', {
-  //         description: 'Please complete your profile to continue.',
-  //         duration: 4000,
-  //       });
-  //     } else {
-  //       toast.success('🎉 Welcome back!', {
-  //         description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
-  //         duration: 4000,
-  //       });
-  //     }
-  //     // GoogleLoginButton handles redirect based on requiresAdditionalInfo
-  //   }
-  // };
 
-  // Google Sign In Error Handler
+//   const handleGoogleSuccess = async (data) => {
+//   console.log('Google sign in success:', data);
   
-  // Google Sign In Success Handler
+//   if (data.token) {
+//     localStorage.setItem('token', data.token);
+//     localStorage.setItem('user', JSON.stringify(data.user));
+    
+//     // ========== ADD THIS CART MERGE CODE FOR GOOGLE LOGIN ==========
+//     // Merge guest cart after successful Google login
+//     const guestSessionId = localStorage.getItem('cartSessionId');
+//     if (guestSessionId && data.token) {
+//       try {
+//         const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
+//           method: 'POST',
+//           headers: {
+//             'Authorization': `Bearer ${data.token}`,
+//             'Content-Type': 'application/json'
+//           },
+//           body: JSON.stringify({ sessionId: guestSessionId })
+//         });
+        
+//         const mergeData = await mergeResponse.json();
+//         if (mergeData.success) {
+//           localStorage.removeItem('cartSessionId');
+//           window.dispatchEvent(new Event('cart-update'));
+//           console.log('Guest cart merged successfully');
+//         }
+//       } catch (mergeError) {
+//         console.error('Merge cart error:', mergeError);
+//       }
+//     }
+//     // ========== END OF CART MERGE CODE ==========
+    
+//     if (data.requiresAdditionalInfo) {
+//       toast.success('🎉 Google Sign In Successful!', {
+//         description: 'Please complete your profile to continue.',
+//         duration: 4000,
+//       });
+//     } else {
+//       toast.success('🎉 Welcome back!', {
+//         description: `Ready for fun, ${data.user.contactPerson || data.user.companyName || 'Toy Lover'}!`,
+//         duration: 4000,
+//       });
+//     }
+//     // GoogleLoginButton handles redirect based on requiresAdditionalInfo
+//   }
+// };
+  
+
 const handleGoogleSuccess = async (data) => {
   console.log('Google sign in success:', data);
   
@@ -697,10 +818,9 @@ const handleGoogleSuccess = async (data) => {
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     
-    // ========== ADD THIS CART MERGE CODE FOR GOOGLE LOGIN ==========
     // Merge guest cart after successful Google login
-    const guestSessionId = localStorage.getItem('cartSessionId');
-    if (guestSessionId && data.token) {
+    const guestCartSessionId = localStorage.getItem('cartSessionId');
+    if (guestCartSessionId && data.token) {
       try {
         const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
           method: 'POST',
@@ -708,7 +828,7 @@ const handleGoogleSuccess = async (data) => {
             'Authorization': `Bearer ${data.token}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ sessionId: guestSessionId })
+          body: JSON.stringify({ sessionId: guestCartSessionId })
         });
         
         const mergeData = await mergeResponse.json();
@@ -721,7 +841,31 @@ const handleGoogleSuccess = async (data) => {
         console.error('Merge cart error:', mergeError);
       }
     }
-    // ========== END OF CART MERGE CODE ==========
+    
+    // ========== ADD THIS - Merge guest wishlist ==========
+    const guestWishlistSessionId = localStorage.getItem('wishlistSessionId');
+    if (guestWishlistSessionId && data.token) {
+      try {
+        const mergeResponse = await fetch('http://localhost:5000/api/wishlist/merge', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${data.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sessionId: guestWishlistSessionId })
+        });
+        
+        const mergeData = await mergeResponse.json();
+        if (mergeData.success) {
+          localStorage.removeItem('wishlistSessionId');
+          window.dispatchEvent(new Event('wishlist-update'));
+          console.log('Guest wishlist merged successfully');
+        }
+      } catch (mergeError) {
+        console.error('Merge wishlist error:', mergeError);
+      }
+    }
+    // ========== END OF WISHLIST MERGE ==========
     
     if (data.requiresAdditionalInfo) {
       toast.success('🎉 Google Sign In Successful!', {
@@ -734,10 +878,8 @@ const handleGoogleSuccess = async (data) => {
         duration: 4000,
       });
     }
-    // GoogleLoginButton handles redirect based on requiresAdditionalInfo
   }
 };
-  
   const handleGoogleError = (error) => {
     console.error('Google sign in error:', error);
     toast.error('Google Sign In Failed', {

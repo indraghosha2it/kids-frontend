@@ -2036,14 +2036,386 @@ const getAgeGroupBadge = (ageGroup) => {
 };
 
 // Product Grid Card - Toy Theme
-const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
+// const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist: propIsInWishlist  }) => {
+//   const [isMobile, setIsMobile] = useState(false);
+//   const [activeIndex, setActiveIndex] = useState(0);
+//   const [isHovered, setIsHovered] = useState(false);
+//   const [cartStatusLoading, setCartStatusLoading] = useState(false);
+  
+//   const isInCart = propIsInCart || false;
+//   const isWishlisted = propIsInWishlist || false;
+//   const productImages = product.images || [];
+//   const hasMultipleImages = productImages.length > 1;
+//   const primaryTag = product.tags?.[0];
+//   const tagStyle = primaryTag ? getTagStyles(primaryTag) : '';
+//   const discountPercent = calculateDiscountPercentage(product.regularPrice, product.discountPrice);
+//   const currentPrice = product.discountPrice && product.discountPrice < product.regularPrice ? product.discountPrice : product.regularPrice;
+//   const originalPrice = product.regularPrice;
+  
+//   useEffect(() => {
+//     const checkMobile = () => {
+//       setIsMobile(window.innerWidth < 768);
+//     };
+//     checkMobile();
+//     window.addEventListener('resize', checkMobile);
+//     return () => window.removeEventListener('resize', checkMobile);
+//   }, []);
+
+// const handleWishlist = async (e) => {
+//   e.stopPropagation();
+  
+//   const toastId = toast.loading(isWishlisted ? 'Removing from wishlist...' : 'Adding to wishlist...');
+  
+//   try {
+//     const token = localStorage.getItem('token');
+//     const sessionId = localStorage.getItem('wishlistSessionId');
+    
+//     const headers = {
+//       'Content-Type': 'application/json'
+//     };
+    
+//     if (token) {
+//       headers['Authorization'] = `Bearer ${token}`;
+//     } else if (sessionId) {
+//       headers['x-session-id'] = sessionId;
+//     }
+    
+//     const response = await fetch('http://localhost:5000/api/wishlist', {
+//       method: 'POST',
+//       headers: headers,
+//       body: JSON.stringify({ productId: product._id })
+//     });
+    
+//     const data = await response.json();
+    
+//     if (data.success) {
+//       if (data.sessionId && !token) {
+//         localStorage.setItem('wishlistSessionId', data.sessionId);
+//       }
+      
+//       // Don't set local state, just dispatch event to refresh parent data
+//       toast.success(data.message, { id: toastId });
+//       window.dispatchEvent(new Event('wishlist-update'));
+//     } else {
+//       toast.error(data.error || 'Failed to update wishlist', { id: toastId });
+//     }
+//   } catch (error) {
+//     console.error('Wishlist error:', error);
+//     toast.error('Network error. Please try again.', { id: toastId });
+//   }
+// };
+
+//   const addToCart = async (e) => {
+//     e.stopPropagation();
+    
+//     if (isInCart) {
+//       toast.info('Product already in cart!', {
+//         description: 'View your cart to proceed with checkout.'
+//       });
+//       return;
+//     }
+    
+//     setCartStatusLoading(true);
+//     const toastId = toast.loading('Adding to cart...');
+    
+//     try {
+//       const token = localStorage.getItem('token');
+//       const sessionId = localStorage.getItem('cartSessionId');
+      
+//       const headers = {
+//         'Content-Type': 'application/json'
+//       };
+      
+//       if (token) {
+//         headers['Authorization'] = `Bearer ${token}`;
+//       } else if (sessionId) {
+//         headers['x-session-id'] = sessionId;
+//       }
+      
+//       const response = await fetch('http://localhost:5000/api/cart', {
+//         method: 'POST',
+//         headers: headers,
+//         body: JSON.stringify({
+//           productId: product._id,
+//           quantity: 1
+//         })
+//       });
+      
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         if (data.sessionId && !token) {
+//           localStorage.setItem('cartSessionId', data.sessionId);
+//         }
+        
+//         toast.success('Added to cart!', { id: toastId });
+//         window.dispatchEvent(new Event('cart-update'));
+        
+//         setTimeout(() => {
+//           window.dispatchEvent(new Event('cart-update'));
+//         }, 500);
+//       } else {
+//         toast.error(data.error || 'Failed to add to cart', { id: toastId });
+//       }
+//     } catch (error) {
+//       console.error('Add to cart error:', error);
+//       toast.error('Network error. Please try again.', { id: toastId });
+//     } finally {
+//       setCartStatusLoading(false);
+//     }
+//   };
+
+//   const viewCart = (e) => {
+//     e.stopPropagation();
+//     router.push('/cart');
+//   };
+
+//   return (
+//     <motion.div
+//       layout
+//       initial={{ opacity: 0, scale: 0.95 }}
+//       animate={{ opacity: 1, scale: 1 }}
+//       exit={{ opacity: 0, scale: 0.95 }}
+//       transition={{
+//         layout: { type: "spring", stiffness: 100, damping: 15 },
+//         opacity: { duration: 0.3 }
+//       }}
+//       onMouseEnter={() => setIsHovered(true)}
+//       onMouseLeave={() => setIsHovered(false)}
+//       className="group bg-white rounded-2xl border-2 border-[#FFE0E6] hover:border-[#FFB6C1] transition-all duration-300 cursor-pointer shadow-md hover:shadow-xl overflow-hidden"
+//       onClick={() => {
+//         if (isMobile) {
+//           window.location.href = `/productDetails?id=${product._id}`;
+//         } else {
+//           window.open(`/productDetails?id=${product._id}`, '_blank');
+//         }
+//       }}
+//     >
+//       {/* Image Container */}
+//       <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden bg-gradient-to-br from-[#FFF9F0] to-[#FFE0E6]">
+//         <motion.img
+//           src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://via.placeholder.com/300'}
+//           alt={product.productName}
+//           className="w-full h-full object-contain p-4"
+//           whileHover={{ scale: 1.08 }}
+//           transition={{ duration: 0.4 }}
+//           onError={(e) => {
+//             e.target.onerror = null;
+//             e.target.src = 'https://via.placeholder.com/300?text=Toy';
+//           }}
+//           loading="lazy"
+//         />
+        
+//         {/* Discount Badge */}
+//         {discountPercent > 0 && (
+//           <div className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg z-20 flex items-center gap-1">
+//             <Zap className="w-3 h-3" />
+//             {discountPercent}% OFF
+//           </div>
+//         )}
+        
+//         {/* Tag Badge - Top Right */}
+//         {primaryTag && (
+//           <motion.div 
+//             initial={{ x: 10, opacity: 0 }}
+//             animate={{ x: 0, opacity: 1 }}
+//             transition={{ delay: 0.2 }}
+//             className={`absolute top-2 right-2 ${tagStyle} text-[8px] md:text-[9px] px-2 py-1 font-semibold rounded-full z-20 flex items-center gap-1 shadow-lg`}
+//           >
+//             <Sparkles className="w-2.5 h-2.5" />
+//             <span className="truncate">{primaryTag}</span>
+//           </motion.div>
+//         )}
+        
+//         {/* Hover Icons - View, Cart, Wishlist */}
+//         <motion.div 
+//           className="absolute inset-0 bg-black/40 flex items-center justify-center gap-3 z-30"
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: isHovered && !isMobile ? 1 : 0 }}
+//           transition={{ duration: 0.2 }}
+//         >
+//           <motion.div
+//             initial={{ scale: 0, y: 20 }}
+//             animate={{ scale: isHovered && !isMobile ? 1 : 0, y: isHovered && !isMobile ? 0 : 20 }}
+//             transition={{ delay: 0.05 }}
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               window.open(`/productDetails?id=${product._id}`, '_blank');
+//             }}
+//             className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center cursor-pointer shadow-lg transition-all hover:scale-110"
+//           >
+//             <Eye className="w-4 h-4 md:w-4.5 md:h-4.5 text-[#4A8A90]" />
+//           </motion.div>
+          
+//           <motion.div
+//             initial={{ scale: 0, y: 20 }}
+//             animate={{ scale: isHovered && !isMobile ? 1 : 0, y: isHovered && !isMobile ? 0 : 20 }}
+//             transition={{ delay: 0.1 }}
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               window.open(`/productDetails?id=${product._id}#inquiry-form`, '_blank');
+//             }}
+//             className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center cursor-pointer shadow-lg transition-all hover:scale-110"
+//           >
+//             <ShoppingCart className="w-4 h-4 md:w-4.5 md:h-4.5 text-[#FFB6C1]" />
+//           </motion.div>
+          
+//           <motion.div
+//             initial={{ scale: 0, y: 20 }}
+//             animate={{ scale: isHovered && !isMobile ? 1 : 0, y: isHovered && !isMobile ? 0 : 20 }}
+//             transition={{ delay: 0.15 }}
+//             onClick={handleWishlist}
+//             className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center cursor-pointer shadow-lg transition-all hover:scale-110"
+//           >
+//             <Heart className={`w-4 h-4 md:w-4.5 md:h-4.5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-[#4A8A90]'}`} />
+//           </motion.div>
+//         </motion.div>
+//       </div>
+      
+//       {/* Thumbnail Images */}
+//       {hasMultipleImages && (
+//         <div className="flex justify-center items-center gap-1.5 py-2 bg-[#FFF9F0]">
+//           {productImages.slice(0, 4).map((image, index) => (
+//             <button
+//               key={index}
+//               className={`w-6 h-6 md:w-7 md:h-7 overflow-hidden rounded-md transition-all duration-200 ${
+//                 activeIndex === index 
+//                   ? 'ring-2 ring-[#4A8A90] ring-offset-1' 
+//                   : 'opacity-60 hover:opacity-100'
+//               }`}
+//               onMouseEnter={() => setActiveIndex(index)}
+//               onClick={(e) => {
+//                 e.stopPropagation();
+//                 setActiveIndex(index);
+//               }}
+//             >
+//               <img src={image.url} alt="" className="w-full h-full object-cover" />
+//             </button>
+//           ))}
+//         </div>
+//       )}
+
+//       {/* Content */}
+//       <div className="p-3 md:p-4">
+//         {/* Product Name */}
+//         <h3 className="text-sm md:text-base font-bold text-[#2D3A5C] line-clamp-2 hover:text-[#4A8A90] transition-colors mb-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }} title={product.productName}>
+//           {truncateText(product.productName, 25)}
+//         </h3>
+        
+//         {/* Age Group and Rating Row */}
+//         <div className="flex items-center justify-between mb-2">
+//           {product.ageGroup && (
+//             <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
+//               <Users className="w-2.5 h-2.5" />
+//               Ages {product.ageGroup} years
+//             </div>
+//           )}
+          
+//           {/* Rating Stars */}
+//           {product.rating > 0 && (
+//             <div className="flex items-center gap-1">
+//               <div className="flex items-center">
+//                 {[1, 2, 3, 4, 5].map((star) => (
+//                   <Star
+//                     key={star}
+//                     className={`w-3 h-3 ${
+//                       star <= Math.floor(product.rating)
+//                         ? 'fill-yellow-400 text-yellow-400'
+//                         : star - 0.5 <= product.rating
+//                         ? 'fill-yellow-400 text-yellow-400 opacity-50'
+//                         : 'text-gray-300'
+//                     }`}
+//                   />
+//                 ))}
+//               </div>
+//               <span className="text-[10px] text-gray-500">({product.rating})</span>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Price Section */}
+//         <div className="flex items-baseline gap-2 mb-2">
+//           <span className="text-lg md:text-xl font-bold text-[#4A8A90]">
+//             ৳{formatPrice(currentPrice)}
+//           </span>
+//           {discountPercent > 0 && (
+//             <>
+//               <span className="text-xs text-gray-400 line-through">
+//                 ৳{formatPrice(originalPrice)}
+//               </span>
+//               <span className="text-xs font-semibold text-red-500 bg-red-100 px-1.5 py-0.5 rounded-full">
+//                 Save {discountPercent}%
+//               </span>
+//             </>
+//           )}
+//         </div>
+
+//         {/* Category and Stock Status Row */}
+//         <div className="flex items-center justify-between gap-2">
+//           {product.category?.name && (
+//             <div className="flex items-center gap-1 text-[10px] text-[#8B9DC3]">
+//               <Package className="w-3 h-3" />
+//               <span className="truncate">{product.category.name}</span>
+//             </div>
+//           )}
+          
+//           {/* Stock Status */}
+//           <div className="flex-shrink-0">
+//             {product.stockQuantity > 0 ? (
+//               <span className="flex items-center gap-1 text-[10px] text-green-600">
+//                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+//                 <span>In Stock ({product.stockQuantity})</span>
+//               </span>
+//             ) : (
+//               <span className="flex items-center gap-1 text-[10px] text-red-500">
+//                 <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+//                 <span>Out of Stock</span>
+//               </span>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Add to Cart / View Cart Button */}
+//       {cartStatusLoading ? (
+//         <button
+//           disabled
+//           className="w-full py-2.5 md:py-3 text-center text-xs md:text-sm font-bold bg-gray-300 text-gray-500 rounded-xl flex items-center justify-center gap-2"
+//         >
+//           <Loader2 className="w-3.5 h-3.5 animate-spin" />
+//           Loading...
+//         </button>
+//       ) : isInCart ? (
+//         <button
+//           onClick={viewCart}
+//           className="w-full py-2.5 md:py-3 text-center text-xs md:text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all flex items-center justify-center gap-2 rounded-xl shadow-md"
+//         >
+//           <ShoppingCart className="w-3.5 h-3.5" />
+//           View in Cart
+//         </button>
+//       ) : (
+//         <button
+//           onClick={addToCart}
+//           className="w-full py-2.5 md:py-3 text-center text-xs md:text-sm font-bold bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white hover:from-[#3A7A80] hover:to-[#5B9399] transition-all flex items-center justify-center gap-2 rounded-xl shadow-md"
+//         >
+//           <ShoppingCart className="w-3.5 h-3.5 md:w-4 md:h-4" />
+//           Add to Cart
+//         </button>
+//       )}
+//     </motion.div>
+//   );
+// };
+
+// Product Grid Card - Compact Design (Like Wishlist Card)
+const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist: propIsInWishlist }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [cartStatusLoading, setCartStatusLoading] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
   
   const isInCart = propIsInCart || false;
+  const isWishlisted = propIsInWishlist || false;
   const productImages = product.images || [];
   const hasMultipleImages = productImages.length > 1;
   const primaryTag = product.tags?.[0];
@@ -2061,19 +2433,57 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const handleWishlist = (e) => {
+  const handleWishlist = async (e) => {
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-    toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+    setWishlistLoading(true);
+    
+    const toastId = toast.loading(isWishlisted ? 'Removing from wishlist...' : 'Adding to wishlist...');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const sessionId = localStorage.getItem('wishlistSessionId');
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
+      }
+      
+      const response = await fetch('http://localhost:5000/api/wishlist', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ productId: product._id })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        if (data.sessionId && !token) {
+          localStorage.setItem('wishlistSessionId', data.sessionId);
+        }
+        
+        toast.success(data.message, { id: toastId });
+        window.dispatchEvent(new Event('wishlist-update'));
+      } else {
+        toast.error(data.error || 'Failed to update wishlist', { id: toastId });
+      }
+    } catch (error) {
+      console.error('Wishlist error:', error);
+      toast.error('Network error. Please try again.', { id: toastId });
+    } finally {
+      setWishlistLoading(false);
+    }
   };
 
   const addToCart = async (e) => {
     e.stopPropagation();
     
     if (isInCart) {
-      toast.info('Product already in cart!', {
-        description: 'View your cart to proceed with checkout.'
-      });
+      router.push('/cart');
       return;
     }
     
@@ -2127,11 +2537,6 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
     }
   };
 
-  const viewCart = (e) => {
-    e.stopPropagation();
-    router.push('/cart');
-  };
-
   return (
     <motion.div
       layout
@@ -2144,7 +2549,7 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group bg-white rounded-2xl border-2 border-[#FFE0E6] hover:border-[#FFB6C1] transition-all duration-300 cursor-pointer shadow-md hover:shadow-xl overflow-hidden"
+      className="group bg-white rounded-xl border border-[#FFE0E6] hover:border-[#FFB6C1] transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md overflow-hidden"
       onClick={() => {
         if (isMobile) {
           window.location.href = `/productDetails?id=${product._id}`;
@@ -2153,12 +2558,12 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
         }
       }}
     >
-      {/* Image Container */}
-      <div className="relative w-full h-48 sm:h-52 md:h-56 overflow-hidden bg-gradient-to-br from-[#FFF9F0] to-[#FFE0E6]">
+      {/* Image Container - Compact */}
+      <div className="relative w-full h-32 sm:h-36 md:h-40 overflow-hidden bg-gradient-to-br from-[#FFF9F0] to-[#FFE0E6]">
         <motion.img
           src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://via.placeholder.com/300'}
           alt={product.productName}
-          className="w-full h-full object-contain p-4"
+          className="w-full h-full object-contain p-2"
           whileHover={{ scale: 1.08 }}
           transition={{ duration: 0.4 }}
           onError={(e) => {
@@ -2170,8 +2575,8 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
         
         {/* Discount Badge */}
         {discountPercent > 0 && (
-          <div className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg z-20 flex items-center gap-1">
-            <Zap className="w-3 h-3" />
+          <div className="absolute top-1 left-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-lg z-20 flex items-center gap-0.5">
+            <Zap className="w-2 h-2" />
             {discountPercent}% OFF
           </div>
         )}
@@ -2181,68 +2586,79 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
           <motion.div 
             initial={{ x: 10, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`absolute top-2 right-2 ${tagStyle} text-[8px] md:text-[9px] px-2 py-1 font-semibold rounded-full z-20 flex items-center gap-1 shadow-lg`}
+            transition={{ delay: 0.1 }}
+            className={`absolute top-1 right-1 ${tagStyle} text-[7px] md:text-[8px] px-1.5 py-0.5 font-semibold rounded-md z-20 flex items-center gap-0.5 shadow-lg`}
           >
-            <Sparkles className="w-2.5 h-2.5" />
-            <span className="truncate">{primaryTag}</span>
+            <Sparkles className="w-2 h-2" />
+            <span className="truncate max-w-[60px]">{primaryTag}</span>
           </motion.div>
         )}
         
-        {/* Hover Icons - View, Cart, Wishlist */}
-        <motion.div 
-          className="absolute inset-0 bg-black/40 flex items-center justify-center gap-3 z-30"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered && !isMobile ? 1 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
+        {/* Hover Icons - Appear from Right Side, Fast Animation */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-30">
           <motion.div
-            initial={{ scale: 0, y: 20 }}
-            animate={{ scale: isHovered && !isMobile ? 1 : 0, y: isHovered && !isMobile ? 0 : 20 }}
-            transition={{ delay: 0.05 }}
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ 
+              x: isHovered && !isMobile ? 0 : 40, 
+              opacity: isHovered && !isMobile ? 1 : 0 
+            }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
             onClick={(e) => {
               e.stopPropagation();
               window.open(`/productDetails?id=${product._id}`, '_blank');
             }}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center cursor-pointer shadow-lg transition-all hover:scale-110"
+            className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-[#4A8A90] flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
           >
-            <Eye className="w-4 h-4 md:w-4.5 md:h-4.5 text-[#4A8A90]" />
+            <Eye className="w-3.5 h-3.5 text-[#4A8A90] hover:text-white transition-colors duration-200" />
           </motion.div>
           
           <motion.div
-            initial={{ scale: 0, y: 20 }}
-            animate={{ scale: isHovered && !isMobile ? 1 : 0, y: isHovered && !isMobile ? 0 : 20 }}
-            transition={{ delay: 0.1 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(`/productDetails?id=${product._id}#inquiry-form`, '_blank');
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ 
+              x: isHovered && !isMobile ? 0 : 40, 
+              opacity: isHovered && !isMobile ? 1 : 0 
             }}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center cursor-pointer shadow-lg transition-all hover:scale-110"
+            transition={{ duration: 0.15, ease: "easeOut", delay: 0.03 }}
+            onClick={addToCart}
+            className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-[#4A8A90] flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
           >
-            <ShoppingCart className="w-4 h-4 md:w-4.5 md:h-4.5 text-[#FFB6C1]" />
+            {cartStatusLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#4A8A90] hover:text-white" />
+            ) : isInCart ? (
+              <ShoppingCart className="w-3.5 h-3.5 text-green-500" />
+            ) : (
+              <ShoppingCart className="w-3.5 h-3.5 text-[#FFB6C1] hover:text-white transition-colors duration-200" />
+            )}
           </motion.div>
           
           <motion.div
-            initial={{ scale: 0, y: 20 }}
-            animate={{ scale: isHovered && !isMobile ? 1 : 0, y: isHovered && !isMobile ? 0 : 20 }}
-            transition={{ delay: 0.15 }}
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ 
+              x: isHovered && !isMobile ? 0 : 40, 
+              opacity: isHovered && !isMobile ? 1 : 0 
+            }}
+            transition={{ duration: 0.15, ease: "easeOut", delay: 0.06 }}
             onClick={handleWishlist}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center cursor-pointer shadow-lg transition-all hover:scale-110"
+            className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-red-500 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
           >
-            <Heart className={`w-4 h-4 md:w-4.5 md:h-4.5 ${isWishlisted ? 'fill-[#FFB6C1] text-[#FFB6C1]' : 'text-[#4A8A90]'}`} />
+            {wishlistLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500 hover:text-white" />
+            ) : (
+              <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-[#4A8A90] hover:text-white'} transition-colors duration-200`} />
+            )}
           </motion.div>
-        </motion.div>
+        </div>
       </div>
       
-      {/* Thumbnail Images */}
+      {/* Thumbnail Images - Show 4 images at bottom of main image */}
       {hasMultipleImages && (
-        <div className="flex justify-center items-center gap-1.5 py-2 bg-[#FFF9F0]">
+        <div className="flex justify-center items-center gap-1 py-1.5 bg-[#FFF9F0] border-b border-[#FFE0E6]">
           {productImages.slice(0, 4).map((image, index) => (
             <button
               key={index}
-              className={`w-6 h-6 md:w-7 md:h-7 overflow-hidden rounded-md transition-all duration-200 ${
+              className={`w-5 h-5 overflow-hidden rounded transition-all duration-200 ${
                 activeIndex === index 
-                  ? 'ring-2 ring-[#4A8A90] ring-offset-1' 
+                  ? 'ring-1.5 ring-[#4A8A90] ring-offset-0.5 scale-110' 
                   : 'opacity-60 hover:opacity-100'
               }`}
               onMouseEnter={() => setActiveIndex(index)}
@@ -2258,29 +2674,32 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
       )}
 
       {/* Content */}
-      <div className="p-3 md:p-4">
+      <div className="p-2">
         {/* Product Name */}
-        <h3 className="text-sm md:text-base font-bold text-[#2D3A5C] line-clamp-2 hover:text-[#4A8A90] transition-colors mb-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }} title={product.productName}>
-          {truncateText(product.productName, 25)}
+        <h3 className="text-xs font-bold text-[#2D3A5C] line-clamp-2 hover:text-[#4A8A90] transition-colors duration-200 mb-1" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }} title={product.productName}>
+          {truncateText(product.productName, 20)}
         </h3>
         
-        {/* Age Group and Rating Row */}
-        <div className="flex items-center justify-between mb-2">
-          {product.ageGroup && (
-            <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
-              <Users className="w-2.5 h-2.5" />
-              Ages {product.ageGroup} years
+        {/* Age Group and Rating Row - Same row */}
+        <div className="flex items-center justify-between mb-1.5">
+          {/* Age Group Badge */}
+          {product.ageGroup ? (
+            <div className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
+              <Users className="w-2 h-2" />
+              Ages {product.ageGroup}
             </div>
+          ) : (
+            <div className="text-[8px] text-gray-400">✨ Toy</div>
           )}
           
           {/* Rating Stars */}
           {product.rating > 0 && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               <div className="flex items-center">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`w-3 h-3 ${
+                    className={`w-2.5 h-2.5 ${
                       star <= Math.floor(product.rating)
                         ? 'fill-yellow-400 text-yellow-400'
                         : star - 0.5 <= product.rating
@@ -2290,47 +2709,52 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
                   />
                 ))}
               </div>
-              <span className="text-[10px] text-gray-500">({product.rating})</span>
+              <span className="text-[8px] text-gray-500">({product.rating})</span>
             </div>
           )}
         </div>
 
         {/* Price Section */}
-        <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-lg md:text-xl font-bold text-[#4A8A90]">
+        <div className="flex items-baseline gap-1.5 mb-1.5">
+          <span className="text-sm font-bold text-[#4A8A90]">
             ৳{formatPrice(currentPrice)}
           </span>
           {discountPercent > 0 && (
             <>
-              <span className="text-xs text-gray-400 line-through">
+              <span className="text-[8px] text-gray-400 line-through">
                 ৳{formatPrice(originalPrice)}
               </span>
-              <span className="text-xs font-semibold text-red-500 bg-red-100 px-1.5 py-0.5 rounded-full">
-                Save {discountPercent}%
+              <span className="text-[7px] font-semibold text-red-500 bg-red-100 px-1 py-0.5 rounded">
+                -{discountPercent}%
               </span>
             </>
           )}
         </div>
 
         {/* Category and Stock Status Row */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-1">
+          {/* Category */}
           {product.category?.name && (
-            <div className="flex items-center gap-1 text-[10px] text-[#8B9DC3]">
-              <Package className="w-3 h-3" />
-              <span className="truncate">{product.category.name}</span>
+            <div className="flex items-center gap-0.5 text-[7px] text-[#8B9DC3]">
+              <Package className="w-2.5 h-2.5" />
+              <span className="truncate max-w-[70px]">{product.category.name}</span>
             </div>
+          )}
+          
+          {!product.category?.name && (
+            <div className="text-[7px] text-gray-400">🎁 Toy</div>
           )}
           
           {/* Stock Status */}
           <div className="flex-shrink-0">
             {product.stockQuantity > 0 ? (
-              <span className="flex items-center gap-1 text-[10px] text-green-600">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="flex items-center gap-0.5 text-[7px] text-green-600 font-medium">
+                <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
                 <span>In Stock ({product.stockQuantity})</span>
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-[10px] text-red-500">
-                <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+              <span className="flex items-center gap-0.5 text-[7px] text-red-500 font-medium">
+                <div className="w-1 h-1 bg-red-500 rounded-full"></div>
                 <span>Out of Stock</span>
               </span>
             )}
@@ -2342,25 +2766,25 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
       {cartStatusLoading ? (
         <button
           disabled
-          className="w-full py-2.5 md:py-3 text-center text-xs md:text-sm font-bold bg-gray-300 text-gray-500 rounded-xl flex items-center justify-center gap-2"
+          className="w-full py-1.5 text-center text-[9px] font-bold bg-gray-300 text-gray-500 flex items-center justify-center gap-1"
         >
-          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          <Loader2 className="w-2.5 h-2.5 animate-spin" />
           Loading...
         </button>
       ) : isInCart ? (
         <button
-          onClick={viewCart}
-          className="w-full py-2.5 md:py-3 text-center text-xs md:text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all flex items-center justify-center gap-2 rounded-xl shadow-md"
+          onClick={() => router.push('/cart')}
+          className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center gap-1"
         >
-          <ShoppingCart className="w-3.5 h-3.5" />
+          <ShoppingCart className="w-2.5 h-2.5" />
           View in Cart
         </button>
       ) : (
         <button
           onClick={addToCart}
-          className="w-full py-2.5 md:py-3 text-center text-xs md:text-sm font-bold bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white hover:from-[#3A7A80] hover:to-[#5B9399] transition-all flex items-center justify-center gap-2 rounded-xl shadow-md"
+          className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white hover:from-[#3A7A80] hover:to-[#5B9399] transition-all duration-200 flex items-center justify-center gap-1"
         >
-          <ShoppingCart className="w-3.5 h-3.5 md:w-4 md:h-4" />
+          <ShoppingCart className="w-2.5 h-2.5" />
           Add to Cart
         </button>
       )}
@@ -2369,13 +2793,13 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart }) => {
 };
 
 // Product List Card - Toy Theme
-const ProductListCard = ({ product, router, isInCart: propIsInCart }) => {
+const ProductListCard = ({ product, router, isInCart: propIsInCart, isInWishlist: propIsInWishlist }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [cartStatusLoading, setCartStatusLoading] = useState(false);
   
   const isInCart = propIsInCart || false;
+   const isWishlisted = propIsInWishlist || false;
   const productImages = product.images || [];
   const hasMultipleImages = productImages.length > 1;
   const primaryTag = product.tags?.[0];
@@ -2383,10 +2807,47 @@ const ProductListCard = ({ product, router, isInCart: propIsInCart }) => {
   const currentPrice = product.discountPrice && product.discountPrice < product.regularPrice ? product.discountPrice : product.regularPrice;
   const originalPrice = product.regularPrice;
 
-  const handleWishlist = (e) => {
+ const handleWishlist = async (e) => {
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-    toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+    
+    const toastId = toast.loading(isWishlisted ? 'Removing from wishlist...' : 'Adding to wishlist...');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const sessionId = localStorage.getItem('wishlistSessionId');
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
+      }
+      
+      const response = await fetch('http://localhost:5000/api/wishlist', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ productId: product._id })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        if (data.sessionId && !token) {
+          localStorage.setItem('wishlistSessionId', data.sessionId);
+        }
+        
+        toast.success(data.message, { id: toastId });
+        window.dispatchEvent(new Event('wishlist-update'));
+      } else {
+        toast.error(data.error || 'Failed to update wishlist', { id: toastId });
+      }
+    } catch (error) {
+      console.error('Wishlist error:', error);
+      toast.error('Network error. Please try again.', { id: toastId });
+    }
   };
 
   // const addToCart = async (e) => {
@@ -2603,7 +3064,7 @@ const ProductListCard = ({ product, router, isInCart: propIsInCart }) => {
                 onClick={handleWishlist}
                 className="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center cursor-pointer shadow-lg"
               >
-                <Heart className={`w-4.5 h-4.5 ${isWishlisted ? 'fill-[#FFB6C1] text-[#FFB6C1]' : 'text-[#4A8A90]'}`} />
+                <Heart className={`w-4.5 h-4.5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-[#4A8A90]'}`} />
               </motion.div>
             </motion.div>
           </div>
@@ -3158,6 +3619,7 @@ export default function ProductsClient() {
   const [minPriceInput, setMinPriceInput] = useState('');
   const [maxPriceInput, setMaxPriceInput] = useState('');
   const [initialCategorySet, setInitialCategorySet] = useState(false);
+  const [productsInWishlist, setProductsInWishlist] = useState({});
 
   const saveScrollPosition = () => {
     scrollPositionRef.current = window.scrollY;
@@ -3278,7 +3740,80 @@ export default function ProductsClient() {
   useEffect(() => {
     if (!loading) restoreScrollPosition();
   }, [loading]);
+// Add this useEffect to check wishlist status
+useEffect(() => {
+  const checkWishlistStatus = async () => {
+    if (products.length === 0) return;
+    
+    const productIds = products.map(p => p._id);
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('wishlistSessionId');
+    
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (sessionId) {
+      headers['x-session-id'] = sessionId;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productIds })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setProductsInWishlist(data.data);
+      }
+    } catch (error) {
+      console.error('Error checking wishlist status:', error);
+    }
+  };
+  
+  checkWishlistStatus();
+}, [products]);
 
+// Refresh wishlist status when wishlist updates
+useEffect(() => {
+  const refreshWishlistStatus = async () => {
+    if (products.length === 0) return;
+    
+    const productIds = products.map(p => p._id);
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('wishlistSessionId');
+    
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (sessionId) {
+      headers['x-session-id'] = sessionId;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productIds })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setProductsInWishlist(data.data);
+      }
+    } catch (error) {
+      console.error('Error refreshing wishlist status:', error);
+    }
+  };
+  
+  const handleWishlistUpdate = () => {
+    refreshWishlistStatus();
+  };
+  
+  window.addEventListener('wishlist-update', handleWishlistUpdate);
+  return () => window.removeEventListener('wishlist-update', handleWishlistUpdate);
+}, [products]);
   // ========== ADD THIS useEffect - Check cart status for all products ==========
   useEffect(() => {
     const checkAllProductsCartStatus = async () => {
@@ -3848,13 +4383,14 @@ export default function ProductsClient() {
                       </div>
                       
                       {viewMode === 'grid' ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
                           {products.map(product => (
                             <ProductGridCard 
                               key={product._id} 
-                              product={product} 
-                              router={router}
-                              isInCart={productsInCart[product._id] || false}
+                            product={product} 
+                            router={router}
+                            isInCart={productsInCart[product._id] || false}
+                            isInWishlist={productsInWishlist[product._id] || false}
                             />
                           ))}
                         </div>
@@ -3866,6 +4402,7 @@ export default function ProductsClient() {
                               product={product} 
                               router={router}
                               isInCart={productsInCart[product._id] || false}
+                               isInWishlist={productsInWishlist[product._id] || false}
                             />
                           ))}
                         </div>

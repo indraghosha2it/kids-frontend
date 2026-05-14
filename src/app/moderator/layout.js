@@ -558,7 +558,8 @@ import {
   Sparkles,
   Gift,
   Rocket,
-  Award
+  Award,
+  Ticket
 } from 'lucide-react';
 
 export default function ModeratorLayout({ children }) {
@@ -613,6 +614,12 @@ export default function ModeratorLayout({ children }) {
     if (href === '/moderator/orders') {
       return currentPath === '/moderator/orders' || 
              currentPath.startsWith('/moderator/orders/');
+    }
+
+     if (href === '/moderator/coupon') {
+      const matches = ['/moderator/coupon', '/moderator/coupon'].some(route => currentPath === route);
+      if (matches) return true;
+      return false;
     }
 
     // Popup Settings
@@ -696,6 +703,8 @@ export default function ModeratorLayout({ children }) {
     { name: 'Create Products', href: '/moderator/create-products', icon: PackagePlus, color: '#4A8A90' },
     { name: 'All Products', href: '/moderator/all-products', icon: Image, color: '#4A8A90' },
     { name: 'All Orders', href: '/moderator/orders', icon: MessageSquare, color: '#4A8A90' },
+    { name: 'Manage Coupon', href: '/moderator/coupon', icon: Ticket, color: '#4A8A90' },
+
     { name: 'Popup Settings', href: '/moderator/popup-settings', icon: Star, color: '#4A8A90' },
     { name: 'Promotional Popup', href: '/moderator/promotional-settings', icon: Rocket, color: '#4A8A90' },
     { name: 'Create Blog', href: '/moderator/create-blog', icon: Newspaper, color: '#4A8A90' },

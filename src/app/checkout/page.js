@@ -1529,6 +1529,69 @@ const PaymentSelector = ({ value, onChange, isLoading, onSubmit }) => {
   );
 };
 
+
+// Order Success Modal for Guest Users
+const OrderSuccessModal = ({ isOpen, onClose, orderId }) => {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden"
+          >
+            {/* Header */}
+            <div className="p-5 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-center">
+              <div className="w-16 h-16 mx-auto mb-3 bg-white/20 rounded-full flex items-center justify-center">
+                <FaCheckCircle className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-xl font-bold">Order Placed Successfully! 🎉</h2>
+            </div>
+            
+            {/* Body */}
+            <div className="p-5 text-center">
+              <p className="text-gray-700 mb-2">
+                Thank you for your order!
+              </p>
+              <p className="text-sm text-gray-500 mb-4">
+                Your order has been received and is being processed.
+              </p>
+              {orderId && (
+                <p className="text-xs text-gray-400 mb-4">
+                  Order ID: {orderId.slice(-8).toUpperCase()}
+                </p>
+              )}
+              <div className="bg-blue-50 rounded-lg p-3 mb-4">
+                <p className="text-sm text-blue-700">
+                  📧 A confirmation email has been sent to your email address.
+                </p>
+              </div>
+             
+            </div>
+            
+            {/* Footer */}
+            <div className="p-5 border-t border-gray-200 bg-gray-50 flex gap-3">
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 py-2 bg-[#4A8A90] text-white rounded-lg hover:bg-[#3A7A80] transition-colors"
+              >
+                Continue Shopping
+              </button>
+              <Link href="/" className="flex-1">
+                <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                  Back to Home
+                </button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
   const [cart, setCart] = useState(null);
@@ -1540,6 +1603,8 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [showOrderSuccessModal, setShowOrderSuccessModal] = useState(false);
+const [lastOrderId, setLastOrderId] = useState(null);
   const [shippingCost, setShippingCost] = useState(SHIPPING_COST_OUTSIDE);
   
   // Coupon Modal State
@@ -1767,6 +1832,7 @@ export default function CheckoutPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+     console.log(`Setting ${name} to ${value}`); 
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -1879,25 +1945,34 @@ const handleApplyCouponFromModal = async (code) => {
     toast.success('Coupon removed');
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    const finalCity = formData.city === 'other' ? customCity : formData.city;
-    const finalZone = formData.zone === 'other' ? customZone : formData.zone;
-    
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    else if (!/^01[3-9]\d{8}$/.test(formData.phone)) newErrors.phone = 'Invalid Bangladesh phone number';
-    if (!formData.address.trim()) newErrors.address = 'Address is required';
-    if (!finalCity) newErrors.city = 'Please select a district';
-    if (!finalZone) newErrors.zone = 'Please select a upazila/thana';
-    if (!formData.zipCode.trim()) newErrors.zipCode = 'Zip code is required';
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+const validateForm = () => {
+  console.log('=== VALIDATING FORM ===');
+  console.log('formData:', formData);
+  console.log('customCity:', customCity);
+  console.log('customZone:', customZone);
+  
+  const newErrors = {};
+  
+  const finalCity = formData.city === 'other' ? customCity : formData.city;
+  const finalZone = formData.zone === 'other' ? customZone : formData.zone;
+  
+  if (!formData.fullName?.trim()) newErrors.fullName = 'Full name is required';
+  if (!formData.email?.trim()) newErrors.email = 'Email is required';
+  else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+  if (!formData.phone?.trim()) newErrors.phone = 'Phone number is required';
+  else if (!/^01[3-9]\d{8}$/.test(formData.phone)) newErrors.phone = 'Invalid Bangladesh phone number';
+  if (!formData.address?.trim()) newErrors.address = 'Address is required';
+  if (!finalCity) newErrors.city = 'Please select a district';
+  if (!finalZone) newErrors.zone = 'Please select a upazila/thana';
+  // REMOVE this line - don't validate zipCode
+  // if (!formData.zipCode?.trim()) newErrors.zipCode = 'Zip code is required';
+  
+  console.log('Validation errors:', newErrors);
+  console.log('Validation result:', Object.keys(newErrors).length === 0);
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const calculateSubtotal = () => {
     return cart?.subtotal || 0;
@@ -1909,81 +1984,112 @@ const handleApplyCouponFromModal = async (code) => {
     return totalWithShipping - discount;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  const isLoggedIn = !!user;
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  if (!validateForm()) {
+    toast.error('Please fill all required fields');
+    return;
+  }
+  
+  if (!cart?.items?.length) {
+    toast.error('Your cart is empty');
+    return;
+  }
+  
+  setSubmitting(true);
+  
+  try {
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('cartSessionId');
     
-    if (!validateForm()) {
-      toast.error('Please fill all required fields');
-      return;
+    const finalCity = formData.city === 'other' ? customCity : formData.city;
+    const finalZone = formData.zone === 'other' ? customZone : formData.zone;
+    const finalArea = formData.area === 'other' ? customArea : formData.area;
+    
+    const orderData = {
+      items: cart.items,
+      subtotal: calculateSubtotal(),
+      shippingCost,
+      discount,
+      total: calculateTotal(),
+      paymentMethod,
+      customerInfo: {
+        ...formData,
+        city: finalCity,
+        zone: finalZone,
+        area: finalArea
+      },
+      couponCode: discountDetails?.couponCode || null,
+      couponDiscount: discount,
+      freeShipping: discountDetails?.freeShipping || false
+    };
+    
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (sessionId) {
+      headers['x-session-id'] = sessionId;
     }
     
-    if (!cart?.items?.length) {
-      toast.error('Your cart is empty');
-      return;
-    }
+    const response = await fetch('http://localhost:5000/api/orders', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(orderData)
+    });
     
-    setSubmitting(true);
+    const data = await response.json();
     
-    try {
-      const token = localStorage.getItem('token');
-      const sessionId = localStorage.getItem('cartSessionId');
+    if (data.success) {
+      // Clear cart
+      await fetch('http://localhost:5000/api/cart', { method: 'DELETE', headers });
+      window.dispatchEvent(new Event('cart-update'));
       
-      const finalCity = formData.city === 'other' ? customCity : formData.city;
-      const finalZone = formData.zone === 'other' ? customZone : formData.zone;
-      const finalArea = formData.area === 'other' ? customArea : formData.area;
+      const orderId = data.orderId || data.data?._id || data.data?.id;
       
-      const orderData = {
-        items: cart.items,
-        subtotal: calculateSubtotal(),
-        shippingCost,
-        discount,
-        total: calculateTotal(),
-        paymentMethod,
-        customerInfo: {
-          ...formData,
-          city: finalCity,
-          zone: finalZone,
-          area: finalArea
-        },
-        couponCode: discountDetails?.couponCode || null,
-        couponDiscount: discount,
-        freeShipping: discountDetails?.freeShipping || false
-      };
-      
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      } else if (sessionId) {
-        headers['x-session-id'] = sessionId;
-      }
-      
-      const response = await fetch('http://localhost:5000/api/orders', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(orderData)
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
+      if (isLoggedIn) {
+        // Logged in user - redirect to orders page
         toast.success('Order placed successfully!');
-        
-        // Clear cart
-        await fetch('http://localhost:5000/api/cart', { method: 'DELETE', headers });
-        window.dispatchEvent(new Event('cart-update'));
-        
-        // Redirect to order confirmation
-        router.push(`/order-confirmation?id=${data.order._id}`);
+        router.push('/customer/orders');
       } else {
-        toast.error(data.error || 'Failed to place order');
+        // Guest user - show modal
+        setShowOrderSuccessModal(true);
+        setLastOrderId(orderId);
+        // Clear form for guest
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          whatsapp: '',
+          address: '',
+          city: '',
+          zone: '',
+          area: '',
+          zipCode: '',
+          country: '',
+          note: ''
+        });
+        // setSelectedCity('');
+        // setSelectedZone('');
+        // setSelectedArea('');
+        setCouponCode('');
+        setDiscount(0);
+        setDiscountDetails(null);
       }
-    } catch (error) {
-      console.error('Order submission error:', error);
-      toast.error('Network error. Please try again.');
-    } finally {
-      setSubmitting(false);
+    } else {
+      toast.error(data.error || 'Failed to place order');
     }
-  };
+  } catch (error) {
+    console.error('Order submission error:', error);
+    toast.error('Network error. Please try again.');
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (loading || locationLoading) {
     return (
@@ -2025,7 +2131,7 @@ const handleApplyCouponFromModal = async (code) => {
 
   const subtotal = calculateSubtotal();
   const total = calculateTotal();
-  const isLoggedIn = !!user;
+
 
   return (
     <>
@@ -2415,6 +2521,15 @@ const handleApplyCouponFromModal = async (code) => {
         subtotal={subtotal}
         isLoading={loadingCoupons}
       />
+      {/* Order Success Modal for Guest Users */}
+<OrderSuccessModal
+  isOpen={showOrderSuccessModal}
+  onClose={() => {
+    setShowOrderSuccessModal(false);
+    router.push('/products');
+  }}
+  orderId={lastOrderId}
+/>
       
       <Footer />
       <WhatsAppButton />

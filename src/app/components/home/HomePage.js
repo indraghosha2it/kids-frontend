@@ -27,6 +27,7 @@ export default function HomePage() {
        <Categories />
         
           <ParentsTrustSection />
+             <ReviewsSection />
 
   
       {/* <Categories />
@@ -39,7 +40,7 @@ export default function HomePage() {
            {/* <AlibabaTrustSection />  */}
          
       {/* <TrustCertifications />
-            <ReviewsSection />
+         
               <CTASection />
            <Footer /> */}
 {/* <WhatsAppButton /> */}

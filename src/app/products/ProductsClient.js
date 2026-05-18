@@ -2773,7 +2773,10 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
         </button>
       ) : isInCart ? (
         <button
-          onClick={() => router.push('/cart')}
+    onClick={(e) => {
+      e.stopPropagation();
+      router.push('/cart');
+    }}
           className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center gap-1"
         >
           <ShoppingCart className="w-2.5 h-2.5" />

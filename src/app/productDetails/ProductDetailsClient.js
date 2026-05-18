@@ -1564,7 +1564,8 @@ import {
   Eye,
   MessageCircle,
   FolderTree,
-  Maximize2
+  Maximize2,
+  Zap
 } from 'lucide-react';
 
 import { toast } from 'sonner';
@@ -1584,13 +1585,18 @@ const COLORS = {
 };
 
 // Helper Functions
+// const formatPrice = (price) => {
+//   return new Intl.NumberFormat('bn-BD', {
+//     style: 'currency',
+//     currency: 'BDT',
+//     minimumFractionDigits: 0,
+//     maximumFractionDigits: 0,
+//   }).format(price || 0);
+// };
+
 const formatPrice = (price) => {
-  return new Intl.NumberFormat('bn-BD', {
-    style: 'currency',
-    currency: 'BDT',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price || 0);
+  // Just return the number with 2 decimal places, no currency symbol
+  return (price || 0).toFixed(2);
 };
 
 const calculateDiscount = (regular, discount) => {
@@ -1609,12 +1615,61 @@ const getAgeBadge = (ageGroup) => {
   };
   return styles[ageGroup] || { bg: 'bg-gray-100', text: 'text-gray-600', icon: '🎈' };
 };
+const getAgeGroupBadge = (ageGroup) => {
+  const styles = {
+    '0-2': 'bg-pink-100 text-pink-600',
+    '3-5': 'bg-blue-100 text-blue-600',
+    '6-10': 'bg-green-100 text-green-600',
+    '11-14': 'bg-purple-100 text-purple-600',
+  };
+  return styles[ageGroup] || 'bg-gray-100 text-gray-600';
+};
+// Add this with your other helper functions (around line 100-150)
+const getTagStyles = (tag) => {
+  const styles = {
+    'Best Seller': 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/30',
+    'New Arrival': 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30',
+    'Limited Edition': 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30',
+    'Eco-Friendly': 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30',
+    'Educational': 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30',
+    'STEM Toy': 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30',
+    'Montessori': 'bg-gradient-to-r from-teal-500 to-green-600 text-white shadow-lg shadow-teal-500/30',
+    'Creative Play': 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg shadow-pink-500/30',
+    'Outdoor Fun': 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/30',
+    'Non-Toxic': 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30',
+    'Award Winner': 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white shadow-lg shadow-yellow-500/30',
+    'Musical Toy': 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30',
+    'Interactive': 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30',
+    'Light Up': 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-yellow-500/30',
+    'Remote Control': 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/30',
+    'Building Set': 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30',
+    'Puzzle Game': 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30',
+    'Art & Craft': 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg shadow-pink-500/30',
+    'Pretend Play': 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30',
+    'Trending': 'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-lg shadow-rose-500/30',
+  };
+  return styles[tag] || 'bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white';
+};
+
+// ADD THIS FUNCTION
+const calculateDiscountPercentage = (regular, discount) => {
+  if (regular && discount && discount < regular) {
+    return Math.round(((regular - discount) / regular) * 100);
+  }
+  return 0;
+};
 
 const getStockStatus = (quantity) => {
   if (quantity <= 0) return { label: 'Out of Stock', color: 'red', icon: AlertCircle };
   if (quantity <= 10) return { label: 'Low Stock', color: 'orange', icon: AlertCircle };
   return { label: 'In Stock', color: 'green', icon: CheckCircle };
 };
+const truncateText = (text, limit = 20) => {
+  if (!text) return '';
+  if (text.length <= limit) return text;
+  return text.substring(0, limit) + '...';
+};
+
 
 // Loading Skeleton Component
 const ProductSkeleton = () => (
@@ -1641,33 +1696,66 @@ const ProductSkeleton = () => (
 );
 
 // Zoom Modal Component
-const ZoomModal = ({ image, onClose }) => (
+// Zoom Modal Component - With Left/Right Navigation Arrows
+const ZoomModal = ({ images, currentIndex, onClose, onImageChange }) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
     onClick={onClose}
   >
-    <motion.div
-      initial={{ scale: 0.9 }}
-      animate={{ scale: 1 }}
-      exit={{ scale: 0.9 }}
-      className="relative max-w-5xl w-full mx-4"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <img
-        src={image}
-        alt="Zoomed product"
-        className="w-full h-auto max-h-[90vh] object-contain rounded-2xl"
-      />
+    <div className="relative w-full h-full flex items-center justify-center">
+      {/* Close Button */}
       <button
         onClick={onClose}
-        className="absolute -top-12 right-0 p-2 bg-white/20 rounded-full hover:bg-white/30 transition"
+        className="absolute top-4 right-4 p-2 bg-white/20 rounded-full hover:bg-white/30 transition z-10"
       >
         <X className="w-6 h-6 text-white" />
       </button>
-    </motion.div>
+      
+      {/* Left Arrow */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onImageChange((currentIndex - 1 + images.length) % images.length);
+        }}
+        className="absolute left-4 p-2 bg-white/20 rounded-full hover:bg-white/30 transition z-10"
+      >
+        <ChevronLeft className="w-6 h-6 text-white" />
+      </button>
+      
+      {/* Main Image */}
+      <motion.div
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.9 }}
+        className="relative max-w-5xl w-full mx-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={images[currentIndex]?.url}
+          alt="Zoomed product"
+          className="w-full h-auto max-h-[80vh] object-contain rounded-2xl"
+        />
+      </motion.div>
+      
+      {/* Right Arrow */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onImageChange((currentIndex + 1) % images.length);
+        }}
+        className="absolute right-4 p-2 bg-white/20 rounded-full hover:bg-white/30 transition z-10"
+      >
+        <ChevronRight className="w-6 h-6 text-white" />
+      </button>
+      
+      {/* Image Counter */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+        {currentIndex + 1} / {images.length}
+      </div>
+    </div>
   </motion.div>
 );
 
@@ -1819,40 +1907,395 @@ const ReviewCard = ({ review }) => {
   );
 };
 
-// Related Product Card
-const RelatedProductCard = ({ product, onAddToCart }) => {
-  const discountPercent = calculateDiscount(product.regularPrice, product.discountPrice);
+// Replace your existing RelatedProductCard with this one - EXACT MATCH to ProductGridCard
+const RelatedProductCard = ({ product, router, isInCart: propIsInCart, isInWishlist: propIsInWishlist }) => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [cartStatusLoading, setCartStatusLoading] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  
+  const isInCart = propIsInCart || false;
+  const isWishlisted = propIsInWishlist || false;
+  const productImages = product.images || [];
+  const hasMultipleImages = productImages.length > 1;
+  const primaryTag = product.tags?.[0];
+  const tagStyle = primaryTag ? getTagStyles(primaryTag) : '';
+  const discountPercent = calculateDiscountPercentage(product.regularPrice, product.discountPrice);
   const currentPrice = product.discountPrice && product.discountPrice < product.regularPrice ? product.discountPrice : product.regularPrice;
-  const productImage = product.images?.[0]?.url || '/placeholder-toy.jpg';
+  const originalPrice = product.regularPrice;
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleWishlist = async (e) => {
+    e.stopPropagation();
+    setWishlistLoading(true);
+    
+    const toastId = toast.loading(isWishlisted ? 'Removing from wishlist...' : 'Adding to wishlist...');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const sessionId = localStorage.getItem('wishlistSessionId');
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
+      }
+      
+      const response = await fetch('http://localhost:5000/api/wishlist', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ productId: product._id })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        if (data.sessionId && !token) {
+          localStorage.setItem('wishlistSessionId', data.sessionId);
+        }
+        
+        toast.success(data.message, { id: toastId });
+        window.dispatchEvent(new Event('wishlist-update'));
+      } else {
+        toast.error(data.error || 'Failed to update wishlist', { id: toastId });
+      }
+    } catch (error) {
+      console.error('Wishlist error:', error);
+      toast.error('Network error. Please try again.', { id: toastId });
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
+  const addToCart = async (e) => {
+    e.stopPropagation();
+    
+    if (isInCart) {
+      router.push('/cart');
+      return;
+    }
+    
+    setCartStatusLoading(true);
+    const toastId = toast.loading('Adding to cart...');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const sessionId = localStorage.getItem('cartSessionId');
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
+      }
+      
+      const response = await fetch('http://localhost:5000/api/cart', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          productId: product._id,
+          quantity: 1
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        if (data.sessionId && !token) {
+          localStorage.setItem('cartSessionId', data.sessionId);
+        }
+        
+        toast.success('Added to cart!', { id: toastId });
+        window.dispatchEvent(new Event('cart-update'));
+        
+        setTimeout(() => {
+          window.dispatchEvent(new Event('cart-update'));
+        }, 500);
+      } else {
+        toast.error(data.error || 'Failed to add to cart', { id: toastId });
+      }
+    } catch (error) {
+      console.error('Add to cart error:', error);
+      toast.error('Network error. Please try again.', { id: toastId });
+    } finally {
+      setCartStatusLoading(false);
+    }
+  };
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      className="bg-white rounded-xl border border-[#FFE0E6] overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group"
-      onClick={() => window.open(`/productDetails?id=${product._id}`, '_blank')}
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{
+        layout: { type: "spring", stiffness: 100, damping: 15 },
+        opacity: { duration: 0.3 }
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="group bg-white rounded-xl border border-[#FFE0E6] hover:border-[#FFB6C1] transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md overflow-hidden"
+      onClick={() => {
+        if (isMobile) {
+          window.location.href = `/productDetails?id=${product._id}`;
+        } else {
+          window.open(`/productDetails?id=${product._id}`, '_blank');
+        }
+      }}
     >
-      <div className="relative h-32 overflow-hidden bg-gradient-to-br from-[#FFF9F0] to-[#FFE0E6]">
-        <img src={productImage} alt={product.productName} className="w-full h-full object-contain p-2 group-hover:scale-105 transition duration-300" />
+      {/* Image Container - Compact */}
+      <div className="relative w-full h-32 sm:h-36 md:h-40 overflow-hidden bg-gradient-to-br from-[#FFF9F0] to-[#FFE0E6]">
+        <motion.img
+          src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://via.placeholder.com/300'}
+          alt={product.productName}
+          className="w-full h-full object-contain p-2"
+          whileHover={{ scale: 1.08 }}
+          transition={{ duration: 0.4 }}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://via.placeholder.com/300?text=Toy';
+          }}
+          loading="lazy"
+        />
+        
+        {/* Discount Badge */}
         {discountPercent > 0 && (
-          <div className="absolute top-1 left-1 bg-red-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-md">
-            -{discountPercent}%
+          <div className="absolute top-1 left-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-lg z-20 flex items-center gap-0.5">
+            <Zap className="w-2 h-2" />
+            {discountPercent}% OFF
           </div>
         )}
-      </div>
-      <div className="p-2">
-        <h4 className="text-xs font-bold text-[#2D3A5C] line-clamp-2 mb-1">{product.productName}</h4>
-        <div className="flex items-center gap-1 mb-2">
-          <span className="text-sm font-bold text-[#4A8A90]">{formatPrice(currentPrice)}</span>
-          {discountPercent > 0 && <span className="text-[9px] text-gray-400 line-through">{formatPrice(product.regularPrice)}</span>}
+        
+        {/* Tag Badge - Top Right */}
+        {primaryTag && (
+          <motion.div 
+            initial={{ x: 10, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className={`absolute top-1 right-1 ${tagStyle} text-[7px] md:text-[8px] px-1.5 py-0.5 font-semibold rounded-md z-20 flex items-center gap-0.5 shadow-lg`}
+          >
+            <Sparkles className="w-2 h-2" />
+            <span className="truncate max-w-[60px]">{primaryTag}</span>
+          </motion.div>
+        )}
+        
+        {/* Hover Icons - Appear from Right Side, Fast Animation */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-30">
+          <motion.div
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ 
+              x: isHovered && !isMobile ? 0 : 40, 
+              opacity: isHovered && !isMobile ? 1 : 0 
+            }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(`/productDetails?id=${product._id}`, '_blank');
+            }}
+            className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-[#4A8A90] flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
+          >
+            <Eye className="w-3.5 h-3.5 text-[#4A8A90] hover:text-white transition-colors duration-200" />
+          </motion.div>
+          
+          <motion.div
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ 
+              x: isHovered && !isMobile ? 0 : 40, 
+              opacity: isHovered && !isMobile ? 1 : 0 
+            }}
+            transition={{ duration: 0.15, ease: "easeOut", delay: 0.03 }}
+            onClick={addToCart}
+            className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-[#4A8A90] flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
+          >
+            {cartStatusLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#4A8A90] hover:text-white" />
+            ) : isInCart ? (
+              <ShoppingCart className="w-3.5 h-3.5 text-green-500" />
+            ) : (
+              <ShoppingCart className="w-3.5 h-3.5 text-[#FFB6C1] hover:text-white transition-colors duration-200" />
+            )}
+          </motion.div>
+          
+          <motion.div
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ 
+              x: isHovered && !isMobile ? 0 : 40, 
+              opacity: isHovered && !isMobile ? 1 : 0 
+            }}
+            transition={{ duration: 0.15, ease: "easeOut", delay: 0.06 }}
+            onClick={handleWishlist}
+            className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-red-500 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
+          >
+            {wishlistLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500 hover:text-white" />
+            ) : (
+              <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-[#4A8A90] hover:text-white'} transition-colors duration-200`} />
+            )}
+          </motion.div>
         </div>
+      </div>
+      
+      {/* Thumbnail Images - Show 4 images at bottom of main image */}
+      {hasMultipleImages && (
+        <div className="flex justify-center items-center gap-1 py-1.5 bg-[#FFF9F0] border-b border-[#FFE0E6]">
+          {productImages.slice(0, 4).map((image, index) => (
+            <button
+              key={index}
+              className={`w-5 h-5 overflow-hidden rounded transition-all duration-200 ${
+                activeIndex === index 
+                  ? 'ring-1.5 ring-[#4A8A90] ring-offset-0.5 scale-110' 
+                  : 'opacity-60 hover:opacity-100'
+              }`}
+              onMouseEnter={() => setActiveIndex(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveIndex(index);
+              }}
+            >
+              <img src={image.url} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="p-2">
+        {/* Product Name */}
+        <h3 className="text-xs font-bold text-[#2D3A5C] line-clamp-2 hover:text-[#4A8A90] transition-colors duration-200 mb-1" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }} title={product.productName}>
+          {truncateText(product.productName, 20)}
+        </h3>
+        
+        {/* Age Group and Rating Row - Same row */}
+        <div className="flex items-center justify-between mb-1.5">
+          {/* Age Group Badge */}
+          {product.ageGroup ? (
+            <div className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
+              <Users className="w-2 h-2" />
+              Ages {product.ageGroup}
+            </div>
+          ) : (
+            <div className="text-[8px] text-gray-400">✨ Toy</div>
+          )}
+          
+          {/* Rating Stars */}
+          {product.rating > 0 && (
+            <div className="flex items-center gap-0.5">
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-2.5 h-2.5 ${
+                      star <= Math.floor(product.rating)
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : star - 0.5 <= product.rating
+                        ? 'fill-yellow-400 text-yellow-400 opacity-50'
+                        : 'text-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-[8px] text-gray-500">({product.rating})</span>
+            </div>
+          )}
+        </div>
+
+        {/* Price Section */}
+        <div className="flex items-baseline gap-1.5 mb-1.5">
+          <span className="text-sm font-bold text-[#4A8A90]">
+            ৳{formatPrice(currentPrice)}
+          </span>
+          {discountPercent > 0 && (
+            <>
+              <span className="text-[8px] text-gray-400 line-through">
+                ৳{formatPrice(originalPrice)}
+              </span>
+              <span className="text-[7px] font-semibold text-red-500 bg-red-100 px-1 py-0.5 rounded">
+                -{discountPercent}%
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Category and Stock Status Row */}
+      {/* Category and Stock Status Row */}
+<div className="flex items-center justify-between gap-1">
+  {/* Category - Check both category.name and categoryName */}
+  {product.category?.name ? (
+    <div className="flex items-center gap-0.5 text-[7px] text-[#8B9DC3]">
+      <Package className="w-2.5 h-2.5" />
+      <span className="truncate max-w-[70px]">{product.category.name}</span>
+    </div>
+  ) : product.categoryName ? (
+    <div className="flex items-center gap-0.5 text-[7px] text-[#8B9DC3]">
+      <Package className="w-2.5 h-2.5" />
+      <span className="truncate max-w-[70px]">{product.categoryName}</span>
+    </div>
+  ) : (
+    <div className="text-[7px] text-gray-400">🎁 Toy</div>
+  )}
+  
+  {/* Stock Status */}
+  <div className="flex-shrink-0">
+    {product.stockQuantity > 0 ? (
+      <span className="flex items-center gap-0.5 text-[7px] text-green-600 font-medium">
+        <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+        <span>In Stock ({product.stockQuantity})</span>
+      </span>
+    ) : (
+      <span className="flex items-center gap-0.5 text-[7px] text-red-500 font-medium">
+        <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+        <span>Out of Stock</span>
+      </span>
+    )}
+  </div>
+</div>
+      </div>
+
+      {/* Add to Cart / View Cart Button */}
+      {cartStatusLoading ? (
         <button
-          onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
-          className="w-full py-1.5 text-[10px] font-bold bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white rounded-lg hover:from-[#3A7A80] hover:to-[#5B9399] transition flex items-center justify-center gap-1"
+          disabled
+          className="w-full py-1.5 text-center text-[9px] font-bold bg-gray-300 text-gray-500 flex items-center justify-center gap-1"
         >
-          <ShoppingCart className="w-3 h-3" />
+          <Loader2 className="w-2.5 h-2.5 animate-spin" />
+          Loading...
+        </button>
+      ) : isInCart ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push('/cart');
+          }}
+          className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center gap-1"
+        >
+          <ShoppingCart className="w-2.5 h-2.5" />
+          View in Cart
+        </button>
+      ) : (
+        <button
+          onClick={addToCart}
+          className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white hover:from-[#3A7A80] hover:to-[#5B9399] transition-all duration-200 flex items-center justify-center gap-1"
+        >
+          <ShoppingCart className="w-2.5 h-2.5" />
           Add to Cart
         </button>
-      </div>
+      )}
     </motion.div>
   );
 };
@@ -1955,6 +2398,11 @@ const [isTransitioning, setIsTransitioning] = useState(false);
   const [enableMagnifier, setEnableMagnifier] = useState(false);
   const [videoThumbnail, setVideoThumbnail] = useState(null);
 const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
+const [checkingCart, setCheckingCart] = useState(true);
+
+
+const [productsInCart, setProductsInCart] = useState({});
+const [productsInWishlist, setProductsInWishlist] = useState({});
 
   
   const mainImageRef = useRef(null);
@@ -1971,10 +2419,18 @@ const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
     if (productId) fetchProductDetails();
   }, [productId]);
 
-  useEffect(() => {
-    if (product) checkWishlistStatus();
-  }, [product]);
+ useEffect(() => {
+  if (product && product._id) {
+    console.log('Checking wishlist status for product:', product._id);
+    checkWishlistStatus();
+  }
+}, [product]);
 
+useEffect(() => {
+  if (productId) {
+    fetchProductDetails();
+  }
+}, [productId]);
   // Generate thumbnail for normal video files (non-YouTube)
 useEffect(() => {
   if (product?.videoUrl && product?.videoType !== 'youtube' && !videoThumbnail && !generatingThumbnail) {
@@ -1987,6 +2443,89 @@ useEffect(() => {
     });
   }
 }, [product?.videoUrl, product?.videoType]);
+
+
+useEffect(() => {
+  if (product) {
+    checkCartStatus();
+  }
+}, [product]);
+
+// Add this useEffect near your other event listeners
+useEffect(() => {
+  const handleWishlistUpdate = () => {
+    console.log('Wishlist update event received, refreshing status');
+    if (product && product._id) {
+      checkWishlistStatus();
+    }
+  };
+  
+  window.addEventListener('wishlist-update', handleWishlistUpdate);
+  
+  return () => {
+    window.removeEventListener('wishlist-update', handleWishlistUpdate);
+  };
+}, [product]);
+
+// Fetch cart and wishlist status for related products
+useEffect(() => {
+  const fetchRelatedProductsStatus = async () => {
+    if (relatedProducts.length === 0) return;
+    
+    const productIds = relatedProducts.map(p => p._id);
+    const token = localStorage.getItem('token');
+    const cartSessionId = localStorage.getItem('cartSessionId');
+    const wishlistSessionId = localStorage.getItem('wishlistSessionId');
+    
+    // Fetch cart status
+    const cartHeaders = {};
+    if (token) {
+      cartHeaders['Authorization'] = `Bearer ${token}`;
+    } else if (cartSessionId) {
+      cartHeaders['x-session-id'] = cartSessionId;
+    }
+    
+    try {
+      const cartResponse = await fetch('http://localhost:5000/api/cart/check-status', {
+        method: 'POST',
+        headers: { ...cartHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productIds })
+      });
+      
+      const cartData = await cartResponse.json();
+      if (cartData.success) {
+        setProductsInCart(cartData.data);
+      }
+    } catch (error) {
+      console.error('Error fetching related products cart status:', error);
+    }
+    
+    // Fetch wishlist status
+    const wishlistHeaders = {};
+    if (token) {
+      wishlistHeaders['Authorization'] = `Bearer ${token}`;
+    } else if (wishlistSessionId) {
+      wishlistHeaders['x-session-id'] = wishlistSessionId;
+    }
+    
+    try {
+      const wishlistResponse = await fetch('http://localhost:5000/api/wishlist/check-status', {
+        method: 'POST',
+        headers: { ...wishlistHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productIds })
+      });
+      
+      const wishlistData = await wishlistResponse.json();
+      if (wishlistData.success) {
+        setProductsInWishlist(wishlistData.data);
+      }
+    } catch (error) {
+      console.error('Error fetching related products wishlist status:', error);
+    }
+  };
+  
+  fetchRelatedProductsStatus();
+}, [relatedProducts]);
 
   const fetchProductDetails = async () => {
     setLoading(true);
@@ -2008,22 +2547,43 @@ useEffect(() => {
     }
   };
 
-  const checkWishlistStatus = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const sessionId = localStorage.getItem('wishlistSessionId');
-      const headers = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      else if (sessionId) headers['x-session-id'] = sessionId;
-      else return;
-
-      const response = await fetch(`http://localhost:5000/api/wishlist/check/${productId}`, { headers });
-      const data = await response.json();
-      if (data.success) setIsInWishlist(data.data.inWishlist);
-    } catch (error) {
-      console.error('Error checking wishlist:', error);
+const checkWishlistStatus = async () => {
+  // Make sure we have a product ID
+  const id = product?._id || productId;
+  if (!id) {
+    console.log('No product ID available for wishlist check');
+    return;
+  }
+  
+  try {
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('wishlistSessionId');
+    const headers = {};
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      console.log('Checking wishlist with token');
+    } else if (sessionId) {
+      headers['x-session-id'] = sessionId;
+      console.log('Checking wishlist with sessionId:', sessionId);
+    } else {
+      console.log('No auth for wishlist check');
+      return;
     }
-  };
+
+    console.log('Calling wishlist check API for product:', id);
+    const response = await fetch(`http://localhost:5000/api/wishlist/check/${id}`, { headers });
+    const data = await response.json();
+    console.log('Wishlist check response:', data);
+    
+    if (data.success) {
+      setIsInWishlist(data.data.inWishlist);
+      console.log('Product in wishlist:', data.data.inWishlist);
+    }
+  } catch (error) {
+    console.error('Error checking wishlist:', error);
+  }
+};
 
   const handleWishlist = async () => {
     const toastId = toast.loading(isInWishlist ? 'Removing from wishlist...' : 'Adding to wishlist...');
@@ -2058,42 +2618,89 @@ useEffect(() => {
     }
   };
 
-  const handleAddToCart = async () => {
-    if (product.stockQuantity <= 0) {
-      toast.error('Out of stock');
-      return;
-    }
-    setAddingToCart(true);
-    const toastId = toast.loading('Adding to cart...');
-    try {
-      const token = localStorage.getItem('token');
-      const sessionId = localStorage.getItem('cartSessionId');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      else if (sessionId) headers['x-session-id'] = sessionId;
+const handleAddToCart = async () => {
+  if (product.stockQuantity <= 0) {
+    toast.error('Out of stock');
+    return;
+  }
+  setAddingToCart(true);
+  const toastId = toast.loading('Adding to cart...');
+  try {
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('cartSessionId');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    else if (sessionId) headers['x-session-id'] = sessionId;
 
-      const response = await fetch('http://localhost:5000/api/cart', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ productId: product._id, quantity: quantity  })
-      });
-      const data = await response.json();
-      if (data.success) {
-        if (data.sessionId && !token) localStorage.setItem('cartSessionId', data.sessionId);
-        setIsInCart(true);
-        toast.success(`${quantity} item(s) added to cart!`, { id: toastId });
-        window.dispatchEvent(new Event('cart-update'));
-        setTimeout(() => window.dispatchEvent(new Event('cart-update')), 500);
-      } else {
-        toast.error(data.error || 'Failed to add to cart', { id: toastId });
-      }
-    } catch (error) {
-      console.error('Add to cart error:', error);
-      toast.error('Network error', { id: toastId });
-    } finally {
-      setAddingToCart(false);
+    const response = await fetch('http://localhost:5000/api/cart', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ productId: product._id, quantity: quantity })
+    });
+    const data = await response.json();
+    if (data.success) {
+      if (data.sessionId && !token) localStorage.setItem('cartSessionId', data.sessionId);
+      setIsInCart(true); // This will change the button to "View in Cart"
+      toast.success(`${quantity} item(s) added to cart!`, { id: toastId });
+      window.dispatchEvent(new Event('cart-update'));
+      setTimeout(() => window.dispatchEvent(new Event('cart-update')), 500);
+    } else {
+      toast.error(data.error || 'Failed to add to cart', { id: toastId });
     }
-  };
+  } catch (error) {
+    console.error('Add to cart error:', error);
+    toast.error('Network error', { id: toastId });
+  } finally {
+    setAddingToCart(false);
+  }
+};
+
+// Add this function after handleAddToCart
+const handleBuyNow = async () => {
+  if (product.stockQuantity <= 0) {
+    toast.error('Out of stock');
+    return;
+  }
+  
+  setAddingToCart(true);
+  const toastId = toast.loading('Processing...');
+  
+  try {
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('cartSessionId');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    else if (sessionId) headers['x-session-id'] = sessionId;
+
+    // First, add the product to cart with selected quantity
+    const response = await fetch('http://localhost:5000/api/cart', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ productId: product._id, quantity: quantity })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      if (data.sessionId && !token) localStorage.setItem('cartSessionId', data.sessionId);
+      
+      // Dispatch cart update event
+      window.dispatchEvent(new Event('cart-update'));
+      
+      // Wait a moment for cart to update, then redirect to checkout
+      setTimeout(() => {
+        toast.success('Redirecting to checkout...', { id: toastId });
+        router.push('/checkout');
+      }, 500);
+    } else {
+      toast.error(data.error || 'Failed to process', { id: toastId });
+    }
+  } catch (error) {
+    console.error('Buy now error:', error);
+    toast.error('Network error', { id: toastId });
+  } finally {
+    setAddingToCart(false);
+  }
+};
 
   const handleQuantityChange = (delta) => {
     const newQuantity = quantity + delta;
@@ -2101,6 +2708,34 @@ useEffect(() => {
       setQuantity(newQuantity);
     }
   };
+
+
+  const checkCartStatus = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('cartSessionId');
+    const headers = {};
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (sessionId) {
+      headers['x-session-id'] = sessionId;
+    } else {
+      setCheckingCart(false);
+      return;
+    }
+    
+    const response = await fetch(`http://localhost:5000/api/cart/check/${product._id}`, { headers });
+    const data = await response.json();
+    if (data.success) {
+      setIsInCart(data.data.inCart);
+    }
+  } catch (error) {
+    console.error('Error checking cart status:', error);
+  } finally {
+    setCheckingCart(false);
+  }
+};
 
   // Handle hover on thumbnail to change main image
   const handleMediaHover = (index) => {
@@ -2363,9 +2998,7 @@ const generateVideoThumbnail = (videoUrl, callback) => {
       )}
     </div>
 
-    {/* Thumbnail Gallery */}
-    {/* Thumbnail Gallery */}
-{/* Thumbnail Gallery */}
+   
 {/* Thumbnail Gallery */}
 <div className="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-thin justify-center">
   {productImages.map((img, idx) => (
@@ -2522,10 +3155,10 @@ const generateVideoThumbnail = (videoUrl, callback) => {
               {/* Price */}
                  <div className="mb-4">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-2xl md:text-3xl font-bold text-[#4A8A90]">{formatPrice(currentPrice)}</span>
+                  <span className="text-2xl md:text-3xl font-bold text-[#4A8A90]">৳{formatPrice(currentPrice)}</span>
                   {discountPercent > 0 && (
                     <>
-                      <span className="text-base text-gray-400 line-through">{formatPrice(product.regularPrice)}</span>
+                      <span className="text-base text-gray-400 line-through">৳{formatPrice(product.regularPrice)}</span>
                       <span className="text-xs font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-full">Save {discountPercent}%</span>
                     </>
                   )}
@@ -2559,52 +3192,73 @@ const generateVideoThumbnail = (videoUrl, callback) => {
          
 
               {/* Quantity + Add to Cart + Wishlist - All on same line */}
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                {/* Quantity Selector */}
-                <div className="flex items-center border-2 border-[#FFE0E6] rounded-full overflow-hidden bg-white">
-                  <button 
-                    onClick={() => handleQuantityChange(-1)} 
-                    disabled={quantity <= 1} 
-                    className="w-9 h-9 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="w-12 text-center font-medium text-[#2D3A5C]">{quantity}</span>
-                  <button 
-                    onClick={() => handleQuantityChange(1)} 
-                    disabled={quantity >= product.stockQuantity} 
-                    className="w-9 h-9 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
+     {/* Quantity + Add to Cart + Buy Now + Wishlist + Share - All on same line */}
+<div className="flex flex-wrap items-center gap-3 mb-6">
+  {/* Quantity Selector */}
+  <div className="flex items-center rounded-lg border-2 border-[#FFE0E6]  overflow-hidden bg-white">
+    <button 
+      onClick={() => handleQuantityChange(-1)} 
+      disabled={quantity <= 1 || isInCart} 
+      className="w-9 h-9 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition"
+    >
+      <Minus className="w-4 h-4" />
+    </button>
+    <span className="w-12 text-center font-medium text-[#2D3A5C]">{quantity}</span>
+    <button 
+      onClick={() => handleQuantityChange(1)} 
+      disabled={quantity >= product.stockQuantity || isInCart} 
+      className="w-9 h-9 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition"
+    >
+      <Plus className="w-4 h-4" />
+    </button>
+  </div>
 
-                {/* Add to Cart Button */}
-                <button
-                  onClick={handleAddToCart}
-                  disabled={addingToCart || product.stockQuantity <= 0}
-                  className="flex-1 py-2.5 px-6 bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white font-bold rounded-full hover:from-[#3A7A80] hover:to-[#5B9399] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {addingToCart ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShoppingCart className="w-4 h-4" />}
-                  {addingToCart ? 'Adding...' : 'Add to Cart'}
-                </button>
+  {/* Add to Cart OR View in Cart Button */}
+  {isInCart ? (
+    <button
+      onClick={() => router.push('/cart')}
+      className="flex-1 py-2.5 px-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-md flex items-center justify-center gap-2"
+    >
+      <ShoppingCart className="w-4 h-4" />
+      View in Cart
+    </button>
+  ) : (
+    <button
+      onClick={handleAddToCart}
+      disabled={addingToCart || product.stockQuantity <= 0}
+      className="flex-1 py-2.5 px-6 bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white font-bold rounded-lg hover:from-[#3A7A80] hover:to-[#5B9399] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+    >
+      {addingToCart ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShoppingCart className="w-4 h-4" />}
+      {addingToCart ? 'Adding...' : 'Add to Cart'}
+    </button>
+  )}
 
-                {/* Wishlist Button */}
-                <button
-                  onClick={handleWishlist}
-                  className="p-2.5 bg-white border-2 border-[#FFE0E6] rounded-full hover:border-[#FFB6C1] hover:bg-pink-50 transition-all"
-                >
-                  <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-[#4A8A90]'}`} />
-                </button>
+  {/* Buy Now Button */}
+  <button
+    onClick={handleBuyNow}
+    disabled={addingToCart || product.stockQuantity <= 0}
+    className="flex-1 py-2.5 px-6 bg-gradient-to-r from-[#FFD93D] to-[#FFB6C1] text-[#2D3A5C] font-bold rounded-lg hover:from-[#FFE44D] hover:to-[#FF9CB0] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+  >
+    <Zap className="w-4 h-4" />
+    Buy Now
+  </button>
 
-                {/* Share Button */}
-                <button
-                  onClick={() => setShowShare(true)}
-                  className="p-2.5 bg-white border-2 border-[#FFE0E6] rounded-full hover:border-[#4A8A90] transition-all"
-                >
-                  <Share2 className="w-5 h-5 text-[#4A8A90]" />
-                </button>
-              </div>
+  {/* Wishlist Button - Heart turns red when in wishlist */}
+  <button
+    onClick={handleWishlist}
+    className="p-2.5 bg-white border-2 border-[#FFE0E6] rounded-full hover:border-[#FFB6C1] hover:bg-pink-50 transition-all"
+  >
+    <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-[#4A8A90]'}`} />
+  </button>
+
+  {/* Share Button */}
+  <button
+    onClick={() => setShowShare(true)}
+    className="p-2.5 bg-white border-2 border-[#FFE0E6] rounded-full hover:border-[#4A8A90] transition-all"
+  >
+    <Share2 className="w-5 h-5 text-[#4A8A90]" />
+  </button>
+</div>
 
               {/* Delivery Info */}
               <div className="bg-gradient-to-r from-[#D4EDEE]/30 to-[#FFE0E6]/30 rounded-xl p-4 border border-[#FFE0E6]">
@@ -2628,153 +3282,167 @@ const generateVideoThumbnail = (videoUrl, callback) => {
           </div>
 
           {/* Tabs for Description, Specifications, Reviews */}
-          <div className="mt-12">
-            <div className="flex flex-wrap gap-2 border-b border-[#FFE0E6]">
-              {['description', 'specifications', 'reviews'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-5 py-2.5 font-semibold text-sm rounded-t-lg transition-all ${
-                    activeTab === tab ? 'bg-white text-[#4A8A90] border-t-2 border-l-2 border-r-2 border-[#FFE0E6] border-b-white' : 'text-gray-500 hover:text-[#4A8A90]'
-                  }`}
-                >
-                  {tab === 'description' && 'Product Description'}
-                  {tab === 'specifications' && 'Specifications'}
-                  {tab === 'reviews' && `Reviews (${totalReviews})`}
-                </button>
-              ))}
-            </div>
+         {/* Tabs for Description, Specifications, Reviews */}
+<div className="mt-12">
+  <div className="flex flex-wrap gap-2 border-b border-[#FFE0E6]">
+    {['description', 'specifications', 'reviews'].map(tab => (
+      <button
+        key={tab}
+        onClick={() => setActiveTab(tab)}
+        className={`px-5 py-2.5 font-semibold text-sm rounded-t-lg transition-all ${
+          activeTab === tab ? 'bg-white text-[#4A8A90] border-t-2 border-l-2 border-r-2 border-[#FFE0E6] border-b-white' : 'text-gray-500 hover:text-[#4A8A90]'
+        }`}
+      >
+        {tab === 'description' && 'Product Description'}
+        {tab === 'specifications' && 'Specifications'}
+        {tab === 'reviews' && `Reviews (${totalReviews})`}
+      </button>
+    ))}
+  </div>
 
-            <div className="bg-white rounded-b-xl rounded-tr-xl border border-t-0 border-[#FFE0E6] p-5 md:p-6">
-              {activeTab === 'description' && (
-                <div className="prose prose-sm max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: product.fullDescription }} />
-                  {product.additionalInfo && product.additionalInfo.length > 0 && (
-                    <div className="mt-6">
-                      <h3 className="text-lg font-bold text-[#2D3A5C] mb-3">Key Features</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {product.additionalInfo.map((info, idx) => (
-                          <div key={idx} className="flex items-start gap-2">
-                            <Sparkles className="w-4 h-4 text-[#FFD93D] mt-0.5 flex-shrink-0" />
-                            <div>
-                              <span className="font-medium text-[#2D3A5C]">{info.fieldName}:</span>
-                              <span className="text-gray-600 ml-1">{info.fieldValue}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+  <div className="bg-white rounded-b-xl rounded-tr-xl border border-t-0 border-[#FFE0E6] p-5 md:p-6">
+    {activeTab === 'description' && (
+      <div className="prose prose-sm max-w-none">
+        <div dangerouslySetInnerHTML={{ __html: product.fullDescription }} />
+        {/* REMOVED additionalInfo from here */}
+      </div>
+    )}
 
-              {activeTab === 'specifications' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    { label: 'Brand', value: product.brand, icon: Tag },
-                    { label: 'Age Group', value: `Ages ${product.ageGroup} years`, icon: Users },
-                    { label: 'SKU', value: product.skuCode, icon: Package },
-                    { label: 'Stock', value: `${product.stockQuantity} units available`, icon: Package },
-                    { label: 'Category', value: product.categoryName, icon: Tag },
-                    { label: 'Subcategory', value: product.subcategoryName, icon: FolderTree },
-                    { label: 'Child Subcategory', value: product.childSubcategoryName, icon: FolderTree },
-                    { label: 'COD Available', value: product.codAvailable ? 'Yes' : 'No', icon: Truck },
-                  ].filter(item => item.value).map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 bg-[#FFF9F0] rounded-xl border border-[#FFE0E6]">
-                      <item.icon className="w-5 h-5 text-[#4A8A90]" />
-                      <div>
-                        <p className="text-xs text-gray-500">{item.label}</p>
-                        <p className="font-medium text-[#2D3A5C]">{item.value || 'N/A'}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+   {activeTab === 'specifications' && (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {/* Basic Specifications */}
+    {[
+      { label: 'Brand', value: product.brand, icon: Tag },
+      { label: 'Age Group', value: `Ages ${product.ageGroup} years`, icon: Users },
+      { label: 'SKU', value: product.skuCode, icon: Package },
+      { label: 'Stock', value: `${product.stockQuantity} units available`, icon: Package },
+      { label: 'Category', value: product.categoryName, icon: Tag },
+      { label: 'Subcategory', value: product.subcategoryName, icon: FolderTree },
+      { label: 'Child Subcategory', value: product.childSubcategoryName, icon: FolderTree },
+      { label: 'COD Available', value: product.codAvailable ? 'Yes' : 'No', icon: Truck },
+    ].filter(item => item.value).map((item, idx) => (
+      <div key={idx} className="flex items-center gap-3 p-3 bg-[#FFF9F0] rounded-xl border border-[#FFE0E6]">
+        <item.icon className="w-5 h-5 text-[#4A8A90]" />
+        <div>
+          <p className="text-xs text-gray-500">{item.label}</p>
+          <p className="font-medium text-[#2D3A5C]">{item.value || 'N/A'}</p>
+        </div>
+      </div>
+    ))}
+    
+    {/* Additional Info - merged directly into specifications */}
+    {product.additionalInfo && product.additionalInfo.map((info, idx) => (
+      <div key={`additional-${idx}`} className="flex items-center gap-3 p-3 bg-[#FFF9F0] rounded-xl border border-[#FFE0E6]">
+        <Sparkles className="w-5 h-5 text-[#FFD93D]" />
+        <div>
+          <p className="text-xs text-gray-500">{info.fieldName}</p>
+          <p className="font-medium text-[#2D3A5C]">{info.fieldValue}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
 
-              {activeTab === 'reviews' && (
-                <div>
-                  <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <div className="text-4xl font-bold text-[#4A8A90]">{averageRating.toFixed(1)}</div>
-                        <div className="flex items-center justify-center mt-1">
-                          {[1, 2, 3, 4, 5].map(star => (
-                            <Star key={star} className={`w-4 h-4 ${star <= Math.floor(averageRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
-                          ))}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">Based on {totalReviews} reviews</div>
-                      </div>
-                      <div className="flex-1 max-w-xs">
-                        {[5, 4, 3, 2, 1].map(rating => {
-                          const count = product.reviewStats?.ratingDistribution?.[rating] || 0;
-                          const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
-                          return (
-                            <div key={rating} className="flex items-center gap-2 text-sm">
-                              <span className="w-8 text-gray-600">{rating}★</span>
-                              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${percentage}%` }} />
-                              </div>
-                              <span className="w-8 text-gray-500 text-xs">{count}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    {!reviews.some(r => r.userId === localStorage.getItem('userId')) && (
-                      <Link href={`/write-review?id=${product._id}`} className="px-4 py-2 bg-[#4A8A90] text-white text-sm font-semibold rounded-full hover:bg-[#3A7A80] transition">
-                        Write a Review
-                      </Link>
-                    )}
-                  </div>
-
-                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                    {reviews.slice(0, reviewsToShow).map((review, idx) => (
-                      <ReviewCard key={idx} review={review} />
-                    ))}
-                  </div>
-
-                  {reviews.length > reviewsToShow && (
-                    <button onClick={() => setReviewsToShow(reviewsToShow + 5)} className="mt-4 text-[#4A8A90] font-medium text-sm hover:underline">
-                      Load More Reviews ({reviews.length - reviewsToShow} left)
-                    </button>
-                  )}
-                  {reviews.length === 0 && (
-                    <div className="text-center py-8">
-                      <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500">No reviews yet. Be the first to review this toy!</p>
-                      <Link href={`/write-review?id=${product._id}`} className="inline-block mt-3 px-4 py-2 bg-[#4A8A90] text-white text-sm font-semibold rounded-full">
-                        Write a Review
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Related Products Section */}
-          {relatedProducts.length > 0 && (
-            <div className="mt-12">
-              <div className="flex items-center gap-2 mb-5">
-                <Sparkles className="w-6 h-6 text-[#FFD93D]" />
-                <h2 className="text-xl md:text-2xl font-bold text-[#2D3A5C]" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
-                  You May Also Like
-                </h2>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {relatedProducts.map(relProduct => (
-                  <RelatedProductCard key={relProduct._id} product={relProduct} onAddToCart={() => {
-                    toast.info(`Added ${relProduct.productName} to cart`);
-                  }} />
+    {activeTab === 'reviews' && (
+      <div>
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-[#4A8A90]">{averageRating.toFixed(1)}</div>
+              <div className="flex items-center justify-center mt-1">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <Star key={star} className={`w-4 h-4 ${star <= Math.floor(averageRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
                 ))}
               </div>
+              <div className="text-xs text-gray-500 mt-1">Based on {totalReviews} reviews</div>
             </div>
+            <div className="flex-1 max-w-xs">
+              {[5, 4, 3, 2, 1].map(rating => {
+                const count = product.reviewStats?.ratingDistribution?.[rating] || 0;
+                const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
+                return (
+                  <div key={rating} className="flex items-center gap-2 text-sm">
+                    <span className="w-8 text-gray-600">{rating}★</span>
+                    <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${percentage}%` }} />
+                    </div>
+                    <span className="w-8 text-gray-500 text-xs">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {!reviews.some(r => r.userId === localStorage.getItem('userId')) && (
+            <Link href={`/write-review?id=${product._id}`} className="px-4 py-2 bg-[#4A8A90] text-white text-sm font-semibold rounded-full hover:bg-[#3A7A80] transition">
+              Write a Review
+            </Link>
           )}
+        </div>
+
+        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+          {reviews.slice(0, reviewsToShow).map((review, idx) => (
+            <ReviewCard key={idx} review={review} />
+          ))}
+        </div>
+
+        {reviews.length > reviewsToShow && (
+          <button onClick={() => setReviewsToShow(reviewsToShow + 5)} className="mt-4 text-[#4A8A90] font-medium text-sm hover:underline">
+            Load More Reviews ({reviews.length - reviewsToShow} left)
+          </button>
+        )}
+        {reviews.length === 0 && (
+          <div className="text-center py-8">
+            <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">No reviews yet. Be the first to review this toy!</p>
+            <Link href={`/write-review?id=${product._id}`} className="inline-block mt-3 px-4 py-2 bg-[#4A8A90] text-white text-sm font-semibold rounded-full">
+              Write a Review
+            </Link>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</div>
+
+        {/* Related Products Section */}
+{relatedProducts.length > 0 && (
+  <div className="mt-12">
+    <div className="flex items-center gap-2 mb-5">
+      <Sparkles className="w-6 h-6 text-[#FFD93D]" />
+      <h2 className="text-xl md:text-2xl font-bold text-[#2D3A5C]" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+        You May Also Like
+      </h2>
+    </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      {relatedProducts.map(relProduct => (
+        <RelatedProductCard 
+          key={relProduct._id} 
+          product={relProduct} 
+          router={router}
+          isInCart={productsInCart[relProduct._id] || false}
+          isInWishlist={productsInWishlist[relProduct._id] || false}
+        />
+      ))}
+    </div>
+  </div>
+)}
         </div>
       </div>
 
       {/* Modals */}
-      <AnimatePresence>{showZoom && <ZoomModal image={mainImage} onClose={() => setShowZoom(false)} />}</AnimatePresence>
+<AnimatePresence>
+  {showZoom && (
+    <ZoomModal 
+      images={productImages} 
+      currentIndex={activeImageIndex}
+      onClose={() => setShowZoom(false)} 
+      onImageChange={(index) => {
+        setActiveImageIndex(index);
+        setShowZoom(true);
+      }}
+    />
+  )}
+</AnimatePresence>
       <AnimatePresence>{showShare && <ShareModal product={product} onClose={() => setShowShare(false)} />}</AnimatePresence>
 
       <Footer />

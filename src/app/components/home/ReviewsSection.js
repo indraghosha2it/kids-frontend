@@ -1609,15 +1609,17 @@
 
 
 
-
 'use client';
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import ReviewModal from './ReviewModal'; // Adjust the import path as needed
 
 export default function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isAllReviewsModalOpen, setIsAllReviewsModalOpen] = useState(false);
 
   const testimonials = [
     {
@@ -1669,148 +1671,189 @@ export default function Testimonials() {
   };
 
   return (
-    <section className="w-full bg-gradient-to-br from-[#F0F7F7] via-white to-[#FEF9F9] py-16 md:py-24">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#4A8A90]/10 rounded-full px-4 py-1.5 mb-4">
-            <span className="text-lg">⭐</span>
-            <span className="text-[#4A8A90] font-semibold text-sm md:text-base">
-              Trusted by Parents Worldwide
-            </span>
-          </div>
-          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
-            What Our Customers Say
-          </h2>
-          <p className="text-gray-500 text-base md:text-lg max-w-2xl mx-auto">
-            Join thousands of happy parents who trust us for quality toys
-          </p>
-        </div>
-
-        {/* Main Row: Fixed Image + 3 Cards */}
-        <div className="flex flex-col lg:flex-row items-stretch -ml-24">
-          {/* Left: Fixed Main Image with Baby - Reduced Height */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex-shrink-0 lg:w-72 xl:w-80 flex items-center"
-          >
-            <div className="relative w-full">
-              <div className="absolute -top-4 -left-4 w-24 h-16 bg-[#FFB6C1]/20 rounded-full blur-2xl"></div>
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-[#4A8A90]/20 rounded-full blur-2xl"></div>
-              <img
-                src={fixedImage}
-                alt="Happy child with toy"
-                className="w-full h-auto max-h-64 md:max-h-72 object-contain drop-shadow-2xl relative z-10 mx-auto"
-              />
+    <>
+      <section className="w-full bg-gradient-to-br from-[#F0F7F7] via-white to-[#FEF9F9] py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#4A8A90]/10 rounded-full px-4 py-1.5 mb-4">
+              <span className="text-lg">⭐</span>
+              <span className="text-[#4A8A90] font-semibold text-sm md:text-base">
+                Trusted by Parents Worldwide
+              </span>
             </div>
-          </motion.div>
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+              What Our Customers Say
+            </h2>
+            <p className="text-gray-500 text-base md:text-lg max-w-2xl mx-auto">
+              Join thousands of happy parents who trust us for quality toys
+            </p>
+          </div>
 
-          {/* Right: 3 Testimonial Cards in a Row */}
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 -ml-[44px]">
-            {visibleTestimonials.map((testimonial, index) => (
-              <motion.div
-                key={`card-${testimonial.id}-${currentIndex}`}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -8 }}
-                className="group"
-              >
-                <div className="bg-white rounded-br-2xl  rounded-t-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
-                  {/* Quote Icon */}
-                  <div className="mb-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] flex items-center justify-center">
-                      <Quote className="w-5 h-5 text-white" />
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-4 mb-10">
+            <button
+              onClick={() => setIsReviewModalOpen(true)}
+              className="px-6 py-2.5 bg-gradient-to-r from-[#4A8A90] to-[#5A9AA0] text-white font-semibold rounded-full shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+            >
+              Write a Review
+            </button>
+            <button
+              onClick={() => setIsAllReviewsModalOpen(true)}
+              className="px-6 py-2.5 bg-white border-2 border-[#4A8A90] text-[#4A8A90] font-semibold rounded-full shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+            >
+              All Reviews
+            </button>
+          </div>
+
+          {/* Main Row: Fixed Image + 3 Cards */}
+          <div className="flex flex-col lg:flex-row items-stretch -ml-24">
+            {/* Left: Fixed Main Image with Baby - Reduced Height */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex-shrink-0 lg:w-72 xl:w-80 flex items-center"
+            >
+              <div className="relative w-full">
+                <div className="absolute -top-4 -left-4 w-24 h-16 bg-[#FFB6C1]/20 rounded-full blur-2xl"></div>
+                <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-[#4A8A90]/20 rounded-full blur-2xl"></div>
+                <img
+                  src={fixedImage}
+                  alt="Happy child with toy"
+                  className="w-full h-auto max-h-64 md:max-h-72 object-contain drop-shadow-2xl relative z-10 mx-auto"
+                />
+              </div>
+            </motion.div>
+
+            {/* Right: 3 Testimonial Cards in a Row */}
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 -ml-[44px]">
+              {visibleTestimonials.map((testimonial, index) => (
+                <motion.div
+                  key={`card-${testimonial.id}-${currentIndex}`}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -8 }}
+                  className="group"
+                >
+                  <div className="bg-white rounded-br-2xl rounded-t-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
+                    {/* Quote Icon */}
+                    <div className="mb-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] flex items-center justify-center">
+                        <Quote className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+
+                    {/* Testimonial Text */}
+                    <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-5 flex-grow">
+                      "{testimonial.text}"
+                    </p>
+
+                    {/* Rating Stars */}
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                        </svg>
+                      ))}
+                    </div>
+
+                    {/* Author Info */}
+                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4A8A90] to-[#FFB6C1] flex items-center justify-center text-white font-bold text-lg">
+                        {testimonial.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900 text-sm">{testimonial.name}</p>
+                        <p className="text-[#4A8A90] text-xs font-medium">{testimonial.role}</p>
+                      </div>
                     </div>
                   </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
 
-                  {/* Testimonial Text */}
-                  <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-5 flex-grow">
-                    "{testimonial.text}"
-                  </p>
+          {/* Navigation Controls */}
+          <div className="flex items-center justify-center gap-4 mt-12">
+            <button
+              onClick={handlePrev}
+              className="w-12 h-12 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center hover:border-[#4A8A90] hover:bg-[#F0F7F7] transition-all duration-300 shadow-sm hover:shadow"
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-600 group-hover:text-[#4A8A90]" />
+            </button>
 
-                  {/* Rating Stars */}
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                      </svg>
-                    ))}
-                  </div>
+            {/* Dots Navigation */}
+            <div className="flex gap-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentIndex
+                      ? 'bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] w-8'
+                      : 'bg-gray-300 w-2 hover:bg-[#4A8A90]'
+                  }`}
+                  aria-label={`Go to testimonial set ${index + 1}`}
+                />
+              ))}
+            </div>
 
-                  {/* Author Info */}
-                  <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4A8A90] to-[#FFB6C1] flex items-center justify-center text-white font-bold text-lg">
-                      {testimonial.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900 text-sm">{testimonial.name}</p>
-                      <p className="text-[#4A8A90] text-xs font-medium">{testimonial.role}</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+            <button
+              onClick={handleNext}
+              className="w-12 h-12 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center hover:border-[#4A8A90] hover:bg-[#F0F7F7] transition-all duration-300 shadow-sm hover:shadow"
+              aria-label="Next testimonial"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-[#4A8A90]" />
+            </button>
+          </div>
+
+          {/* Trust Badge */}
+          <div className="flex flex-wrap items-center justify-center gap-8 mt-12 pt-8 border-t border-gray-200">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🏆</span>
+              <span className="text-sm text-gray-600">Award Winning Toys</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">✅</span>
+              <span className="text-sm text-gray-600">100% Safe Materials</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🚚</span>
+              <span className="text-sm text-gray-600">Free Shipping Worldwide</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">💳</span>
+              <span className="text-sm text-gray-600">Secure Payment</span>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Navigation Controls */}
-        <div className="flex items-center justify-center gap-4 mt-12">
-          <button
-            onClick={handlePrev}
-            className="w-12 h-12 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center hover:border-[#4A8A90] hover:bg-[#F0F7F7] transition-all duration-300 shadow-sm hover:shadow"
-            aria-label="Previous testimonial"
-          >
-            <ChevronLeft className="w-5 h-5 text-gray-600 group-hover:text-[#4A8A90]" />
-          </button>
+      {/* Write a Review Modal */}
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        onReviewSubmitted={() => {
+          // Optional: Refresh testimonials or show a success toast
+          console.log('Review submitted successfully');
+        }}
+        productId={null}
+        productName={null}
+      />
 
-          {/* Dots Navigation */}
-          <div className="flex gap-2">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  index === currentIndex
-                    ? 'bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] w-8'
-                    : 'bg-gray-300 w-2 hover:bg-[#4A8A90]'
-                }`}
-                aria-label={`Go to testimonial set ${index + 1}`}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={handleNext}
-            className="w-12 h-12 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center hover:border-[#4A8A90] hover:bg-[#F0F7F7] transition-all duration-300 shadow-sm hover:shadow"
-            aria-label="Next testimonial"
-          >
-            <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-[#4A8A90]" />
-          </button>
-        </div>
-
-        {/* Trust Badge */}
-        <div className="flex flex-wrap items-center justify-center gap-8 mt-12 pt-8 border-t border-gray-200">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🏆</span>
-            <span className="text-sm text-gray-600">Award Winning Toys</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">✅</span>
-            <span className="text-sm text-gray-600">100% Safe Materials</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🚚</span>
-            <span className="text-sm text-gray-600">Free Shipping Worldwide</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">💳</span>
-            <span className="text-sm text-gray-600">Secure Payment</span>
-          </div>
-        </div>
-      </div>
-    </section>
+      {/* All Reviews Modal - Using the same ReviewModal but with all-reviews mode */}
+      {/* You can create a separate AllReviewsModal if needed, or reuse ReviewModal with a prop */}
+      <ReviewModal
+        isOpen={isAllReviewsModalOpen}
+        onClose={() => setIsAllReviewsModalOpen(false)}
+        onReviewSubmitted={() => {}}
+        productId={null}
+        productName={null}
+        viewAllMode={true}
+      />
+    </>
   );
 }

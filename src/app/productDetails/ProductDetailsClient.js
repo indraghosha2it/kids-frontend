@@ -2399,6 +2399,11 @@ const [isTransitioning, setIsTransitioning] = useState(false);
   const [videoThumbnail, setVideoThumbnail] = useState(null);
 const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
 const [checkingCart, setCheckingCart] = useState(true);
+// Add these state variables
+const [carouselIndex, setCarouselIndex] = useState(0);
+const [carouselItemsPerView, setCarouselItemsPerView] = useState(5);
+const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+const autoScrollIntervalRef = useRef(null);
 
 
 const [productsInCart, setProductsInCart] = useState({});
@@ -2526,6 +2531,64 @@ useEffect(() => {
   
   fetchRelatedProductsStatus();
 }, [relatedProducts]);
+
+// Handle responsive items per view
+useEffect(() => {
+  const handleResize = () => {
+    if (window.innerWidth < 640) {
+      setCarouselItemsPerView(2);
+    } else if (window.innerWidth < 1024) {
+      setCarouselItemsPerView(3);
+    } else {
+      setCarouselItemsPerView(5);
+    }
+  };
+  
+  handleResize();
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
+
+// Auto-scroll functionality
+useEffect(() => {
+  if (isAutoScrolling && relatedProducts.length > carouselItemsPerView) {
+    autoScrollIntervalRef.current = setInterval(() => {
+      setCarouselIndex((prev) => {
+        const maxIndex = Math.max(0, relatedProducts.length - carouselItemsPerView);
+        if (prev >= maxIndex) {
+          return 0;
+        }
+        return prev + 1;
+      });
+    }, 5000);
+  }
+  
+  return () => {
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+    }
+  };
+}, [isAutoScrolling, relatedProducts.length, carouselItemsPerView]);
+
+// Stop auto-scroll when user interacts
+const handleCarouselInteraction = () => {
+  setIsAutoScrolling(false);
+  // Resume auto-scroll after 10 seconds of no interaction
+  setTimeout(() => {
+    setIsAutoScrolling(true);
+  }, 5000);
+};
+
+const handlePrevSlide = () => {
+  handleCarouselInteraction();
+  setCarouselIndex((prev) => Math.max(0, prev - 1));
+};
+
+const handleNextSlide = () => {
+  handleCarouselInteraction();
+  const maxIndex = Math.max(0, relatedProducts.length - carouselItemsPerView);
+  setCarouselIndex((prev) => Math.min(maxIndex, prev + 1));
+};
 
   const fetchProductDetails = async () => {
     setLoading(true);
@@ -2655,7 +2718,7 @@ const handleAddToCart = async () => {
   }
 };
 
-// Add this function after handleAddToCart
+// Update the handleBuyNow function
 const handleBuyNow = async () => {
   if (product.stockQuantity <= 0) {
     toast.error('Out of stock');
@@ -2672,28 +2735,41 @@ const handleBuyNow = async () => {
     if (token) headers['Authorization'] = `Bearer ${token}`;
     else if (sessionId) headers['x-session-id'] = sessionId;
 
-    // First, add the product to cart with selected quantity
-    const response = await fetch('http://localhost:5000/api/cart', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ productId: product._id, quantity: quantity })
-    });
-    const data = await response.json();
+    // First, check if product is already in cart
+    const checkResponse = await fetch(`http://localhost:5000/api/cart/check/${product._id}`, { headers });
+    const checkData = await checkResponse.json();
     
-    if (data.success) {
-      if (data.sessionId && !token) localStorage.setItem('cartSessionId', data.sessionId);
-      
-      // Dispatch cart update event
-      window.dispatchEvent(new Event('cart-update'));
-      
-      // Wait a moment for cart to update, then redirect to checkout
-      setTimeout(() => {
-        toast.success('Redirecting to checkout...', { id: toastId });
-        router.push('/checkout');
-      }, 500);
-    } else {
-      toast.error(data.error || 'Failed to process', { id: toastId });
+    let alreadyInCart = false;
+    if (checkData.success) {
+      alreadyInCart = checkData.data.inCart;
     }
+    
+    if (!alreadyInCart) {
+      // Only add to cart if not already in cart
+      const response = await fetch('http://localhost:5000/api/cart', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ productId: product._id, quantity: quantity })
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        if (data.sessionId && !token) localStorage.setItem('cartSessionId', data.sessionId);
+        // Dispatch cart update event
+        window.dispatchEvent(new Event('cart-update'));
+      } else {
+        toast.error(data.error || 'Failed to process', { id: toastId });
+        setAddingToCart(false);
+        return;
+      }
+    }
+    
+    // Wait a moment for cart to update (if needed), then redirect to checkout
+    setTimeout(() => {
+      toast.success('Redirecting to checkout...', { id: toastId });
+      router.push('/checkout');
+    }, 500);
+    
   } catch (error) {
     console.error('Buy now error:', error);
     toast.error('Network error', { id: toastId });
@@ -3107,28 +3183,35 @@ const generateVideoThumbnail = (videoUrl, callback) => {
 </div>
 
             {/* Right Column - Product Info (4/7 width) */}
-            <div className="lg:col-span-4">
+            <div className="lg:col-span-4 bg-white p-4 rounded-lg">
               {/* Category Hierarchy */}
-              {categoryHierarchy.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <FolderTree className="w-4 h-4 text-[#4A8A90]" />
-                  <span className="text-xs text-gray-500">Categories:</span>
-                  {categoryHierarchy.map((cat, idx) => (
-                    <span key={idx} className="text-xs font-medium text-[#4A8A90] bg-[#D4EDEE] px-2 py-0.5 rounded-full">
-                      {cat}
-                    </span>
-                  ))}
-                </div>
-              )}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+    {categoryHierarchy.map((cat, idx) => (
+      <span 
+        key={idx} 
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-gradient-to-r from-[#4A8A90]/10 to-[#4A8A90]/5 text-[#4A8A90] border border-[#4A8A90]/20"
+      >
+        <FolderTree className="w-3 h-3" />
+        {cat}
+      </span>
+    ))}
+    
+    {product.brand && (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-gradient-to-r from-[#FFB6C1]/20 to-[#FFB6C1]/10 text-[#FF6B8A] border border-[#FFB6C1]/30">
+        <Tag className="w-3 h-3" />
+        {product.brand}
+      </span>
+    )}
+
+    
+
+    
+  </div>
 
               {/* Title & Brand */}
               <div className="mb-4">
-                {product.brand && (
-                  <span className="inline-block text-xs font-semibold text-[#4A8A90] bg-[#D4EDEE] px-3 py-1 rounded-full mb-2">
-                    {product.brand}
-                  </span>
-                )}
-                <h1 className="text-2xl md:text-3xl font-bold text-[#2D3A5C]" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+              
+                <h1 className="text-2xl md:text-2xl font-bold text-[#2D3A5C]" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
                   {product.productName}
                 </h1>
               </div>
@@ -3152,19 +3235,27 @@ const generateVideoThumbnail = (videoUrl, callback) => {
                 </div>
               </div>
 
-              {/* Price */}
-                 <div className="mb-4">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-2xl md:text-3xl font-bold text-[#4A8A90]">৳{formatPrice(currentPrice)}</span>
-                  {discountPercent > 0 && (
-                    <>
-                      <span className="text-base text-gray-400 line-through">৳{formatPrice(product.regularPrice)}</span>
-                      <span className="text-xs font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-full">Save {discountPercent}%</span>
-                    </>
-                  )}
-                </div>
-              
-              </div>
+             {/* Price Card - Modern Design */}
+  <div className="mb-5 p-4 bg-gradient-to-r from-[#D4EDEE]/20 to-[#FFF9F0] rounded-xl border border-[#FFE0E6]">
+    <div className="flex items-baseline gap-3 flex-wrap">
+      <span className="text-3xl md:text-4xl font-bold text-[#4A8A90]">৳{formatPrice(currentPrice)}</span>
+      {discountPercent > 0 && (
+        <>
+          <span className="text-base text-gray-400 line-through">৳{formatPrice(product.regularPrice)}</span>
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-500 bg-red-100 px-2 py-1 rounded-full">
+            <Zap className="w-3 h-3" />
+            Save {discountPercent}%
+          </span>
+        </>
+      )}
+    </div>
+    {product.codAvailable && (
+      <div className="flex items-center gap-1.5 mt-3 text-green-600 text-sm bg-green-50 inline-flex px-3 py-1 rounded-full">
+        <Truck className="w-3.5 h-3.5" />
+        <span>Cash on Delivery available</span>
+      </div>
+    )}
+  </div>
                    {/* Short Description */}
               <div className="mb-5 p-4 bg-white rounded-xl border border-[#FFE0E6]">
                 <div className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: product.shortDescription }} />
@@ -3179,14 +3270,11 @@ const generateVideoThumbnail = (videoUrl, callback) => {
                   {stockStatus.label === 'In Stock' && <span className="text-xs text-gray-500">({product.stockQuantity} available)</span>}
                 </div>
                 <div>
-                     {product.codAvailable && (
-                  <div className="flex items-center gap-1 mt-2 text-green-600 text-sm">
-                    <Truck className="w-4 h-4" />
-                    <span>Cash on Delivery available</span>
-                  </div>
-                )}
+                  
                 </div>
+
               </div>
+              
              
 
          
@@ -3279,6 +3367,13 @@ const generateVideoThumbnail = (videoUrl, callback) => {
                 </div>
               </div>
             </div>
+
+
+
+
+
+
+            
           </div>
 
           {/* Tabs for Description, Specifications, Reviews */}
@@ -3405,25 +3500,92 @@ const generateVideoThumbnail = (videoUrl, callback) => {
 </div>
 
         {/* Related Products Section */}
+{/* Related Products Section - Carousel */}
 {relatedProducts.length > 0 && (
   <div className="mt-12">
-    <div className="flex items-center gap-2 mb-5">
-      <Sparkles className="w-6 h-6 text-[#FFD93D]" />
-      <h2 className="text-xl md:text-2xl font-bold text-[#2D3A5C]" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
-        You May Also Like
-      </h2>
+    <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center gap-2">
+        <Sparkles className="w-6 h-6 text-[#FFD93D]" />
+        <h2 className="text-xl md:text-2xl font-bold text-[#2D3A5C]" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+          You May Also Like
+        </h2>
+      </div>
+      
+      {/* Navigation Arrows */}
+      {relatedProducts.length > carouselItemsPerView && (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handlePrevSlide}
+            disabled={carouselIndex === 0}
+            className={`p-2 rounded-full transition-all ${
+              carouselIndex === 0 
+                ? 'bg-gray-100 text-gray-300 cursor-not-allowed' 
+                : 'bg-white border border-[#FFE0E6] text-[#4A8A90] hover:bg-[#D4EDEE] hover:scale-110'
+            }`}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleNextSlide}
+            disabled={carouselIndex >= relatedProducts.length - carouselItemsPerView}
+            className={`p-2 rounded-full transition-all ${
+              carouselIndex >= relatedProducts.length - carouselItemsPerView 
+                ? 'bg-gray-100 text-gray-300 cursor-not-allowed' 
+                : 'bg-white border border-[#FFE0E6] text-[#4A8A90] hover:bg-[#D4EDEE] hover:scale-110'
+            }`}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
     </div>
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-      {relatedProducts.map(relProduct => (
-        <RelatedProductCard 
-          key={relProduct._id} 
-          product={relProduct} 
-          router={router}
-          isInCart={productsInCart[relProduct._id] || false}
-          isInWishlist={productsInWishlist[relProduct._id] || false}
-        />
-      ))}
+    
+    {/* Carousel Container */}
+    <div className="relative overflow-hidden">
+      <motion.div
+        className="flex gap-4"
+        animate={{ x: `-${carouselIndex * (100 / carouselItemsPerView)}%` }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        style={{ width: `${(relatedProducts.length / carouselItemsPerView) * 100}%` }}
+      >
+        {relatedProducts.map((relProduct) => (
+          <div 
+            key={relProduct._id} 
+            className="flex-shrink-0"
+            style={{ width: `${100 / relatedProducts.length}%` }}
+          >
+            <RelatedProductCard 
+              product={relProduct} 
+              router={router}
+              isInCart={productsInCart[relProduct._id] || false}
+              isInWishlist={productsInWishlist[relProduct._id] || false}
+            />
+          </div>
+        ))}
+      </motion.div>
     </div>
+    
+    {/* Dots Indicator */}
+    {relatedProducts.length > carouselItemsPerView && (
+      <div className="flex justify-center gap-2 mt-6">
+        {Array.from({ length: Math.ceil(relatedProducts.length / carouselItemsPerView) }).map((_, idx) => {
+          const pageIndex = idx * carouselItemsPerView;
+          const isActive = carouselIndex >= pageIndex && carouselIndex < pageIndex + carouselItemsPerView;
+          return (
+            <button
+              key={idx}
+              onClick={() => {
+                handleCarouselInteraction();
+                setCarouselIndex(pageIndex);
+              }}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                isActive ? 'w-6 bg-[#4A8A90]' : 'w-2 bg-gray-300 hover:bg-gray-400'
+              }`}
+            />
+          );
+        })}
+      </div>
+    )}
   </div>
 )}
         </div>

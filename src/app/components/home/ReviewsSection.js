@@ -1649,7 +1649,7 @@ export default function Testimonials() {
   ];
 
   // Fixed single image (not changing)
-  const fixedImage = 'https://i.ibb.co.com/60RfKpG1/Gemini-Generated-Image-8mhnj68mhnj68mhn-removebg-preview-Copy.png';
+  const fixedImage = 'https://i.ibb.co.com/MWF9N8y/Gemini-Generated-Image-x69sikx69sikx69s-1-removebg-preview.png';
 
   // Get 3 testimonials to display (current + next 2)
   const getVisibleTestimonials = () => {
@@ -1727,7 +1727,7 @@ export default function Testimonials() {
             </motion.div>
 
             {/* Right: 3 Testimonial Cards in a Row */}
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 -ml-[44px]">
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 -ml-[61px]">
               {visibleTestimonials.map((testimonial, index) => (
                 <motion.div
                   key={`card-${testimonial.id}-${currentIndex}`}

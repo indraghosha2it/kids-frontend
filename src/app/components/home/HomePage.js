@@ -28,6 +28,7 @@ export default function HomePage() {
         
           <ParentsTrustSection />
              <ReviewsSection />
+             <Footer />
 
   
       {/* <Categories />

@@ -2404,6 +2404,10 @@ const [carouselIndex, setCarouselIndex] = useState(0);
 const [carouselItemsPerView, setCarouselItemsPerView] = useState(5);
 const [isAutoScrolling, setIsAutoScrolling] = useState(true);
 const autoScrollIntervalRef = useRef(null);
+// Add these state variables with your other useState declarations
+const [productReviews, setProductReviews] = useState([]);
+const [reviewStats, setReviewStats] = useState(null);
+const [loadingReviews, setLoadingReviews] = useState(false);
 
 
 const [productsInCart, setProductsInCart] = useState({});
@@ -2422,6 +2426,7 @@ const [productsInWishlist, setProductsInWishlist] = useState({});
 
   useEffect(() => {
     if (productId) fetchProductDetails();
+    fetchProductReviews();
   }, [productId]);
 
  useEffect(() => {
@@ -2609,6 +2614,58 @@ const handleNextSlide = () => {
       setLoading(false);
     }
   };
+
+  // Add this function after fetchProductDetails
+const fetchProductReviews = async () => {
+  if (!productId) return;
+  
+  setLoadingReviews(true);
+  try {
+    const token = localStorage.getItem('token');
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    // Fetch reviews for this specific product
+    const response = await fetch(`http://localhost:5000/api/reviews?productId=${productId}&status=approved&limit=50`, {
+      headers
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Get current user ID to check for own pending reviews
+      const currentUserId = token ? (await fetch('http://localhost:5000/api/auth/me', { headers }).then(res => res.json()).catch(() => null))?.user?._id : null;
+      
+      let allReviews = data.data || [];
+      
+      // If user is logged in, also fetch their pending reviews for this product
+      if (token && currentUserId) {
+        const userReviewsResponse = await fetch(`http://localhost:5000/api/reviews?productId=${productId}&userId=${currentUserId}`, {
+          headers
+        });
+        const userReviewsData = await userReviewsResponse.json();
+        
+        if (userReviewsData.success) {
+          // Combine approved reviews with user's pending reviews
+          const userPendingReviews = userReviewsData.data.filter(r => r.status === 'pending');
+          allReviews = [...allReviews, ...userPendingReviews];
+        }
+      }
+      
+      setProductReviews(allReviews);
+      setReviewStats(data.stats);
+    } else {
+      setProductReviews([]);
+    }
+  } catch (error) {
+    console.error('Error fetching product reviews:', error);
+    setProductReviews([]);
+  } finally {
+    setLoadingReviews(false);
+  }
+};
 
 const checkWishlistStatus = async () => {
   // Make sure we have a product ID
@@ -3438,64 +3495,131 @@ const generateVideoThumbnail = (videoUrl, callback) => {
   </div>
 )}
 
-    {activeTab === 'reviews' && (
-      <div>
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-[#4A8A90]">{averageRating.toFixed(1)}</div>
-              <div className="flex items-center justify-center mt-1">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <Star key={star} className={`w-4 h-4 ${star <= Math.floor(averageRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
-                ))}
+   {activeTab === 'reviews' && (
+  <div>
+    {loadingReviews ? (
+      <div className="flex justify-center py-8">
+        <Loader2 className="w-6 h-6 animate-spin text-[#4A8A90]" />
+      </div>
+    ) : (
+      <>
+        {/* Review Stats */}
+        {reviewStats && reviewStats.totalReviews > 0 && (
+          <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-[#4A8A90]">{reviewStats.averageRating?.toFixed(1) || '0.0'}</div>
+                <div className="flex items-center justify-center mt-1">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <Star key={star} className={`w-4 h-4 ${star <= Math.floor(reviewStats.averageRating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                  ))}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">Based on {reviewStats.totalReviews} reviews</div>
               </div>
-              <div className="text-xs text-gray-500 mt-1">Based on {totalReviews} reviews</div>
-            </div>
-            <div className="flex-1 max-w-xs">
-              {[5, 4, 3, 2, 1].map(rating => {
-                const count = product.reviewStats?.ratingDistribution?.[rating] || 0;
-                const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
-                return (
-                  <div key={rating} className="flex items-center gap-2 text-sm">
-                    <span className="w-8 text-gray-600">{rating}★</span>
-                    <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${percentage}%` }} />
+              <div className="flex-1 max-w-xs">
+                {[5, 4, 3, 2, 1].map(rating => {
+                  const count = reviewStats.ratingDistribution?.[rating] || 0;
+                  const percentage = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0;
+                  return (
+                    <div key={rating} className="flex items-center gap-2 text-sm">
+                      <span className="w-8 text-gray-600">{rating}★</span>
+                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${percentage}%` }} />
+                      </div>
+                      <span className="w-8 text-gray-500 text-xs">{count}</span>
                     </div>
-                    <span className="w-8 text-gray-500 text-xs">{count}</span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-          {!reviews.some(r => r.userId === localStorage.getItem('userId')) && (
-            <Link href={`/write-review?id=${product._id}`} className="px-4 py-2 bg-[#4A8A90] text-white text-sm font-semibold rounded-full hover:bg-[#3A7A80] transition">
+            <Link href={`/write-review?id=${productId}`} className="px-4 py-2 bg-[#4A8A90] text-white text-sm font-semibold rounded-full hover:bg-[#3A7A80] transition">
               Write a Review
             </Link>
+          </div>
+        )}
+
+        {/* Reviews List */}
+        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+          {productReviews.length > 0 ? (
+            productReviews.slice(0, reviewsToShow).map((review, idx) => {
+              // Check if this is the current user's pending review
+              const isPending = review.status === 'pending';
+              const currentUserId = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('user') || '{}')?._id : null;
+              const isUserReview = currentUserId && review.user === currentUserId;
+              
+              return (
+                <div key={idx} className="border-b border-[#FFE0E6] pb-4 last:border-0">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] flex items-center justify-center text-white font-bold">
+                        {review.userName?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-[#2D3A5C]">{review.userName}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <div className="flex items-center">
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <Star
+                                key={star}
+                                className={`w-3.5 h-3.5 ${star <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-xs text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+                          {isPending && isUserReview && (
+                            <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+                              Pending Approval
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {review.isVerifiedPurchase && (
+                      <span className="flex items-center gap-1 text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full">
+                        <CheckCircle className="w-3 h-3" />
+                        Verified
+                      </span>
+                    )}
+                  </div>
+                  {review.title && <p className="font-medium text-[#2D3A5C] mt-2">{review.title}</p>}
+                  <p className="text-sm text-gray-600 mt-1">
+                    {review.comment}
+                  </p>
+                  {review.images && review.images.length > 0 && (
+                    <div className="flex gap-2 mt-3">
+                      {review.images.slice(0, 3).map((img, imgIdx) => (
+                        <img key={imgIdx} src={img.url} alt={`Review ${idx + 1}`} className="w-16 h-16 rounded-lg object-cover border border-gray-200" />
+                      ))}
+                    </div>
+                  )}
+                  {isPending && isUserReview && (
+                    <div className="mt-2 p-2 bg-yellow-50 rounded-lg text-xs text-yellow-700">
+                      Your review is pending moderation. It will appear here once approved.
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-8">
+              <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500">No reviews yet. Be the first to review this toy!</p>
+              <Link href={`/write-review?id=${productId}`} className="inline-block mt-3 px-4 py-2 bg-[#4A8A90] text-white text-sm font-semibold rounded-full">
+                Write a Review
+              </Link>
+            </div>
           )}
         </div>
 
-        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-          {reviews.slice(0, reviewsToShow).map((review, idx) => (
-            <ReviewCard key={idx} review={review} />
-          ))}
-        </div>
-
-        {reviews.length > reviewsToShow && (
+        {productReviews.length > reviewsToShow && (
           <button onClick={() => setReviewsToShow(reviewsToShow + 5)} className="mt-4 text-[#4A8A90] font-medium text-sm hover:underline">
-            Load More Reviews ({reviews.length - reviewsToShow} left)
+            Load More Reviews ({productReviews.length - reviewsToShow} left)
           </button>
         )}
-        {reviews.length === 0 && (
-          <div className="text-center py-8">
-            <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No reviews yet. Be the first to review this toy!</p>
-            <Link href={`/write-review?id=${product._id}`} className="inline-block mt-3 px-4 py-2 bg-[#4A8A90] text-white text-sm font-semibold rounded-full">
-              Write a Review
-            </Link>
-          </div>
-        )}
-      </div>
+      </>
     )}
+  </div>
+)}
   </div>
 </div>
 

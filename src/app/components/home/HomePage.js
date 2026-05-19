@@ -25,9 +25,11 @@ export default function HomePage() {
      <Navbar />
       <HeroBanner />
        <Categories />
+         <FeaturedProducts />
         
           <ParentsTrustSection />
              <ReviewsSection />
+            
              <Footer />
 
   

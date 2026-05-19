@@ -121,7 +121,7 @@ export default function Categories() {
   }
 
   return (
-    <section className="py-8 md:py-12 lg:py-10 bg-gradient-to-t from-[#D4EDEE] to-white">
+    <section className="py-8 md:py-12 lg:py-10 bg-gradient-to-t from-[#A8E6E1] to-white">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Section Header */}
         <div className="text-center mb-8 md:mb-12">

@@ -1088,6 +1088,7 @@ import {
   ChevronDown,
   Home,
   ChevronRight,
+  Truck,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -1186,6 +1187,11 @@ export default function AdminLayout({ children }) {
     // Create Coupon
     if (href === '/admin/coupon') {
       if (currentPath === '/admin/coupon') return true;
+      return false;
+    }
+
+     if (href === '/admin/delivery-settings') {
+      if (currentPath === '/admin/delivery-settings') return true;
       return false;
     }
     
@@ -1304,7 +1310,7 @@ export default function AdminLayout({ children }) {
     { name: 'All Products', href: '/admin/all-products', icon: ShoppingBag, color: '#4A8A90' },
     { name: 'Create Category', href: '/admin/create-categories', icon: FolderPlus, color: '#4A8A90' },
     { name: 'Create Coupon', href: '/admin/coupon', icon: Ticket, color: '#4A8A90' },
-    { name: 'Delivery Settings', href: '/admin/delivery-settings', icon: Ticket, color: '#4A8A90' }, 
+    { name: 'Delivery Settings', href: '/admin/delivery-settings', icon: Truck, color: '#4A8A90' }, 
     { name: 'Manage Certifications', href: '/admin/certifications', icon: Award, color: '#4A8A90' },
     { name: 'Create Users', href: '/admin/create-users', icon: UserPlus, color: '#4A8A90' },
     { name: 'Manage Users', href: '/admin/manage-users', icon: UserCog, color: '#4A8A90' },

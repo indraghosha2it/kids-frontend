@@ -1025,7 +1025,7 @@ const getAgeGroupBadge = (ageGroup) => {
   return styles[ageGroup] || 'bg-gray-100 text-gray-600';
 };
 
-// Enhanced Product Grid Card Component
+
 // Enhanced Product Grid Card Component
 const ProductGridCard = ({ product, router, onWishlistUpdate, isInWishlist: propIsInWishlist }) => {
   const [isMobile, setIsMobile] = useState(false);
@@ -1796,8 +1796,8 @@ useEffect(() => {
 
           {/* Content Container */}
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 mb-16 items-stretch">
-
-<div className="w-[27.5%] lg:w-[27.5%] flex-shrink-0 h-[420px] hidden lg:block">
+ {/* Left Side - Featured Product Banner (Hidden on mobile, visible on tablet and up) */}
+<div className="w-[27.5%] lg:w-[27.5%] flex-shrink-0 h-[380px] hidden lg:block">
   <motion.div 
     initial={{ opacity: 0, x: -50 }}
     animate={{ opacity: 1, x: 0 }}
@@ -1881,7 +1881,7 @@ useEffect(() => {
           transition={{ duration: 0.3 }}
           src={getFeaturedContent(activeTag).image}
           alt="Promotion banner"
-          className="w-28 sm:w-36 lg:w-40 h-28 sm:h-36 lg:h-48 object-contain mix-blend-lighten drop-shadow-lg cursor-pointer"
+          className="-mt-10 w-28 sm:w-36 lg:w-40 h-28 sm:h-36 lg:h-48 object-contain mix-blend-lighten drop-shadow-lg cursor-pointer"
         />
       </motion.div>
       
@@ -1907,7 +1907,7 @@ useEffect(() => {
 </div>
             
             
-            {/* Left Side - Featured Product Banner (Hidden on mobile, visible on tablet and up) */}
+           
            
 
             {/* Right Side - Product Grid */}

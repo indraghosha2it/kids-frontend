@@ -1037,18 +1037,7 @@ const handleGoogleSuccess = async (data) => {
 
                 {/* Options Row */}
                 <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-1.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="rememberMe"
-                      checked={formData.rememberMe}
-                      onChange={handleChange}
-                      className="w-3.5 h-3.5 text-[#4F9DFF] rounded focus:ring-[#4F9DFF]"
-                    />
-                    <span className="text-xs text-gray-600" style={{ fontFamily: "'Comic Neue', cursive" }}>
-                      Remember me 🎈
-                    </span>
-                  </label>
+                 
                   <button
                     type="button"
                     onClick={() => setShowForgotPassword(true)}

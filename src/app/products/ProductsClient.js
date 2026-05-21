@@ -3637,6 +3637,951 @@ const FilterSidebar = ({
 );
 
 // ========== MAIN PRODUCTS CONTENT COMPONENT ==========
+// export default function ProductsClient() {
+//   const router = useRouter();
+//   const searchParams = useSearchParams();
+//   const [products, setProducts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [viewMode, setViewMode] = useState('grid');
+//   const [showMobileFilters, setShowMobileFilters] = useState(false);
+//   const [subcategories, setSubcategories] = useState([]);
+//   const [childSubcategories, setChildSubcategories] = useState([]);
+//   const [selectedCategory, setSelectedCategory] = useState(null);
+//   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+//   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
+//   const [productsInCart, setProductsInCart] = useState({});
+  
+//   const [expandedSections, setExpandedSections] = useState({
+//     price: true,
+//     categories: true,
+//     subcategories: true,
+//     childSubcategories: true,
+//     ageGroup: true
+//   });
+
+//   const productsContainerRef = useRef(null);
+//   const scrollPositionRef = useRef(0);
+//   const searchTimerRef = useRef(null);
+
+//   const [filters, setFilters] = useState({
+//     search: '',
+//     categories: [],
+//     subcategories: [],
+//     childSubcategories: [],
+//     ageGroups: [],
+//     priceRange: { min: '', max: '' },
+//     sortBy: 'newest'
+//   });
+
+//   const [searchInput, setSearchInput] = useState('');
+//   const [categories, setCategories] = useState([]);
+//   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [totalPages, setTotalPages] = useState(1);
+//   const [totalProducts, setTotalProducts] = useState(0);
+//   const [minPriceInput, setMinPriceInput] = useState('');
+//   const [maxPriceInput, setMaxPriceInput] = useState('');
+//   const [initialCategorySet, setInitialCategorySet] = useState(false);
+//   const [productsInWishlist, setProductsInWishlist] = useState({});
+
+//   const saveScrollPosition = () => {
+//     scrollPositionRef.current = window.scrollY;
+//   };
+
+//   const restoreScrollPosition = () => {
+//     if (scrollPositionRef.current > 0) {
+//       window.scrollTo({ top: scrollPositionRef.current, behavior: 'instant' });
+//     }
+//   };
+
+//   const debouncedSearch = useCallback((searchValue) => {
+//     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+//     searchTimerRef.current = setTimeout(() => {
+//       saveScrollPosition();
+//       setFilters(prev => ({ ...prev, search: searchValue }));
+//       setCurrentPage(1);
+//     }, 500);
+//   }, []);
+
+//   const handleSearchChange = (e) => {
+//     const value = e.target.value;
+//     setSearchInput(value);
+//     debouncedSearch(value);
+//   };
+
+//   const handleClearSearch = () => {
+//     setSearchInput('');
+//     saveScrollPosition();
+//     setFilters(prev => ({ ...prev, search: '' }));
+//     setCurrentPage(1);
+//   };
+
+//   useEffect(() => {
+//     fetchCategories();
+//   }, []);
+
+//   useEffect(() => {
+//     if (categories.length > 0 && !initialCategorySet) {
+//       const categoryParam = searchParams.get('category');
+//       const subcategoryParam = searchParams.get('subcategory');
+//       const childSubcategoryParam = searchParams.get('childSubcategory');
+      
+//       if (categoryParam) {
+//         const categoryExists = categories.some(cat => cat._id === categoryParam);
+//         if (categoryExists) {
+//           setFilters(prev => ({ ...prev, categories: [categoryParam] }));
+          
+//           if (subcategoryParam) {
+//             const loadSubcategoriesAndSetFilter = async () => {
+//               const subcats = await fetchSubcategories(categoryParam);
+//               if (subcats && Array.isArray(subcats)) {
+//                 const subcategoryExists = subcats.some(sub => sub._id === subcategoryParam);
+//                 if (subcategoryExists) {
+//                   setFilters(prev => ({ ...prev, subcategories: [subcategoryParam] }));
+                  
+//                   if (childSubcategoryParam) {
+//                     const children = await fetchChildSubcategories(categoryParam, subcategoryParam);
+//                     if (children && Array.isArray(children)) {
+//                       const childExists = children.some(child => child._id === childSubcategoryParam);
+//                       if (childExists) {
+//                         setFilters(prev => ({ ...prev, childSubcategories: [childSubcategoryParam] }));
+//                       }
+//                     }
+//                   }
+//                 }
+//               }
+//             };
+//             loadSubcategoriesAndSetFilter();
+//           }
+//         }
+//       }
+//       setInitialCategorySet(true);
+//     }
+//   }, [categories, searchParams, initialCategorySet]);
+
+//   useEffect(() => {
+//     if (filters.categories.length === 1) {
+//       const categoryId = filters.categories[0];
+//       setSelectedCategory(categoryId);
+//       fetchSubcategories(categoryId);
+//     } else {
+//       setSubcategories([]);
+//       setSelectedCategory(null);
+//       setChildSubcategories([]);
+//       setSelectedSubcategory(null);
+//       setShowChildSubcategory(false);
+//       if (filters.subcategories.length > 0) {
+//         setFilters(prev => ({ ...prev, subcategories: [] }));
+//       }
+//       if (filters.childSubcategories.length > 0) {
+//         setFilters(prev => ({ ...prev, childSubcategories: [] }));
+//       }
+//     }
+//   }, [filters.categories]);
+
+//   useEffect(() => {
+//     if (filters.subcategories.length === 1 && selectedCategory) {
+//       const subcategoryId = filters.subcategories[0];
+//       setSelectedSubcategory(subcategoryId);
+//       fetchChildSubcategories(selectedCategory, subcategoryId);
+//     } else {
+//       setChildSubcategories([]);
+//       setSelectedSubcategory(null);
+//       setShowChildSubcategory(false);
+//       if (filters.childSubcategories.length > 0) {
+//         setFilters(prev => ({ ...prev, childSubcategories: [] }));
+//       }
+//     }
+//   }, [filters.subcategories, selectedCategory]);
+
+//   useEffect(() => {
+//     if (initialCategorySet) {
+//       fetchProducts();
+//     }
+//   }, [filters, currentPage, initialCategorySet]);
+
+//   useEffect(() => {
+//     if (!loading) restoreScrollPosition();
+//   }, [loading]);
+// // Add this useEffect to check wishlist status
+// useEffect(() => {
+//   const checkWishlistStatus = async () => {
+//     if (products.length === 0) return;
+    
+//     const productIds = products.map(p => p._id);
+//     const token = localStorage.getItem('token');
+//     const sessionId = localStorage.getItem('wishlistSessionId');
+    
+//     const headers = {};
+//     if (token) {
+//       headers['Authorization'] = `Bearer ${token}`;
+//     } else if (sessionId) {
+//       headers['x-session-id'] = sessionId;
+//     }
+    
+//     try {
+//       const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+//         method: 'POST',
+//         headers: { ...headers, 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ productIds })
+//       });
+      
+//       const data = await response.json();
+//       if (data.success) {
+//         setProductsInWishlist(data.data);
+//       }
+//     } catch (error) {
+//       console.error('Error checking wishlist status:', error);
+//     }
+//   };
+  
+//   checkWishlistStatus();
+// }, [products]);
+
+// // Refresh wishlist status when wishlist updates
+// useEffect(() => {
+//   const refreshWishlistStatus = async () => {
+//     if (products.length === 0) return;
+    
+//     const productIds = products.map(p => p._id);
+//     const token = localStorage.getItem('token');
+//     const sessionId = localStorage.getItem('wishlistSessionId');
+    
+//     const headers = {};
+//     if (token) {
+//       headers['Authorization'] = `Bearer ${token}`;
+//     } else if (sessionId) {
+//       headers['x-session-id'] = sessionId;
+//     }
+    
+//     try {
+//       const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+//         method: 'POST',
+//         headers: { ...headers, 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ productIds })
+//       });
+      
+//       const data = await response.json();
+//       if (data.success) {
+//         setProductsInWishlist(data.data);
+//       }
+//     } catch (error) {
+//       console.error('Error refreshing wishlist status:', error);
+//     }
+//   };
+  
+//   const handleWishlistUpdate = () => {
+//     refreshWishlistStatus();
+//   };
+  
+//   window.addEventListener('wishlist-update', handleWishlistUpdate);
+//   return () => window.removeEventListener('wishlist-update', handleWishlistUpdate);
+// }, [products]);
+//   // ========== ADD THIS useEffect - Check cart status for all products ==========
+//   useEffect(() => {
+//     const checkAllProductsCartStatus = async () => {
+//       if (products.length === 0) return;
+      
+//       const productIds = products.map(p => p._id);
+//       const token = localStorage.getItem('token');
+//       const sessionId = localStorage.getItem('cartSessionId');
+      
+//       const headers = {};
+//       if (token) {
+//         headers['Authorization'] = `Bearer ${token}`;
+//       } else if (sessionId) {
+//         headers['x-session-id'] = sessionId;
+//       }
+      
+//       try {
+//         const response = await fetch('http://localhost:5000/api/cart/check-status', {
+//           method: 'POST',
+//           headers: { ...headers, 'Content-Type': 'application/json' },
+//           body: JSON.stringify({ productIds })
+//         });
+        
+//         const data = await response.json();
+//         if (data.success) {
+//           setProductsInCart(data.data);
+//         }
+//       } catch (error) {
+//         console.error('Error checking cart status:', error);
+//       }
+//     };
+    
+//     checkAllProductsCartStatus();
+//   }, [products]);
+
+//   // ========== ADD THIS useEffect - Refresh cart status when cart updates ==========
+//   useEffect(() => {
+//     const refreshCartStatus = async () => {
+//       if (products.length === 0) return;
+      
+//       const productIds = products.map(p => p._id);
+//       const token = localStorage.getItem('token');
+//       const sessionId = localStorage.getItem('cartSessionId');
+      
+//       const headers = {};
+//       if (token) {
+//         headers['Authorization'] = `Bearer ${token}`;
+//       } else if (sessionId) {
+//         headers['x-session-id'] = sessionId;
+//       }
+      
+//       try {
+//         const response = await fetch('http://localhost:5000/api/cart/check-status', {
+//           method: 'POST',
+//           headers: { ...headers, 'Content-Type': 'application/json' },
+//           body: JSON.stringify({ productIds })
+//         });
+        
+//         const data = await response.json();
+//         if (data.success) {
+//           setProductsInCart(data.data);
+//         }
+//       } catch (error) {
+//         console.error('Error refreshing cart status:', error);
+//       }
+//     };
+    
+//     const handleCartUpdate = () => {
+//       refreshCartStatus();
+//     };
+    
+//     window.addEventListener('cart-update', handleCartUpdate);
+//     return () => window.removeEventListener('cart-update', handleCartUpdate);
+//   }, [products]);
+
+//   const fetchCategories = async () => {
+//     try {
+//       const response = await fetch('http://localhost:5000/api/categories');
+//       const data = await response.json();
+//       if (data.success) {
+//         setCategories(data.data);
+//       }
+//       setCategoriesLoaded(true);
+//     } catch (error) {
+//       console.error('Error fetching categories:', error);
+//       setCategoriesLoaded(true);
+//     }
+//   };
+
+//   const fetchSubcategories = async (categoryId) => {
+//     try {
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`);
+//       const data = await response.json();
+//       if (data.success && Array.isArray(data.data.subcategories)) {
+//         setSubcategories(data.data.subcategories);
+//         return data.data.subcategories;
+//       } else {
+//         setSubcategories([]);
+//         return [];
+//       }
+//     } catch (error) {
+//       console.error('Error fetching subcategories:', error);
+//       setSubcategories([]);
+//       return [];
+//     }
+//   };
+
+//   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
+//     try {
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`);
+//       const data = await response.json();
+//       if (data.success && Array.isArray(data.data.children)) {
+//         setChildSubcategories(data.data.children);
+//         setShowChildSubcategory(data.data.children.length > 0);
+//         return data.data.children;
+//       } else {
+//         setChildSubcategories([]);
+//         setShowChildSubcategory(false);
+//         return [];
+//       }
+//     } catch (error) {
+//       console.error('Error fetching child subcategories:', error);
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
+//       return [];
+//     }
+//   };
+
+//   const handleCategoryChange = (categoryId) => {
+//     saveScrollPosition();
+//     setFilters(prev => {
+//       const newCategories = prev.categories.includes(categoryId)
+//         ? prev.categories.filter(id => id !== categoryId)
+//         : [...prev.categories, categoryId];
+//       return { ...prev, categories: newCategories, subcategories: [], childSubcategories: [] };
+//     });
+//     setCurrentPage(1);
+    
+//     if (typeof window !== 'undefined') {
+//       const isSelected = !filters.categories.includes(categoryId);
+//       const newCategory = isSelected ? categoryId : null;
+      
+//       if (newCategory) {
+//         const params = new URLSearchParams(window.location.search);
+//         params.set('category', newCategory);
+//         const newUrl = `${window.location.pathname}?${params.toString()}`;
+//         window.history.pushState({}, '', newUrl);
+//       } else {
+//         const params = new URLSearchParams(window.location.search);
+//         params.delete('category');
+//         const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+//         window.history.pushState({}, '', newUrl);
+//       }
+      
+//       window.dispatchEvent(new CustomEvent('categoryFilterChanged', { 
+//         detail: { categoryId: newCategory }
+//       }));
+//     }
+//   };
+
+//   const handleRemoveCategory = (categoryId) => {
+//     saveScrollPosition();
+//     setFilters(prev => ({
+//       ...prev,
+//       categories: prev.categories.filter(id => id !== categoryId),
+//       subcategories: [],
+//       childSubcategories: []
+//     }));
+//     setCurrentPage(1);
+    
+//     if (typeof window !== 'undefined') {
+//       const params = new URLSearchParams(window.location.search);
+//       params.delete('category');
+//       const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+//       window.history.pushState({}, '', newUrl);
+      
+//       window.dispatchEvent(new CustomEvent('categoryFilterChanged', { 
+//         detail: { categoryId: null }
+//       }));
+//     }
+//   };
+
+//   const handleSubcategoryChange = (subcategoryId) => {
+//     saveScrollPosition();
+//     setFilters(prev => {
+//       const newSubcategories = prev.subcategories.includes(subcategoryId)
+//         ? prev.subcategories.filter(id => id !== subcategoryId)
+//         : [...prev.subcategories, subcategoryId];
+//       return { ...prev, subcategories: newSubcategories, childSubcategories: [] };
+//     });
+//     setCurrentPage(1);
+//   };
+
+//   const handleRemoveSubcategory = (subcategoryId) => {
+//     saveScrollPosition();
+//     setFilters(prev => ({
+//       ...prev,
+//       subcategories: prev.subcategories.filter(id => id !== subcategoryId),
+//       childSubcategories: []
+//     }));
+//     setCurrentPage(1);
+//   };
+
+//   const handleChildSubcategoryChange = (childSubcategoryId) => {
+//     saveScrollPosition();
+//     setFilters(prev => {
+//       const newChildSubcategories = prev.childSubcategories.includes(childSubcategoryId)
+//         ? prev.childSubcategories.filter(id => id !== childSubcategoryId)
+//         : [...prev.childSubcategories, childSubcategoryId];
+//       return { ...prev, childSubcategories: newChildSubcategories };
+//     });
+//     setCurrentPage(1);
+//   };
+
+//   const handleRemoveChildSubcategory = (childSubcategoryId) => {
+//     saveScrollPosition();
+//     setFilters(prev => ({
+//       ...prev,
+//       childSubcategories: prev.childSubcategories.filter(id => id !== childSubcategoryId)
+//     }));
+//     setCurrentPage(1);
+//   };
+
+//   const handleAgeGroupChange = (ageGroup) => {
+//     saveScrollPosition();
+//     setFilters(prev => {
+//       const newAgeGroups = prev.ageGroups.includes(ageGroup)
+//         ? prev.ageGroups.filter(a => a !== ageGroup)
+//         : [...prev.ageGroups, ageGroup];
+//       return { ...prev, ageGroups: newAgeGroups };
+//     });
+//     setCurrentPage(1);
+//   };
+
+//   const fetchProducts = async () => {
+//     setLoading(true);
+//     try {
+//       const queryParams = new URLSearchParams();
+//       queryParams.append('page', currentPage);
+//       queryParams.append('limit', 12);
+      
+//       if (filters.search) queryParams.append('search', filters.search);
+      
+//       if (filters.categories.length > 0) {
+//         filters.categories.forEach(cat => queryParams.append('category', cat));
+//       }
+
+//       if (filters.subcategories.length > 0) {
+//         filters.subcategories.forEach(sub => queryParams.append('subcategory', sub));
+//       }
+
+//       if (filters.childSubcategories.length > 0) {
+//         filters.childSubcategories.forEach(child => queryParams.append('childSubcategory', child));
+//       }
+      
+//       if (filters.ageGroups.length > 0) {
+//         filters.ageGroups.forEach(age => queryParams.append('ageGroup', age));
+//       }
+      
+//       if (filters.priceRange.min) queryParams.append('minPrice', filters.priceRange.min);
+//       if (filters.priceRange.max) queryParams.append('maxPrice', filters.priceRange.max);
+      
+//       let sortParam = '-createdAt';
+//       switch (filters.sortBy) {
+//         case 'price_low': sortParam = 'price_asc'; break;
+//         case 'price_high': sortParam = 'price_desc'; break;
+//         case 'name_asc': sortParam = 'name_asc'; break;
+//         default: sortParam = 'newest';
+//       }
+//       queryParams.append('sort', sortParam);
+
+//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         setProducts(data.data || []);
+//         setTotalPages(data.pagination?.pages || 1);
+//         setTotalProducts(data.pagination?.total || 0);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching products:', error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleFilterChange = (filterType, value) => {
+//     saveScrollPosition();
+//     setFilters(prev => ({ ...prev, [filterType]: value }));
+//     setCurrentPage(1);
+//   };
+
+//   const applyPriceRange = () => {
+//     saveScrollPosition();
+//     setFilters(prev => ({
+//       ...prev,
+//       priceRange: { min: minPriceInput || '', max: maxPriceInput || '' }
+//     }));
+//     setCurrentPage(1);
+//   };
+
+//   const clearPriceRange = () => {
+//     saveScrollPosition();
+//     setMinPriceInput('');
+//     setMaxPriceInput('');
+//     setFilters(prev => ({ ...prev, priceRange: { min: '', max: '' } }));
+//   };
+
+//   const clearFilters = () => {
+//     saveScrollPosition();
+//     setSearchInput('');
+//     setFilters({
+//       search: '',
+//       categories: [],
+//       subcategories: [],
+//       childSubcategories: [],
+//       ageGroups: [],
+//       priceRange: { min: '', max: '' },
+//       sortBy: 'newest'
+//     });
+//     setMinPriceInput('');
+//     setMaxPriceInput('');
+//     setCurrentPage(1);
+    
+//     if (typeof window !== 'undefined') {
+//       window.history.pushState({}, '', window.location.pathname);
+//       window.dispatchEvent(new CustomEvent('categoryFilterChanged', { 
+//         detail: { categoryId: null }
+//       }));
+//     }
+//   };
+
+//   const handlePageChange = (newPage) => {
+//     saveScrollPosition();
+//     setCurrentPage(newPage);
+//   };
+
+//   const toggleSection = (section) => {
+//     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+//   };
+
+//   const getActiveFilterCount = () => {
+//     let count = 0;
+//     if (filters.search) count += 1;
+//     if (filters.categories.length > 0) count += filters.categories.length;
+//     if (filters.subcategories.length > 0) count += filters.subcategories.length;
+//     if (filters.childSubcategories.length > 0) count += filters.childSubcategories.length;
+//     if (filters.ageGroups.length > 0) count += filters.ageGroups.length;
+//     if (filters.priceRange.min || filters.priceRange.max) count += 1;
+//     return count;
+//   };
+
+//   useEffect(() => {
+//     return () => {
+//       if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+//     };
+//   }, []);
+
+//   return (
+//     <>
+//       <LoadingBar isVisible={loading} />
+//       <Navbar />
+      
+//       {/* Hero Banner Section */}
+//       <div className="bg-[#FFF9F0]">
+//         <div className="container mx-auto px-4 max-w-7xl py-4 md:py-8">
+//           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#4A8A90] text-center mb-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//             Our Toy Collection
+//           </h1>
+//           <p className="text-[#4A8A90]/90 text-center text-sm md:text-base">
+//             Discover magical toys that spark imagination and joy
+//           </p>
+//         </div>
+//       </div>
+
+//       <div className="min-h-screen bg-[#FFF9F0]">
+//         <div className="container mx-auto px-4 max-w-7xl py-6 md:py-8">
+//           {/* Filter and Sort Bar */}
+//           <div className="mb-6">
+//             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+//               <div className="flex items-center gap-2">
+//                 <button
+//                   onClick={() => setShowMobileFilters(true)}
+//                   className="md:hidden flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#FFE0E6] rounded-xl hover:bg-gray-50 transition-colors shadow-sm text-sm font-medium text-[#2D3A5C]"
+//                 >
+//                   <SlidersHorizontal className="w-4 h-4" />
+//                   <span>Filters</span>
+//                   {getActiveFilterCount() > 0 && (
+//                     <span className="ml-1 px-1.5 py-0.5 bg-[#4A8A90] text-white text-xs rounded-full">
+//                       {getActiveFilterCount()}
+//                     </span>
+//                   )}
+//                 </button>
+
+//                 <select
+//                   value={filters.sortBy}
+//                   onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+//                   className="px-4 py-2 text-sm border-2 border-[#FFE0E6] bg-white rounded-xl focus:ring-2 focus:ring-[#4A8A90]/20 focus:border-[#4A8A90] outline-none transition shadow-sm"
+//                 >
+//                   <option value="newest">Newest First</option>
+//                   <option value="price_low">Price: Low to High</option>
+//                   <option value="price_high">Price: High to Low</option>
+//                   <option value="name_asc">Name: A to Z</option>
+//                 </select>
+
+//                 <div className="hidden md:flex items-center gap-1 bg-white border-2 border-[#FFE0E6] rounded-xl p-1 shadow-sm">
+//                   <button 
+//                     onClick={() => setViewMode('grid')} 
+//                     className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white shadow-md' : 'text-[#8B9DC3] hover:bg-gray-100'}`} 
+//                     title="Grid View"
+//                   >
+//                     <Grid className="w-4 h-4" />
+//                   </button>
+//                   <button 
+//                     onClick={() => setViewMode('list')} 
+//                     className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white shadow-md' : 'text-[#8B9DC3] hover:bg-gray-100'}`} 
+//                     title="List View"
+//                   >
+//                     <List className="w-4 h-4" />
+//                   </button>
+//                 </div>
+//               </div>
+              
+//               {/* Search Bar */}
+//               <div className="relative w-full md:w-80">
+//                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B9DC3]" />
+//                 <input
+//                   type="text"
+//                   placeholder="Search toys..."
+//                   value={searchInput}
+//                   onChange={handleSearchChange}
+//                   className="w-full pl-10 pr-4 py-2 text-sm border-2 border-[#FFE0E6] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent bg-white"
+//                 />
+//                 {searchInput && (
+//                   <button onClick={handleClearSearch} className="absolute right-3 top-1/2 -translate-y-1/2">
+//                     <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+//                   </button>
+//                 )}
+//               </div>
+//             </div>
+
+//             {/* Active Filters Display */}
+//             {getActiveFilterCount() > 0 && (
+//               <div className="mt-4 flex items-center gap-2 flex-wrap">
+//                 {filters.search && (
+//                   <div className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF9F0] text-[#4A8A90] text-xs font-medium rounded-full border border-[#FFE0E6]">
+//                     <span>🔍 "{filters.search}"</span>
+//                     <button onClick={handleClearSearch} className="ml-1 hover:text-[#FFB6C1]"><X className="w-3 h-3" /></button>
+//                   </div>
+//                 )}
+//                 {filters.categories.map(catId => {
+//                   const category = categories.find(c => c._id === catId);
+//                   return category ? (
+//                     <div key={catId} className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF9F0] text-[#4A8A90] text-xs font-medium rounded-full border border-[#FFE0E6]">
+//                       <Tag className="w-3 h-3" />
+//                       <span>{category.name}</span>
+//                       <button onClick={() => handleRemoveCategory(catId)} className="ml-1 hover:text-[#FFB6C1]"><X className="w-3 h-3" /></button>
+//                     </div>
+//                   ) : null;
+//                 })}
+//                 {filters.subcategories.map(subId => {
+//                   const subcategory = subcategories.find(s => s._id === subId);
+//                   return subcategory ? (
+//                     <div key={subId} className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF9F0] text-[#4A8A90] text-xs font-medium rounded-full border border-[#FFE0E6]">
+//                       <FolderTree className="w-3 h-3" />
+//                       <span>{subcategory.name}</span>
+//                       <button onClick={() => handleRemoveSubcategory(subId)} className="ml-1 hover:text-[#FFB6C1]"><X className="w-3 h-3" /></button>
+//                     </div>
+//                   ) : null;
+//                 })}
+//                 {filters.childSubcategories.map(childId => {
+//                   const child = childSubcategories.find(c => c._id === childId);
+//                   return child ? (
+//                     <div key={childId} className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF9F0] text-[#4A8A90] text-xs font-medium rounded-full border border-[#FFE0E6]">
+//                       <FolderTree className="w-3 h-3" />
+//                       <span>{child.name}</span>
+//                       <button onClick={() => handleRemoveChildSubcategory(childId)} className="ml-1 hover:text-[#FFB6C1]"><X className="w-3 h-3" /></button>
+//                     </div>
+//                   ) : null;
+//                 })}
+//                 {filters.ageGroups.map(age => (
+//                   <div key={age} className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF9F0] text-[#4A8A90] text-xs font-medium rounded-full border border-[#FFE0E6]">
+//                     <Users className="w-3 h-3" />
+//                     <span>Ages {age}</span>
+//                     <button onClick={() => handleAgeGroupChange(age)} className="ml-1 hover:text-[#FFB6C1]"><X className="w-3 h-3" /></button>
+//                   </div>
+//                 ))}
+//                 {(filters.priceRange.min || filters.priceRange.max) && (
+//                   <div className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF9F0] text-[#4A8A90] text-xs font-medium rounded-full border border-[#FFE0E6]">
+//                     <DollarSign className="w-3 h-3" />
+//                     <span>৳{filters.priceRange.min || '0'} - ৳{filters.priceRange.max || '∞'}</span>
+//                     <button onClick={clearPriceRange} className="ml-1 hover:text-[#FFB6C1]"><X className="w-3 h-3" /></button>
+//                   </div>
+//                 )}
+//                 {getActiveFilterCount() > 0 && (
+//                   <button onClick={clearFilters} className="px-3 py-1.5 text-xs text-[#8B9DC3] hover:text-[#4A8A90] font-medium">
+//                     Clear All
+//                   </button>
+//                 )}
+//               </div>
+//             )}
+//           </div>
+
+//           {/* Main Content */}
+//           <div className="flex flex-col md:flex-row gap-6">
+//             {/* Desktop Filters */}
+//             <div className="hidden md:block md:w-80 flex-shrink-0">
+//               <FilterSidebar 
+//                 expandedSections={expandedSections}
+//                 toggleSection={toggleSection}
+//                 categories={categories}
+//                 subcategories={subcategories}
+//                 childSubcategories={childSubcategories}
+//                 filters={filters}
+//                 handleCategoryChange={handleCategoryChange}
+//                 handleRemoveCategory={handleRemoveCategory}
+//                 handleSubcategoryChange={handleSubcategoryChange}
+//                 handleRemoveSubcategory={handleRemoveSubcategory}
+//                 handleChildSubcategoryChange={handleChildSubcategoryChange}
+//                 handleRemoveChildSubcategory={handleRemoveChildSubcategory}
+//                 handleTargetedCustomerChange={handleAgeGroupChange}
+//                 minPriceInput={minPriceInput}
+//                 maxPriceInput={maxPriceInput}
+//                 setMinPriceInput={setMinPriceInput}
+//                 setMaxPriceInput={setMaxPriceInput}
+//                 applyPriceRange={applyPriceRange}
+//                 clearPriceRange={clearPriceRange}
+//                 getActiveFilterCount={getActiveFilterCount}
+//                 clearFilters={clearFilters}
+//                 selectedCategory={selectedCategory}
+//                 selectedSubcategory={selectedSubcategory}
+//                 showChildSubcategory={showChildSubcategory}
+//               />
+//             </div>
+
+//             {/* Products Grid/List */}
+//             <div className="flex-1" ref={productsContainerRef}>
+//               {loading ? (
+//                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+//                   {[...Array(12)].map((_, index) => (
+//                     <div key={index} className="bg-white rounded-2xl border-2 border-[#FFE0E6] overflow-hidden animate-pulse shadow-md">
+//                       <div className="h-48 bg-gray-200"></div>
+//                       <div className="p-4">
+//                         <div className="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
+//                         <div className="h-6 bg-gray-200 rounded mb-2 w-1/2"></div>
+//                         <div className="h-3 bg-gray-200 rounded mb-2"></div>
+//                         <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               ) : (
+//                 <>
+//                   {products.length === 0 ? (
+//                     <div className="text-center py-16 bg-white rounded-2xl border-2 border-[#FFE0E6] shadow-md">
+//                       <Gift className="w-16 h-16 text-[#FFB6C1] mx-auto mb-4" />
+//                       <p className="text-gray-500 mb-4">No toys found matching your criteria</p>
+//                       <button onClick={clearFilters} className="px-6 py-2.5 bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white font-bold rounded-full hover:from-[#3A7A80] hover:to-[#5B9399] transition-all shadow-md">
+//                         Clear All Filters
+//                       </button>
+//                     </div>
+//                   ) : (
+//                     <>
+//                       {/* Results count */}
+//                       <div className="mb-4 text-sm text-[#8B9DC3]">
+//                         Found {totalProducts} toy{totalProducts !== 1 ? 's' : ''}
+//                       </div>
+                      
+//                       {viewMode === 'grid' ? (
+//                         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+//                           {products.map(product => (
+//                             <ProductGridCard 
+//                               key={product._id} 
+//                             product={product} 
+//                             router={router}
+//                             isInCart={productsInCart[product._id] || false}
+//                             isInWishlist={productsInWishlist[product._id] || false}
+//                             />
+//                           ))}
+//                         </div>
+//                       ) : (
+//                         <div className="space-y-4">
+//                           {products.map(product => (
+//                             <ProductListCard 
+//                               key={product._id} 
+//                               product={product} 
+//                               router={router}
+//                               isInCart={productsInCart[product._id] || false}
+//                                isInWishlist={productsInWishlist[product._id] || false}
+//                             />
+//                           ))}
+//                         </div>
+//                       )}
+
+//                       {/* Pagination */}
+//                       {totalPages > 1 && (
+//                         <div className="flex justify-center items-center gap-2 mt-8">
+//                           <button 
+//                             onClick={() => handlePageChange(Math.max(currentPage - 1, 1))} 
+//                             disabled={currentPage === 1} 
+//                             className="p-2 border-2 border-[#FFE0E6] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors bg-white rounded-xl shadow-sm"
+//                           >
+//                             <ChevronLeft className="w-4 h-4" />
+//                           </button>
+//                           {[...Array(totalPages)].map((_, i) => {
+//                             const pageNum = i + 1;
+//                             if (pageNum === 1 || pageNum === totalPages || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)) {
+//                               return (
+//                                 <button 
+//                                   key={i} 
+//                                   onClick={() => handlePageChange(pageNum)} 
+//                                   className={`w-9 h-9 rounded-xl text-sm font-bold transition-all shadow-sm ${currentPage === pageNum ? 'bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white shadow-md' : 'bg-white border-2 border-[#FFE0E6] text-[#2D3A5C] hover:bg-gray-50'}`}
+//                                 >
+//                                   {pageNum}
+//                                 </button>
+//                               );
+//                             } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+//                               return <span key={i} className="text-sm text-[#8B9DC3]">...</span>;
+//                             }
+//                             return null;
+//                           })}
+//                           <button 
+//                             onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))} 
+//                             disabled={currentPage === totalPages} 
+//                             className="p-2 border-2 border-[#FFE0E6] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors bg-white rounded-xl shadow-sm"
+//                           >
+//                             <ChevronRight className="w-4 h-4" />
+//                           </button>
+//                         </div>
+//                       )}
+//                     </>
+//                   )}
+//                 </>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Mobile Filters Modal */}
+//       {showMobileFilters && (
+//         <div className="fixed inset-0 z-50 md:hidden">
+//           <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileFilters(false)} />
+//           <div className="absolute right-0 top-0 h-full w-80 bg-white overflow-y-auto rounded-l-2xl shadow-2xl">
+//             <div className="sticky top-0 bg-white p-4 border-b-2 border-[#FFE0E6] flex items-center justify-between">
+//               <h3 className="text-lg font-bold text-[#2D3A5C]" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>Filters</h3>
+//               <button onClick={() => setShowMobileFilters(false)} className="p-2 hover:bg-gray-100 rounded-full">
+//                 <X className="w-5 h-5" />
+//               </button>
+//             </div>
+//             <div className="p-4">
+//               <FilterSidebar 
+//                 expandedSections={expandedSections}
+//                 toggleSection={toggleSection}
+//                 categories={categories}
+//                 subcategories={subcategories}
+//                 childSubcategories={childSubcategories}
+//                 filters={filters}
+//                 handleCategoryChange={handleCategoryChange}
+//                 handleRemoveCategory={handleRemoveCategory}
+//                 handleSubcategoryChange={handleSubcategoryChange}
+//                 handleRemoveSubcategory={handleRemoveSubcategory}
+//                 handleChildSubcategoryChange={handleChildSubcategoryChange}
+//                 handleRemoveChildSubcategory={handleRemoveChildSubcategory}
+//                 handleTargetedCustomerChange={handleAgeGroupChange}
+//                 minPriceInput={minPriceInput}
+//                 maxPriceInput={maxPriceInput}
+//                 setMinPriceInput={setMinPriceInput}
+//                 setMaxPriceInput={setMaxPriceInput}
+//                 applyPriceRange={applyPriceRange}
+//                 clearPriceRange={clearPriceRange}
+//                 getActiveFilterCount={getActiveFilterCount}
+//                 clearFilters={clearFilters}
+//                 selectedCategory={selectedCategory}
+//                 selectedSubcategory={selectedSubcategory}
+//                 showChildSubcategory={showChildSubcategory}
+//               />
+//             </div>
+//             <div className="sticky bottom-0 bg-white p-4 border-t-2 border-[#FFE0E6]">
+//               <button onClick={() => setShowMobileFilters(false)} className="w-full py-3 bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white font-bold rounded-xl hover:from-[#3A7A80] hover:to-[#5B9399] transition-all shadow-md">
+//                 Apply Filters
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       <Footer />
+//       <WhatsAppButton />
+
+//       <style jsx>{`
+//         @keyframes loading-bar {
+//           0% { transform: translateX(-100%); }
+//           50% { transform: translateX(0); }
+//           100% { transform: translateX(100%); }
+//         }
+//         .animate-loading-bar {
+//           animation: loading-bar 1.5s ease-in-out infinite;
+//         }
+//       `}</style>
+//     </>
+//   );
+// }
+
 export default function ProductsClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -3650,6 +4595,7 @@ export default function ProductsClient() {
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
   const [productsInCart, setProductsInCart] = useState({});
+  const [forceFetch, setForceFetch] = useState(0);
   
   const [expandedSections, setExpandedSections] = useState({
     price: true,
@@ -3721,44 +4667,46 @@ export default function ProductsClient() {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    if (categories.length > 0 && !initialCategorySet) {
-      const categoryParam = searchParams.get('category');
-      const subcategoryParam = searchParams.get('subcategory');
-      const childSubcategoryParam = searchParams.get('childSubcategory');
-      
-      if (categoryParam) {
-        const categoryExists = categories.some(cat => cat._id === categoryParam);
-        if (categoryExists) {
-          setFilters(prev => ({ ...prev, categories: [categoryParam] }));
-          
-          if (subcategoryParam) {
-            const loadSubcategoriesAndSetFilter = async () => {
-              const subcats = await fetchSubcategories(categoryParam);
-              if (subcats && Array.isArray(subcats)) {
-                const subcategoryExists = subcats.some(sub => sub._id === subcategoryParam);
-                if (subcategoryExists) {
-                  setFilters(prev => ({ ...prev, subcategories: [subcategoryParam] }));
-                  
-                  if (childSubcategoryParam) {
-                    const children = await fetchChildSubcategories(categoryParam, subcategoryParam);
-                    if (children && Array.isArray(children)) {
-                      const childExists = children.some(child => child._id === childSubcategoryParam);
-                      if (childExists) {
-                        setFilters(prev => ({ ...prev, childSubcategories: [childSubcategoryParam] }));
-                      }
+  // Initialize filters from URL params
+// Initialize filters from URL params on page load
+useEffect(() => {
+  if (categories.length > 0 && !initialCategorySet) {
+    const categoryParam = searchParams.get('category');
+    const subcategoryParam = searchParams.get('subcategory');
+    const childSubcategoryParam = searchParams.get('childSubcategory');
+    
+    if (categoryParam) {
+      const categoryExists = categories.some(cat => cat._id === categoryParam);
+      if (categoryExists) {
+        setFilters(prev => ({ ...prev, categories: [categoryParam] }));
+        
+        if (subcategoryParam) {
+          const loadSubcategoriesAndSetFilter = async () => {
+            const subcats = await fetchSubcategories(categoryParam);
+            if (subcats && Array.isArray(subcats)) {
+              const subcategoryExists = subcats.some(sub => sub._id === subcategoryParam);
+              if (subcategoryExists) {
+                setFilters(prev => ({ ...prev, subcategories: [subcategoryParam] }));
+                
+                if (childSubcategoryParam) {
+                  const children = await fetchChildSubcategories(categoryParam, subcategoryParam);
+                  if (children && Array.isArray(children)) {
+                    const childExists = children.some(child => child._id === childSubcategoryParam);
+                    if (childExists) {
+                      setFilters(prev => ({ ...prev, childSubcategories: [childSubcategoryParam] }));
                     }
                   }
                 }
               }
-            };
-            loadSubcategoriesAndSetFilter();
-          }
+            }
+          };
+          loadSubcategoriesAndSetFilter();
         }
       }
-      setInitialCategorySet(true);
     }
-  }, [categories, searchParams, initialCategorySet]);
+    setInitialCategorySet(true);
+  }
+}, [categories, searchParams]);
 
   useEffect(() => {
     if (filters.categories.length === 1) {
@@ -3795,90 +4743,95 @@ export default function ProductsClient() {
     }
   }, [filters.subcategories, selectedCategory]);
 
-  useEffect(() => {
-    if (initialCategorySet) {
-      fetchProducts();
-    }
-  }, [filters, currentPage, initialCategorySet]);
+  // MAIN FETCH PRODUCTS EFFECT - Only ONE
+// MAIN FETCH PRODUCTS EFFECT
+// MAIN FETCH PRODUCTS EFFECT
+useEffect(() => {
+  if (initialCategorySet) {
+    console.log('Filters changed, fetching products. Categories:', filters.categories);
+    fetchProducts();
+  }
+}, [filters.categories, filters.subcategories, filters.childSubcategories, filters.ageGroups, filters.priceRange, filters.search, filters.sortBy, currentPage, initialCategorySet, forceFetch]);
 
   useEffect(() => {
     if (!loading) restoreScrollPosition();
   }, [loading]);
-// Add this useEffect to check wishlist status
-useEffect(() => {
-  const checkWishlistStatus = async () => {
-    if (products.length === 0) return;
-    
-    const productIds = products.map(p => p._id);
-    const token = localStorage.getItem('token');
-    const sessionId = localStorage.getItem('wishlistSessionId');
-    
-    const headers = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    } else if (sessionId) {
-      headers['x-session-id'] = sessionId;
-    }
-    
-    try {
-      const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
-        method: 'POST',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productIds })
-      });
-      
-      const data = await response.json();
-      if (data.success) {
-        setProductsInWishlist(data.data);
-      }
-    } catch (error) {
-      console.error('Error checking wishlist status:', error);
-    }
-  };
-  
-  checkWishlistStatus();
-}, [products]);
 
-// Refresh wishlist status when wishlist updates
-useEffect(() => {
-  const refreshWishlistStatus = async () => {
-    if (products.length === 0) return;
-    
-    const productIds = products.map(p => p._id);
-    const token = localStorage.getItem('token');
-    const sessionId = localStorage.getItem('wishlistSessionId');
-    
-    const headers = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    } else if (sessionId) {
-      headers['x-session-id'] = sessionId;
-    }
-    
-    try {
-      const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
-        method: 'POST',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productIds })
-      });
+  // Wishlist status effects
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      if (products.length === 0) return;
       
-      const data = await response.json();
-      if (data.success) {
-        setProductsInWishlist(data.data);
+      const productIds = products.map(p => p._id);
+      const token = localStorage.getItem('token');
+      const sessionId = localStorage.getItem('wishlistSessionId');
+      
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
       }
-    } catch (error) {
-      console.error('Error refreshing wishlist status:', error);
-    }
-  };
-  
-  const handleWishlistUpdate = () => {
-    refreshWishlistStatus();
-  };
-  
-  window.addEventListener('wishlist-update', handleWishlistUpdate);
-  return () => window.removeEventListener('wishlist-update', handleWishlistUpdate);
-}, [products]);
-  // ========== ADD THIS useEffect - Check cart status for all products ==========
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+          method: 'POST',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productIds })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          setProductsInWishlist(data.data);
+        }
+      } catch (error) {
+        console.error('Error checking wishlist status:', error);
+      }
+    };
+    
+    checkWishlistStatus();
+  }, [products]);
+
+  useEffect(() => {
+    const refreshWishlistStatus = async () => {
+      if (products.length === 0) return;
+      
+      const productIds = products.map(p => p._id);
+      const token = localStorage.getItem('token');
+      const sessionId = localStorage.getItem('wishlistSessionId');
+      
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
+      }
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+          method: 'POST',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productIds })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          setProductsInWishlist(data.data);
+        }
+      } catch (error) {
+        console.error('Error refreshing wishlist status:', error);
+      }
+    };
+    
+    const handleWishlistUpdate = () => {
+      refreshWishlistStatus();
+    };
+    
+    window.addEventListener('wishlist-update', handleWishlistUpdate);
+    return () => window.removeEventListener('wishlist-update', handleWishlistUpdate);
+  }, [products]);
+
+  // Cart status effects
   useEffect(() => {
     const checkAllProductsCartStatus = async () => {
       if (products.length === 0) return;
@@ -3913,7 +4866,6 @@ useEffect(() => {
     checkAllProductsCartStatus();
   }, [products]);
 
-  // ========== ADD THIS useEffect - Refresh cart status when cart updates ==========
   useEffect(() => {
     const refreshCartStatus = async () => {
       if (products.length === 0) return;
@@ -3952,6 +4904,78 @@ useEffect(() => {
     window.addEventListener('cart-update', handleCartUpdate);
     return () => window.removeEventListener('cart-update', handleCartUpdate);
   }, [products]);
+
+ // Listen for category filter changes from navbar
+useEffect(() => {
+  const handleCategoryFilterChange = (event) => {
+    const categoryId = event.detail?.categoryId;
+    console.log('Category filter changed:', categoryId);
+    
+    if (categoryId) {
+      saveScrollPosition();
+      setFilters(prev => ({ 
+        ...prev, 
+        categories: [categoryId],
+        subcategories: [],
+        childSubcategories: []
+      }));
+      setCurrentPage(1);
+      setForceFetch(prev => prev + 1); // Force a re-fetch
+      
+      // Update URL
+      const url = new URL(window.location.href);
+      url.searchParams.set('category', categoryId);
+      window.history.pushState({}, '', url);
+    } else if (event.detail?.categoryId === null) {
+      saveScrollPosition();
+      setFilters(prev => ({ 
+        ...prev, 
+        categories: [],
+        subcategories: [],
+        childSubcategories: []
+      }));
+      setCurrentPage(1);
+      setForceFetch(prev => prev + 1); // Force a re-fetch
+      
+      // Clear URL parameter
+      const url = new URL(window.location.href);
+      url.searchParams.delete('category');
+      window.history.pushState({}, '', url);
+    }
+  };
+
+  window.addEventListener('categoryFilterChanged', handleCategoryFilterChange);
+  
+  return () => {
+    window.removeEventListener('categoryFilterChanged', handleCategoryFilterChange);
+  };
+}, []);
+
+  // Handle browser back/forward buttons
+useEffect(() => {
+  const handlePopState = () => {
+    const categoryParam = new URLSearchParams(window.location.search).get('category');
+    if (categoryParam) {
+      setFilters(prev => ({ 
+        ...prev, 
+        categories: [categoryParam],
+        subcategories: [],
+        childSubcategories: []
+      }));
+    } else {
+      setFilters(prev => ({ 
+        ...prev, 
+        categories: [],
+        subcategories: [],
+        childSubcategories: []
+      }));
+    }
+    setCurrentPage(1);
+  };
+  
+  window.addEventListener('popstate', handlePopState);
+  return () => window.removeEventListener('popstate', handlePopState);
+}, []);
 
   const fetchCategories = async () => {
     try {
@@ -4003,6 +5027,63 @@ useEffect(() => {
       setChildSubcategories([]);
       setShowChildSubcategory(false);
       return [];
+    }
+  };
+
+  const fetchProducts = async () => {
+    console.log('Fetching products with categories:', filters.categories);
+     console.log('Current page:', currentPage);
+    setLoading(true);
+    try {
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', currentPage);
+      queryParams.append('limit', 12);
+      
+      if (filters.search) queryParams.append('search', filters.search);
+      
+      if (filters.categories.length > 0) {
+        filters.categories.forEach(cat => queryParams.append('category', cat));
+         console.log('Adding category param:', filters.categories[0]);
+      }
+
+      if (filters.subcategories.length > 0) {
+        filters.subcategories.forEach(sub => queryParams.append('subcategory', sub));
+      }
+
+      if (filters.childSubcategories.length > 0) {
+        filters.childSubcategories.forEach(child => queryParams.append('childSubcategory', child));
+      }
+      
+      if (filters.ageGroups.length > 0) {
+        filters.ageGroups.forEach(age => queryParams.append('ageGroup', age));
+      }
+      
+      if (filters.priceRange.min) queryParams.append('minPrice', filters.priceRange.min);
+      if (filters.priceRange.max) queryParams.append('maxPrice', filters.priceRange.max);
+      
+      let sortParam = '-createdAt';
+      switch (filters.sortBy) {
+        case 'price_low': sortParam = 'price_asc'; break;
+        case 'price_high': sortParam = 'price_desc'; break;
+        case 'name_asc': sortParam = 'name_asc'; break;
+        default: sortParam = 'newest';
+      }
+      queryParams.append('sort', sortParam);
+
+      console.log('API URL:', `http://localhost:5000/api/products?${queryParams.toString()}`);
+
+      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setProducts(data.data || []);
+        setTotalPages(data.pagination?.pages || 1);
+        setTotalProducts(data.pagination?.total || 0);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -4101,7 +5182,7 @@ useEffect(() => {
     setCurrentPage(1);
   };
 
-  const handleAgeGroupChange = (ageGroup) => {
+  const handleTargetedCustomerChange = (ageGroup) => {
     saveScrollPosition();
     setFilters(prev => {
       const newAgeGroups = prev.ageGroups.includes(ageGroup)
@@ -4110,58 +5191,6 @@ useEffect(() => {
       return { ...prev, ageGroups: newAgeGroups };
     });
     setCurrentPage(1);
-  };
-
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-      queryParams.append('page', currentPage);
-      queryParams.append('limit', 12);
-      
-      if (filters.search) queryParams.append('search', filters.search);
-      
-      if (filters.categories.length > 0) {
-        filters.categories.forEach(cat => queryParams.append('category', cat));
-      }
-
-      if (filters.subcategories.length > 0) {
-        filters.subcategories.forEach(sub => queryParams.append('subcategory', sub));
-      }
-
-      if (filters.childSubcategories.length > 0) {
-        filters.childSubcategories.forEach(child => queryParams.append('childSubcategory', child));
-      }
-      
-      if (filters.ageGroups.length > 0) {
-        filters.ageGroups.forEach(age => queryParams.append('ageGroup', age));
-      }
-      
-      if (filters.priceRange.min) queryParams.append('minPrice', filters.priceRange.min);
-      if (filters.priceRange.max) queryParams.append('maxPrice', filters.priceRange.max);
-      
-      let sortParam = '-createdAt';
-      switch (filters.sortBy) {
-        case 'price_low': sortParam = 'price_asc'; break;
-        case 'price_high': sortParam = 'price_desc'; break;
-        case 'name_asc': sortParam = 'name_asc'; break;
-        default: sortParam = 'newest';
-      }
-      queryParams.append('sort', sortParam);
-
-      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setProducts(data.data || []);
-        setTotalPages(data.pagination?.pages || 1);
-        setTotalProducts(data.pagination?.total || 0);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleFilterChange = (filterType, value) => {
@@ -4362,7 +5391,7 @@ useEffect(() => {
                   <div key={age} className="flex items-center gap-1 px-3 py-1.5 bg-[#FFF9F0] text-[#4A8A90] text-xs font-medium rounded-full border border-[#FFE0E6]">
                     <Users className="w-3 h-3" />
                     <span>Ages {age}</span>
-                    <button onClick={() => handleAgeGroupChange(age)} className="ml-1 hover:text-[#FFB6C1]"><X className="w-3 h-3" /></button>
+                    <button onClick={() => handleTargetedCustomerChange(age)} className="ml-1 hover:text-[#FFB6C1]"><X className="w-3 h-3" /></button>
                   </div>
                 ))}
                 {(filters.priceRange.min || filters.priceRange.max) && (
@@ -4398,7 +5427,7 @@ useEffect(() => {
                 handleRemoveSubcategory={handleRemoveSubcategory}
                 handleChildSubcategoryChange={handleChildSubcategoryChange}
                 handleRemoveChildSubcategory={handleRemoveChildSubcategory}
-                handleTargetedCustomerChange={handleAgeGroupChange}
+                handleTargetedCustomerChange={handleTargetedCustomerChange}
                 minPriceInput={minPriceInput}
                 maxPriceInput={maxPriceInput}
                 setMinPriceInput={setMinPriceInput}
@@ -4451,10 +5480,10 @@ useEffect(() => {
                           {products.map(product => (
                             <ProductGridCard 
                               key={product._id} 
-                            product={product} 
-                            router={router}
-                            isInCart={productsInCart[product._id] || false}
-                            isInWishlist={productsInWishlist[product._id] || false}
+                              product={product} 
+                              router={router}
+                              isInCart={productsInCart[product._id] || false}
+                              isInWishlist={productsInWishlist[product._id] || false}
                             />
                           ))}
                         </div>
@@ -4466,7 +5495,7 @@ useEffect(() => {
                               product={product} 
                               router={router}
                               isInCart={productsInCart[product._id] || false}
-                               isInWishlist={productsInWishlist[product._id] || false}
+                              isInWishlist={productsInWishlist[product._id] || false}
                             />
                           ))}
                         </div>
@@ -4542,7 +5571,7 @@ useEffect(() => {
                 handleRemoveSubcategory={handleRemoveSubcategory}
                 handleChildSubcategoryChange={handleChildSubcategoryChange}
                 handleRemoveChildSubcategory={handleRemoveChildSubcategory}
-                handleTargetedCustomerChange={handleAgeGroupChange}
+                handleTargetedCustomerChange={handleTargetedCustomerChange}
                 minPriceInput={minPriceInput}
                 maxPriceInput={maxPriceInput}
                 setMinPriceInput={setMinPriceInput}

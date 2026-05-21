@@ -3115,7 +3115,7 @@ const fetchOrders = useCallback(async () => {
                             </div>
                           ) : (
                             <div className="text-gray-600">
-                              <span className="text-gray-400 text-[10px]">Placed:</span> {formatDate(order.createdAt)}
+                              <span className="text-gray-400 text-[10px]">📦</span> {formatDate(order.createdAt)}
                             </div>
                           )}
                         </td>

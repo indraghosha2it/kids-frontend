@@ -36,17 +36,18 @@ export default function ModeratorBlogs() {
   });
 
   // Categories for filter
-  const categories = [
-    { value: 'fashion-trends', label: 'Fashion Trends', icon: '👗' },
-    { value: 'wholesale-guide', label: 'Wholesale Guide', icon: '📦' },
-    { value: 'industry-news', label: 'Industry News', icon: '📰' },
-    { value: 'style-tips', label: 'Style Tips', icon: '✨' },
-    { value: 'business-tips', label: 'Business Tips', icon: '💼' },
-    { value: 'fabric-and-quality', label: 'Fabric and Quality', icon: '🧵' },
-    { value: 'customer-stories', label: 'Customer Stories', icon: '👥' },
-    { value: 'case-studies', label: 'Case Studies', icon: '📊' },
-    { value: 'product-guide', label: 'Product Guide', icon: '📖' },
-    { value: 'others', label: 'Others', icon: '📌' }
+ const categories = [
+   { value: 'all', label: 'All Articles', icon: '📚', color: '#4A8A90' },
+  { value: 'parenting-kids', label: 'Parenting & Kids', icon: '👨‍👩‍👧', color: '#FF6B6B' },
+  { value: 'toys-games', label: 'Toys & Games', icon: '🎮', color: '#9B59B6' },
+  { value: 'education-learning', label: 'Education & Learning', icon: '📚', color: '#3498DB' },
+  { value: 'gift-guides', label: 'Gift Guides', icon: '🎁', color: '#E67E22' },
+  { value: 'kids-activities', label: 'Kids Activities', icon: '🎨', color: '#1ABC9C' },
+  { value: 'child-development', label: 'Child Development', icon: '🌱', color: '#27AE60' },
+  { value: 'trends-news', label: 'Trends & News', icon: '📈', color: '#F39C12' },
+  { value: 'health-safety', label: 'Health & Safety', icon: '🛡️', color: '#E74C3C' },
+  { value: 'lifestyle-family', label: 'Lifestyle & Family', icon: '🏠', color: '#16A085' },
+  { value: 'sustainability-eco-friendly', label: 'Sustainability & Eco-Friendly', icon: '🌿', color: '#2ECC71' }
   ];
 
   // Status options

@@ -87,7 +87,7 @@ export default function ForgotPassword({ onOTPSent, onBack }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 px-4 bg-gradient-to-r from-[#6B4F3A] to-[#7c5c44] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-[#6B4F3A]/25 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+          className="w-full py-3 px-4 bg-[#558C92] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-[#6B4F3A]/25 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
         >
           {isSubmitting ? (
             <>

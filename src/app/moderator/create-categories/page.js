@@ -1067,7 +1067,7 @@ const fetchCategories = async () => {
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3">
                 <div className="text-xs sm:text-sm text-gray-600 bg-gray-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
-                  Total: <span className="font-semibold text-[#84654C]">{categories.length}</span> categories
+                  Total: <span className="font-semibold text-[#558C92]">{categories.length}</span> categories
                 </div>
                 <button
                   onClick={fetchCategories}
@@ -1090,7 +1090,7 @@ const fetchCategories = async () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 sticky top-24">
               <div className="p-5 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-[#84654C]" />
+                  <Plus className="w-5 h-5 text-[#558C92]" />
                   Add New Category
                 </h2>
               </div>
@@ -1106,7 +1106,7 @@ const fetchCategories = async () => {
                     <>
                       <div 
                         className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer ${
-                          imageError ? 'border-red-300 bg-red-50' : errors.image ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-[#84654C] hover:bg-orange-50'
+                          imageError ? 'border-red-300 bg-red-50' : errors.image ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-[#558C92] hover:bg-orange-50'
                         }`}
                         onClick={() => {
                           setImageError('');
@@ -1168,7 +1168,7 @@ const fetchCategories = async () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#84654C] focus:border-transparent outline-none transition ${
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#558C92] focus:border-transparent outline-none transition ${
                       errors.name ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="e.g., T-Shirts"
@@ -1186,7 +1186,7 @@ const fetchCategories = async () => {
                     value={formData.description}
                     onChange={handleChange}
                     rows="3"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#84654C] focus:border-transparent outline-none transition"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#558C92] focus:border-transparent outline-none transition"
                     placeholder="Brief description (optional)"
                   />
                 </div>
@@ -1195,7 +1195,7 @@ const fetchCategories = async () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#84654C] text-white font-medium rounded-lg hover:bg-[#55351C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#558C92] text-white font-medium rounded-lg hover:bg-[#3f848b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                   {isSubmitting ? (
                     <>
@@ -1231,7 +1231,7 @@ const fetchCategories = async () => {
                       placeholder="Search categories..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#84654C] focus:border-transparent outline-none transition placeholder:text-gray-400"
+                      className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#558C92] focus:border-transparent outline-none transition placeholder:text-gray-400"
                     />
                   </div>
                 </div>
@@ -1264,7 +1264,7 @@ const fetchCategories = async () => {
                     {isLoading ? (
                       <tr>
                         <td colSpan="6" className="px-5 py-8 text-center">
-                          <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#84654C]" />
+                          <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#558C92]" />
                         </td>
                       </tr>
                     ) : filteredCategories.length === 0 ? (
@@ -1321,7 +1321,7 @@ const fetchCategories = async () => {
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => handleViewClick(category)}
-                                className="p-1.5 text-gray-600 hover:text-[#84654C] hover:bg-orange-50 rounded-lg transition-colors"
+                                className="p-1.5 text-gray-600 hover:text-[#558C92] hover:bg-orange-50 rounded-lg transition-colors"
                                 title="View Details"
                               >
                                 <Eye className="w-4 h-4" />
@@ -1423,7 +1423,7 @@ const fetchCategories = async () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <Hash className="w-3.5 h-3.5 text-[#84654C]" />
+                    <Hash className="w-3.5 h-3.5 text-[#558C92]" />
                     <span className="text-xs font-medium text-gray-500">Category ID</span>
                   </div>
                   <p className="text-xs font-mono text-gray-900 break-all">{viewModal.category?._id}</p>
@@ -1432,7 +1432,7 @@ const fetchCategories = async () => {
                 {/* Subcategories Section - Expandable with child count */}
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
-                    <FolderTree className="w-3.5 h-3.5 text-[#84654C]" />
+                    <FolderTree className="w-3.5 h-3.5 text-[#558C92]" />
                     <span className="text-xs font-medium text-gray-500">Subcategories</span>
                   </div>
                   
@@ -1453,7 +1453,7 @@ const fetchCategories = async () => {
                     <div className="mt-3 pt-3 border-t border-gray-200">
                       {isLoadingSubcategories ? (
                         <div className="flex items-center justify-center py-4">
-                          <Loader2 className="w-4 h-4 animate-spin text-[#84654C]" />
+                          <Loader2 className="w-4 h-4 animate-spin text-[#558C92]" />
                           <span className="text-xs text-gray-500 ml-2">Loading...</span>
                         </div>
                       ) : viewSubcategoriesList.length === 0 ? (
@@ -1505,7 +1505,7 @@ const fetchCategories = async () => {
 
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <Package className="w-3.5 h-3.5 text-[#84654C]" />
+                    <Package className="w-3.5 h-3.5 text-[#558C92]" />
                     <span className="text-xs font-medium text-gray-500">Total Products</span>
                   </div>
                   <p className="text-xs font-medium text-gray-900">
@@ -1521,7 +1521,7 @@ const fetchCategories = async () => {
 
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <Calendar className="w-3.5 h-3.5 text-[#84654C]" />
+                    <Calendar className="w-3.5 h-3.5 text-[#558C92]" />
                     <span className="text-xs font-medium text-gray-500">Created</span>
                   </div>
                   <p className="text-xs font-medium text-gray-900">
@@ -1531,7 +1531,7 @@ const fetchCategories = async () => {
 
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <User className="w-3.5 h-3.5 text-[#84654C]" />
+                    <User className="w-3.5 h-3.5 text-[#558C92]" />
                     <span className="text-xs font-medium text-gray-500">Created By</span>
                   </div>
                   <p className="text-xs font-medium text-gray-900">
@@ -1541,7 +1541,7 @@ const fetchCategories = async () => {
 
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <Clock className="w-3.5 h-3.5 text-[#84654C]" />
+                    <Clock className="w-3.5 h-3.5 text-[#558C92]" />
                     <span className="text-xs font-medium text-gray-500">Updated</span>
                   </div>
                   <p className="text-xs font-medium text-gray-900">
@@ -1551,7 +1551,7 @@ const fetchCategories = async () => {
 
                 <div className="col-span-2 bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <FileText className="w-3.5 h-3.5 text-[#84654C]" />
+                    <FileText className="w-3.5 h-3.5 text-[#558C92]" />
                     <span className="text-xs font-medium text-gray-500">Description</span>
                   </div>
                   <p className="text-xs text-gray-700 leading-relaxed">
@@ -1576,7 +1576,7 @@ const fetchCategories = async () => {
                     handleViewClose();
                     handleEditClick(viewModal.category);
                   }}
-                  className="px-3 py-1.5 text-xs font-medium text-[#84654C] hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-1"
+                  className="px-3 py-1.5 text-xs font-medium text-[#558C92] hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-1"
                 >
                   <Edit className="w-3.5 h-3.5" />
                   Edit Category
@@ -1617,7 +1617,7 @@ const fetchCategories = async () => {
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               {viewSubcategoriesModal.isLoading ? (
                 <div className="text-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#84654C]" />
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#558C92]" />
                   <p className="text-gray-500 mt-2">Loading subcategories...</p>
                 </div>
               ) : viewSubcategoriesModal.subcategories.length === 0 ? (
@@ -1629,7 +1629,7 @@ const fetchCategories = async () => {
                       setViewSubcategoriesModal({ show: false, category: null, subcategories: [], isLoading: false, expandedChildren: {} });
                       handleAddSubcategory(viewSubcategoriesModal.category);
                     }}
-                    className="mt-3 px-4 py-2 bg-[#84654C] text-white text-sm rounded-lg hover:bg-[#55351C]"
+                    className="mt-3 px-4 py-2 bg-[#558C92] text-white text-sm rounded-lg hover:bg-[#558C92]"
                   >
                     Add First Subcategory
                   </button>
@@ -1818,7 +1818,7 @@ const fetchCategories = async () => {
             <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
               <button
                 onClick={() => handleAddSubcategory(viewSubcategoriesModal.category)}
-                className="px-4 py-2 bg-[#84654C] text-white text-sm rounded-lg hover:bg-[#55351C] flex items-center gap-2"
+                className="px-4 py-2 bg-[#558C92] text-white text-sm rounded-lg hover:bg-[#558C92] flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Add Subcategory
@@ -1836,7 +1836,7 @@ const fetchCategories = async () => {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-[#f8efeb] rounded-lg">
-                    <Plus className="w-5 h-5 text-[#84654C]" />
+                    <Plus className="w-5 h-5 text-[#558C92]" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">
@@ -1868,7 +1868,7 @@ const fetchCategories = async () => {
                           type="text"
                           value={sub.name}
                           onChange={(e) => updateSubcategoryName(sub.id, e.target.value)}
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#84654C] focus:border-transparent outline-none"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#558C92] focus:border-transparent outline-none"
                           placeholder={`e.g., Subcategory ${index + 1}`}
                           autoFocus={index === subcategoryModal.subcategories.length - 1}
                         />
@@ -1894,7 +1894,7 @@ const fetchCategories = async () => {
                 <button
                   type="button"
                   onClick={addSubcategoryField}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-[#84654C] hover:bg-[#ede4de] rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-[#558C92] hover:bg-[#ede4de] rounded-lg transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Another Subcategory
@@ -1911,7 +1911,7 @@ const fetchCategories = async () => {
                   <button
                     type="submit"
                     disabled={subcategoryModal.isSubmitting}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#84654C] text-white text-sm font-medium rounded-lg hover:bg-[#ea9354] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#558C92] text-white text-sm font-medium rounded-lg hover:bg-[#38737a] transition-colors disabled:opacity-50"
                   >
                     {subcategoryModal.isSubmitting ? (
                       <>
@@ -2044,7 +2044,7 @@ const fetchCategories = async () => {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-50 rounded-lg">
-                    <Edit className="w-5 h-5 text-[#84654C]" />
+                    <Edit className="w-5 h-5 text-[#558C92]" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900">Edit Subcategory</h3>
                 </div>
@@ -2083,7 +2083,7 @@ const fetchCategories = async () => {
                   <button
                     type="submit"
                     disabled={editSubcategoryModal.isSubmitting}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#84654C] text-white text-sm font-medium rounded-lg hover:bg-[#55351C] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#558C92] text-white text-sm font-medium rounded-lg hover:bg-[#558C92] transition-colors disabled:opacity-50"
                   >
                     {editSubcategoryModal.isSubmitting ? (
                       <>
@@ -2181,8 +2181,8 @@ const fetchCategories = async () => {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#84654C]/10 rounded-lg">
-                    <Edit className="w-5 h-5 text-[#84654C]" />
+                  <div className="p-2 bg-[#558C92]/10 rounded-lg">
+                    <Edit className="w-5 h-5 text-[#558C92]" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900">Edit Category</h3>
                 </div>
@@ -2201,7 +2201,7 @@ const fetchCategories = async () => {
                     <>
                       <div 
                         className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
-                          editModal.imageError ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-[#84654C] hover:bg-orange-50'
+                          editModal.imageError ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-[#558C92] hover:bg-orange-50'
                         }`}
                         onClick={() => {
                           setEditModal(prev => ({ ...prev, imageError: '' }));
@@ -2267,7 +2267,7 @@ const fetchCategories = async () => {
                       ...prev,
                       formData: { ...prev.formData, name: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#84654C] focus:border-transparent outline-none transition"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#558C92] focus:border-transparent outline-none transition"
                     placeholder="e.g., T-Shirts"
                   />
                 </div>
@@ -2281,7 +2281,7 @@ const fetchCategories = async () => {
                       formData: { ...prev.formData, description: e.target.value }
                     }))}
                     rows="3"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#84654C] focus:border-transparent outline-none transition"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#558C92] focus:border-transparent outline-none transition"
                     placeholder="Brief description (optional)"
                   />
                 </div>
@@ -2297,7 +2297,7 @@ const fetchCategories = async () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#84654C] text-white text-sm font-medium rounded-lg hover:bg-[#55351C] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#558C92] text-white text-sm font-medium rounded-lg hover:bg-[#558C92] transition-colors disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>

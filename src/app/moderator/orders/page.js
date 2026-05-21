@@ -1278,10 +1278,10 @@ export default function ModeratorOrdersPage() {
                           {order.orderStatus === 'delivered' && order.deliveredAt ? (
                             <div className="flex flex-col gap-0.5">
                               <div className="text-gray-600">
-                                <span className="text-gray-400 text-[10px]">Ordered:</span> {formatDate(order.createdAt)}
+                                <span className="text-gray-400 text-[10px]">📦</span> {formatDate(order.createdAt)}
                               </div>
                               <div className="text-green-600 font-medium">
-                                <span className="text-green-500 text-[10px]">Delivered:</span> {new Date(order.deliveredAt).toLocaleDateString('en-BD', {
+                                <span className="text-green-500 text-[10px]">✅:</span> {new Date(order.deliveredAt).toLocaleDateString('en-BD', {
                                   day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
                                 })}
                               </div>
@@ -1289,17 +1289,17 @@ export default function ModeratorOrdersPage() {
                           ) : order.orderStatus === 'cancelled' && order.cancelledAt ? (
                             <div className="flex flex-col gap-0.5">
                               <div className="text-gray-600">
-                                <span className="text-gray-400 text-[10px]">Ordered:</span> {formatDate(order.createdAt)}
+                                <span className="text-gray-400 text-[10px]">📦</span> {formatDate(order.createdAt)}
                               </div>
                               <div className="text-red-600 font-medium">
-                                <span className="text-red-500 text-[10px]">Cancelled:</span> {new Date(order.cancelledAt).toLocaleDateString('en-BD', {
+                                <span className="text-red-500 text-[10px]">❌</span> {new Date(order.cancelledAt).toLocaleDateString('en-BD', {
                                   day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
                                 })}
                               </div>
                             </div>
                           ) : (
                             <div className="text-gray-600">
-                              <span className="text-gray-400 text-[10px]">Placed:</span> {formatDate(order.createdAt)}
+                              <span className="text-gray-400 text-[10px]">📦</span> {formatDate(order.createdAt)}
                             </div>
                           )}
                         </td>

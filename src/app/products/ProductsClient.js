@@ -2037,6 +2037,395 @@ const getAgeGroupBadge = (ageGroup) => {
 
 
 // Product Grid Card - Compact Design (Like Wishlist Card)
+// const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist: propIsInWishlist }) => {
+//   const [isMobile, setIsMobile] = useState(false);
+//   const [activeIndex, setActiveIndex] = useState(0);
+//   const [isHovered, setIsHovered] = useState(false);
+//   const [cartStatusLoading, setCartStatusLoading] = useState(false);
+//   const [wishlistLoading, setWishlistLoading] = useState(false);
+  
+//   const isInCart = propIsInCart || false;
+//   const isWishlisted = propIsInWishlist || false;
+//   const productImages = product.images || [];
+//   const hasMultipleImages = productImages.length > 1;
+//   const primaryTag = product.tags?.[0];
+//   const tagStyle = primaryTag ? getTagStyles(primaryTag) : '';
+//   const discountPercent = calculateDiscountPercentage(product.regularPrice, product.discountPrice);
+//   const currentPrice = product.discountPrice && product.discountPrice < product.regularPrice ? product.discountPrice : product.regularPrice;
+//   const originalPrice = product.regularPrice;
+  
+//   useEffect(() => {
+//     const checkMobile = () => {
+//       setIsMobile(window.innerWidth < 768);
+//     };
+//     checkMobile();
+//     window.addEventListener('resize', checkMobile);
+//     return () => window.removeEventListener('resize', checkMobile);
+//   }, []);
+
+//   const handleWishlist = async (e) => {
+//     e.stopPropagation();
+//     setWishlistLoading(true);
+    
+//     const toastId = toast.loading(isWishlisted ? 'Removing from wishlist...' : 'Adding to wishlist...');
+    
+//     try {
+//       const token = localStorage.getItem('token');
+//       const sessionId = localStorage.getItem('wishlistSessionId');
+      
+//       const headers = {
+//         'Content-Type': 'application/json'
+//       };
+      
+//       if (token) {
+//         headers['Authorization'] = `Bearer ${token}`;
+//       } else if (sessionId) {
+//         headers['x-session-id'] = sessionId;
+//       }
+      
+//       const response = await fetch('http://localhost:5000/api/wishlist', {
+//         method: 'POST',
+//         headers: headers,
+//         body: JSON.stringify({ productId: product._id })
+//       });
+      
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         if (data.sessionId && !token) {
+//           localStorage.setItem('wishlistSessionId', data.sessionId);
+//         }
+        
+//         toast.success(data.message, { id: toastId });
+//         window.dispatchEvent(new Event('wishlist-update'));
+//       } else {
+//         toast.error(data.error || 'Failed to update wishlist', { id: toastId });
+//       }
+//     } catch (error) {
+//       console.error('Wishlist error:', error);
+//       toast.error('Network error. Please try again.', { id: toastId });
+//     } finally {
+//       setWishlistLoading(false);
+//     }
+//   };
+
+//   const addToCart = async (e) => {
+//     e.stopPropagation();
+    
+//     if (isInCart) {
+//       router.push('/cart');
+//       return;
+//     }
+    
+//     setCartStatusLoading(true);
+//     const toastId = toast.loading('Adding to cart...');
+    
+//     try {
+//       const token = localStorage.getItem('token');
+//       const sessionId = localStorage.getItem('cartSessionId');
+      
+//       const headers = {
+//         'Content-Type': 'application/json'
+//       };
+      
+//       if (token) {
+//         headers['Authorization'] = `Bearer ${token}`;
+//       } else if (sessionId) {
+//         headers['x-session-id'] = sessionId;
+//       }
+      
+//       const response = await fetch('http://localhost:5000/api/cart', {
+//         method: 'POST',
+//         headers: headers,
+//         body: JSON.stringify({
+//           productId: product._id,
+//           quantity: 1
+//         })
+//       });
+      
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         if (data.sessionId && !token) {
+//           localStorage.setItem('cartSessionId', data.sessionId);
+//         }
+        
+//         toast.success('Added to cart!', { id: toastId });
+//         window.dispatchEvent(new Event('cart-update'));
+        
+//         setTimeout(() => {
+//           window.dispatchEvent(new Event('cart-update'));
+//         }, 500);
+//       } else {
+//         toast.error(data.error || 'Failed to add to cart', { id: toastId });
+//       }
+//     } catch (error) {
+//       console.error('Add to cart error:', error);
+//       toast.error('Network error. Please try again.', { id: toastId });
+//     } finally {
+//       setCartStatusLoading(false);
+//     }
+//   };
+
+//   return (
+//     <motion.div
+//       layout
+//       initial={{ opacity: 0, scale: 0.95 }}
+//       animate={{ opacity: 1, scale: 1 }}
+//       exit={{ opacity: 0, scale: 0.95 }}
+//       transition={{
+//         layout: { type: "spring", stiffness: 100, damping: 15 },
+//         opacity: { duration: 0.3 }
+//       }}
+//       onMouseEnter={() => setIsHovered(true)}
+//       onMouseLeave={() => setIsHovered(false)}
+//       className="group bg-white rounded-xl border border-[#FFE0E6] hover:border-[#FFB6C1] transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md overflow-hidden"
+//       onClick={() => {
+//         if (isMobile) {
+//           window.location.href = `/productDetails?id=${product._id}`;
+//         } else {
+//           window.open(`/productDetails?id=${product._id}`, '_blank');
+//         }
+//       }}
+//     >
+//       {/* Image Container - Compact */}
+//       <div className="relative w-full h-32 sm:h-36 md:h-40 overflow-hidden bg-gradient-to-br from-[#FFF9F0] to-[#FFE0E6]">
+//         <motion.img
+//           src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://via.placeholder.com/300'}
+//           alt={product.productName}
+//           className="w-full h-full object-contain p-2"
+//           whileHover={{ scale: 1.08 }}
+//           transition={{ duration: 0.4 }}
+//           onError={(e) => {
+//             e.target.onerror = null;
+//             e.target.src = 'https://via.placeholder.com/300?text=Toy';
+//           }}
+//           loading="lazy"
+//         />
+        
+//         {/* Discount Badge */}
+//         {discountPercent > 0 && (
+//           <div className="absolute top-1 left-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-lg z-20 flex items-center gap-0.5">
+//             <Zap className="w-2 h-2" />
+//             {discountPercent}% OFF
+//           </div>
+//         )}
+        
+//         {/* Tag Badge - Top Right */}
+//         {primaryTag && (
+//           <motion.div 
+//             initial={{ x: 10, opacity: 0 }}
+//             animate={{ x: 0, opacity: 1 }}
+//             transition={{ delay: 0.1 }}
+//             className={`absolute top-1 right-1 ${tagStyle} text-[7px] md:text-[8px] px-1.5 py-0.5 font-semibold rounded-md z-20 flex items-center gap-0.5 shadow-lg`}
+//           >
+//             <Sparkles className="w-2 h-2" />
+//             <span className="truncate max-w-[60px]">{primaryTag}</span>
+//           </motion.div>
+//         )}
+        
+//         {/* Hover Icons - Appear from Right Side, Fast Animation */}
+//         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-30">
+//           <motion.div
+//             initial={{ x: 40, opacity: 0 }}
+//             animate={{ 
+//               x: isHovered && !isMobile ? 0 : 40, 
+//               opacity: isHovered && !isMobile ? 1 : 0 
+//             }}
+//             transition={{ duration: 0.15, ease: "easeOut" }}
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               window.open(`/productDetails?id=${product._id}`, '_blank');
+//             }}
+//             className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-[#4A8A90] flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
+//           >
+//             <Eye className="w-3.5 h-3.5 text-[#4A8A90] hover:text-white transition-colors duration-200" />
+//           </motion.div>
+          
+//           <motion.div
+//             initial={{ x: 40, opacity: 0 }}
+//             animate={{ 
+//               x: isHovered && !isMobile ? 0 : 40, 
+//               opacity: isHovered && !isMobile ? 1 : 0 
+//             }}
+//             transition={{ duration: 0.15, ease: "easeOut", delay: 0.03 }}
+//             onClick={addToCart}
+//             className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-[#4A8A90] flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
+//           >
+//             {cartStatusLoading ? (
+//               <Loader2 className="w-3.5 h-3.5 animate-spin text-[#4A8A90] hover:text-white" />
+//             ) : isInCart ? (
+//               <ShoppingCart className="w-3.5 h-3.5 text-green-500" />
+//             ) : (
+//               <ShoppingCart className="w-3.5 h-3.5 text-[#FFB6C1] hover:text-white transition-colors duration-200" />
+//             )}
+//           </motion.div>
+          
+//           <motion.div
+//             initial={{ x: 40, opacity: 0 }}
+//             animate={{ 
+//               x: isHovered && !isMobile ? 0 : 40, 
+//               opacity: isHovered && !isMobile ? 1 : 0 
+//             }}
+//             transition={{ duration: 0.15, ease: "easeOut", delay: 0.06 }}
+//             onClick={handleWishlist}
+//             className="w-7 h-7 rounded-full bg-white shadow-md hover:bg-red-500 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
+//           >
+//             {wishlistLoading ? (
+//               <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500 hover:text-white" />
+//             ) : (
+//               <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-[#4A8A90] hover:text-white'} transition-colors duration-200`} />
+//             )}
+//           </motion.div>
+//         </div>
+//       </div>
+      
+//       {/* Thumbnail Images - Show 4 images at bottom of main image */}
+//       {hasMultipleImages && (
+//         <div className="flex justify-center items-center gap-1 py-1.5 bg-[#FFF9F0] border-b border-[#FFE0E6]">
+//           {productImages.slice(0, 4).map((image, index) => (
+//             <button
+//               key={index}
+//               className={`w-5 h-5 overflow-hidden rounded transition-all duration-200 ${
+//                 activeIndex === index 
+//                   ? 'ring-1.5 ring-[#4A8A90] ring-offset-0.5 scale-110' 
+//                   : 'opacity-60 hover:opacity-100'
+//               }`}
+//               onMouseEnter={() => setActiveIndex(index)}
+//               onClick={(e) => {
+//                 e.stopPropagation();
+//                 setActiveIndex(index);
+//               }}
+//             >
+//               <img src={image.url} alt="" className="w-full h-full object-cover" />
+//             </button>
+//           ))}
+//         </div>
+//       )}
+
+//       {/* Content */}
+//       <div className="p-2">
+//         {/* Product Name */}
+//         <h3 className="text-xs font-bold text-[#2D3A5C] line-clamp-2 hover:text-[#4A8A90] transition-colors duration-200 mb-1" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }} title={product.productName}>
+//           {truncateText(product.productName, 20)}
+//         </h3>
+        
+//         {/* Age Group and Rating Row - Same row */}
+//         <div className="flex items-center justify-between mb-1.5">
+//           {/* Age Group Badge */}
+//           {product.ageGroup ? (
+//             <div className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
+//               <Users className="w-2 h-2" />
+//               Ages {product.ageGroup}
+//             </div>
+//           ) : (
+//             <div className="text-[8px] text-gray-400">✨ Toy</div>
+//           )}
+          
+//           {/* Rating Stars */}
+//           {product.rating > 0 && (
+//             <div className="flex items-center gap-0.5">
+//               <div className="flex items-center">
+//                 {[1, 2, 3, 4, 5].map((star) => (
+//                   <Star
+//                     key={star}
+//                     className={`w-2.5 h-2.5 ${
+//                       star <= Math.floor(product.rating)
+//                         ? 'fill-yellow-400 text-yellow-400'
+//                         : star - 0.5 <= product.rating
+//                         ? 'fill-yellow-400 text-yellow-400 opacity-50'
+//                         : 'text-gray-300'
+//                     }`}
+//                   />
+//                 ))}
+//               </div>
+//               <span className="text-[8px] text-gray-500">({product.rating})</span>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Price Section */}
+//         <div className="flex items-baseline gap-1.5 mb-1.5">
+//           <span className="text-sm font-bold text-[#4A8A90]">
+//             ৳{formatPrice(currentPrice)}
+//           </span>
+//           {discountPercent > 0 && (
+//             <>
+//               <span className="text-[8px] text-gray-400 line-through">
+//                 ৳{formatPrice(originalPrice)}
+//               </span>
+//               <span className="text-[7px] font-semibold text-red-500 bg-red-100 px-1 py-0.5 rounded">
+//                 -{discountPercent}%
+//               </span>
+//             </>
+//           )}
+//         </div>
+
+//         {/* Category and Stock Status Row */}
+//         <div className="flex items-center justify-between gap-1">
+//           {/* Category */}
+//           {product.category?.name && (
+//             <div className="flex items-center gap-0.5 text-[7px] text-[#8B9DC3]">
+//               <Package className="w-2.5 h-2.5" />
+//               <span className="truncate max-w-[70px]">{product.category.name}</span>
+//             </div>
+//           )}
+          
+//           {!product.category?.name && (
+//             <div className="text-[7px] text-gray-400">🎁 Toy</div>
+//           )}
+          
+//           {/* Stock Status */}
+//           <div className="flex-shrink-0">
+//             {product.stockQuantity > 0 ? (
+//               <span className="flex items-center gap-0.5 text-[7px] text-green-600 font-medium">
+//                 <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+//                 <span>In Stock ({product.stockQuantity})</span>
+//               </span>
+//             ) : (
+//               <span className="flex items-center gap-0.5 text-[7px] text-red-500 font-medium">
+//                 <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+//                 <span>Out of Stock</span>
+//               </span>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Add to Cart / View Cart Button */}
+//       {cartStatusLoading ? (
+//         <button
+//           disabled
+//           className="w-full py-1.5 text-center text-[9px] font-bold bg-gray-300 text-gray-500 flex items-center justify-center gap-1"
+//         >
+//           <Loader2 className="w-2.5 h-2.5 animate-spin" />
+//           Loading...
+//         </button>
+//       ) : isInCart ? (
+//         <button
+//     onClick={(e) => {
+//       e.stopPropagation();
+//       router.push('/cart');
+//     }}
+//           className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center gap-1"
+//         >
+//           <ShoppingCart className="w-2.5 h-2.5" />
+//           View in Cart
+//         </button>
+//       ) : (
+//         <button
+//           onClick={addToCart}
+//           className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white hover:from-[#3A7A80] hover:to-[#5B9399] transition-all duration-200 flex items-center justify-center gap-1"
+//         >
+//           <ShoppingCart className="w-2.5 h-2.5" />
+//           Add to Cart
+//         </button>
+//       )}
+//     </motion.div>
+//   );
+// };
+
+// Product Grid Card - Compact Design (Like Wishlist Card)
 const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist: propIsInWishlist }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -2188,7 +2577,7 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
         }
       }}
     >
-      {/* Image Container - Compact */}
+      {/* Image Container */}
       <div className="relative w-full h-32 sm:h-36 md:h-40 overflow-hidden bg-gradient-to-br from-[#FFF9F0] to-[#FFE0E6]">
         <motion.img
           src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://via.placeholder.com/300'}
@@ -2203,10 +2592,10 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
           loading="lazy"
         />
         
-        {/* Discount Badge */}
+        {/* Discount Badge - Reduced size for mobile */}
         {discountPercent > 0 && (
-          <div className="absolute top-1 left-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-lg z-20 flex items-center gap-0.5">
-            <Zap className="w-2 h-2" />
+          <div className="absolute top-0.5 left-0.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[7px] sm:text-[9px] font-bold px-1 py-0.5 rounded-md shadow-lg z-20 flex items-center gap-0.5">
+            <Zap className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
             {discountPercent}% OFF
           </div>
         )}
@@ -2217,15 +2606,15 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
             initial={{ x: 10, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className={`absolute top-1 right-1 ${tagStyle} text-[7px] md:text-[8px] px-1.5 py-0.5 font-semibold rounded-md z-20 flex items-center gap-0.5 shadow-lg`}
+            className={`absolute top-0.5 right-0.5 ${tagStyle} text-[6px] sm:text-[7px] md:text-[8px] px-1 py-0.5 font-semibold rounded-md z-20 flex items-center gap-0.5 shadow-lg`}
           >
-            <Sparkles className="w-2 h-2" />
-            <span className="truncate max-w-[60px]">{primaryTag}</span>
+            <Sparkles className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
+            <span className="truncate max-w-[40px] sm:max-w-[60px]">{primaryTag}</span>
           </motion.div>
         )}
         
-        {/* Hover Icons - Appear from Right Side, Fast Animation */}
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-30">
+        {/* Desktop Hover Icons - Appear from Right Side (unchanged for large devices) */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-30 hidden sm:flex">
           <motion.div
             initial={{ x: 40, opacity: 0 }}
             animate={{ 
@@ -2278,17 +2667,60 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
             )}
           </motion.div>
         </div>
+        
+        {/* Mobile Action Icons - Bottom Center (only visible on mobile) */}
+        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2 z-30 px-2 sm:hidden">
+          {/* View Details Button */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(`/productDetails?id=${product._id}`, '_blank');
+            }}
+            className="bg-white/80 backdrop-blur-sm rounded-full p-1.5 shadow-md flex items-center justify-center"
+          >
+            <Eye className="w-3 h-3 text-[#4A8A90]" />
+          </motion.button>
+          
+          {/* Add to Cart Button */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={addToCart}
+            className="bg-white/80 backdrop-blur-sm rounded-full p-1.5 shadow-md flex items-center justify-center"
+          >
+            {cartStatusLoading ? (
+              <Loader2 className="w-3 h-3 animate-spin text-[#4A8A90]" />
+            ) : isInCart ? (
+              <ShoppingCart className="w-3 h-3 text-green-500" />
+            ) : (
+              <ShoppingCart className="w-3 h-3 text-[#FFB6C1]" />
+            )}
+          </motion.button>
+          
+          {/* Wishlist Button */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={handleWishlist}
+            className="bg-white/80 backdrop-blur-sm rounded-full p-1.5 shadow-md flex items-center justify-center"
+          >
+            {wishlistLoading ? (
+              <Loader2 className="w-3 h-3 animate-spin text-red-500" />
+            ) : (
+              <Heart className={`w-3 h-3 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-[#4A8A90]'}`} />
+            )}
+          </motion.button>
+        </div>
       </div>
       
-      {/* Thumbnail Images - Show 4 images at bottom of main image */}
+      {/* Thumbnail Images - Reduced size for mobile */}
       {hasMultipleImages && (
-        <div className="flex justify-center items-center gap-1 py-1.5 bg-[#FFF9F0] border-b border-[#FFE0E6]">
+        <div className="flex justify-center items-center gap-1 py-1 bg-[#FFF9F0] border-b border-[#FFE0E6]">
           {productImages.slice(0, 4).map((image, index) => (
             <button
               key={index}
-              className={`w-5 h-5 overflow-hidden rounded transition-all duration-200 ${
+              className={`w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 overflow-hidden rounded transition-all duration-200 ${
                 activeIndex === index 
-                  ? 'ring-1.5 ring-[#4A8A90] ring-offset-0.5 scale-110' 
+                  ? 'ring-1 ring-[#4A8A90] ring-offset-0.5 scale-110' 
                   : 'opacity-60 hover:opacity-100'
               }`}
               onMouseEnter={() => setActiveIndex(index)}
@@ -2304,32 +2736,30 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
       )}
 
       {/* Content */}
-      <div className="p-2">
-        {/* Product Name */}
-        <h3 className="text-xs font-bold text-[#2D3A5C] line-clamp-2 hover:text-[#4A8A90] transition-colors duration-200 mb-1" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }} title={product.productName}>
-          {truncateText(product.productName, 20)}
+      <div className="p-1.5 sm:p-2">
+        {/* Product Name - Smaller on mobile */}
+        <h3 className="text-[10px] sm:text-xs font-bold text-[#2D3A5C] line-clamp-2 hover:text-[#4A8A90] transition-colors duration-200 mb-1" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }} title={product.productName}>
+          {truncateText(product.productName, isMobile ? 12 : 20)}
         </h3>
         
-        {/* Age Group and Rating Row - Same row */}
-        <div className="flex items-center justify-between mb-1.5">
-          {/* Age Group Badge */}
+        {/* Age Group and Rating Row - Smaller on mobile */}
+        <div className="flex items-center justify-between mb-1">
           {product.ageGroup ? (
-            <div className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
-              <Users className="w-2 h-2" />
+            <div className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[6px] sm:text-[8px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
+              <Users className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
               Ages {product.ageGroup}
             </div>
           ) : (
-            <div className="text-[8px] text-gray-400">✨ Toy</div>
+            <div className="text-[6px] sm:text-[8px] text-gray-400">✨ Toy</div>
           )}
           
-          {/* Rating Stars */}
           {product.rating > 0 && (
             <div className="flex items-center gap-0.5">
               <div className="flex items-center">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`w-2.5 h-2.5 ${
+                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-2.5 md:h-2.5 ${
                       star <= Math.floor(product.rating)
                         ? 'fill-yellow-400 text-yellow-400'
                         : star - 0.5 <= product.rating
@@ -2339,86 +2769,87 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
                   />
                 ))}
               </div>
-              <span className="text-[8px] text-gray-500">({product.rating})</span>
+              <span className="text-[6px] sm:text-[8px] text-gray-500">({product.rating})</span>
             </div>
           )}
         </div>
 
         {/* Price Section */}
-        <div className="flex items-baseline gap-1.5 mb-1.5">
-          <span className="text-sm font-bold text-[#4A8A90]">
+        <div className="flex items-baseline gap-1 mb-1">
+          <span className="text-xs sm:text-sm font-bold text-[#4A8A90]">
             ৳{formatPrice(currentPrice)}
           </span>
           {discountPercent > 0 && (
             <>
-              <span className="text-[8px] text-gray-400 line-through">
+              <span className="text-[6px] sm:text-[8px] text-gray-400 line-through">
                 ৳{formatPrice(originalPrice)}
               </span>
-              <span className="text-[7px] font-semibold text-red-500 bg-red-100 px-1 py-0.5 rounded">
+              <span className="text-[5px] sm:text-[7px] font-semibold text-red-500 bg-red-100 px-0.5 py-0.5 rounded">
                 -{discountPercent}%
               </span>
             </>
           )}
         </div>
 
-        {/* Category and Stock Status Row */}
-        <div className="flex items-center justify-between gap-1">
-          {/* Category */}
-          {product.category?.name && (
-            <div className="flex items-center gap-0.5 text-[7px] text-[#8B9DC3]">
-              <Package className="w-2.5 h-2.5" />
-              <span className="truncate max-w-[70px]">{product.category.name}</span>
-            </div>
-          )}
-          
-          {!product.category?.name && (
-            <div className="text-[7px] text-gray-400">🎁 Toy</div>
-          )}
-          
-          {/* Stock Status */}
-          <div className="flex-shrink-0">
-            {product.stockQuantity > 0 ? (
-              <span className="flex items-center gap-0.5 text-[7px] text-green-600 font-medium">
-                <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
-                <span>In Stock ({product.stockQuantity})</span>
-              </span>
-            ) : (
-              <span className="flex items-center gap-0.5 text-[7px] text-red-500 font-medium">
-                <div className="w-1 h-1 bg-red-500 rounded-full"></div>
-                <span>Out of Stock</span>
-              </span>
-            )}
-          </div>
-        </div>
+        {/* Category and Stock Status Row - Smaller on mobile */}
+     {/* Category and Stock Status Row */}
+<div className="flex items-center justify-between gap-1">
+  {/* Category */}
+  {product.category?.name && (
+    <div className="flex items-center gap-0.5 text-[7px] text-[#8B9DC3]">
+      <Package className="w-2.5 h-2.5" />
+      <span className="truncate max-w-[70px]">{product.category.name}</span>
+    </div>
+  )}
+  
+  {!product.category?.name && (
+    <div className="text-[7px] text-gray-400">🎁 Toy</div>
+  )}
+  
+  {/* Stock Status - WITH STOCK COUNT */}
+  <div className="flex-shrink-0">
+    {product.stockQuantity > 0 ? (
+      <span className="flex items-center gap-0.5 text-[7px] text-green-600 font-medium">
+        <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+        <span>In Stock ({product.stockQuantity})</span>
+      </span>
+    ) : (
+      <span className="flex items-center gap-0.5 text-[7px] text-red-500 font-medium">
+        <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+        <span>Out of Stock</span>
+      </span>
+    )}
+  </div>
+</div>
       </div>
 
-      {/* Add to Cart / View Cart Button */}
+      {/* Add to Cart / View Cart Button - Smaller on mobile */}
       {cartStatusLoading ? (
         <button
           disabled
-          className="w-full py-1.5 text-center text-[9px] font-bold bg-gray-300 text-gray-500 flex items-center justify-center gap-1"
+          className="w-full py-1 sm:py-1.5 text-center text-[8px] sm:text-[9px] font-bold bg-gray-300 text-gray-500 flex items-center justify-center gap-1"
         >
-          <Loader2 className="w-2.5 h-2.5 animate-spin" />
+          <Loader2 className="w-2 h-2 sm:w-2.5 sm:h-2.5 animate-spin" />
           Loading...
         </button>
       ) : isInCart ? (
         <button
-    onClick={(e) => {
-      e.stopPropagation();
-      router.push('/cart');
-    }}
-          className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center gap-1"
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push('/cart');
+          }}
+          className="w-full py-1 sm:py-1.5 text-center text-[8px] sm:text-[9px] font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center gap-1"
         >
-          <ShoppingCart className="w-2.5 h-2.5" />
-          View in Cart
+          <ShoppingCart className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+          <span className="sm:inline">View in Cart</span>
         </button>
       ) : (
         <button
           onClick={addToCart}
-          className="w-full py-1.5 text-center text-[9px] font-bold bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white hover:from-[#3A7A80] hover:to-[#5B9399] transition-all duration-200 flex items-center justify-center gap-1"
+          className="w-full py-1 sm:py-1.5 text-center text-[8px] sm:text-[9px] font-bold bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white hover:from-[#3A7A80] hover:to-[#5B9399] transition-all duration-200 flex items-center justify-center gap-1"
         >
-          <ShoppingCart className="w-2.5 h-2.5" />
-          Add to Cart
+          <ShoppingCart className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+          <span className="sm:inline">Add to Cart</span>
         </button>
       )}
     </motion.div>

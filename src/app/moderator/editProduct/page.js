@@ -1693,7 +1693,7 @@ const AVAILABLE_TAGS = [
 // Promotion options
 const PROMOTION_OPTIONS = [
   { value: 'flash-sale', label: 'Flash Sale', icon: '⚡', color: '#FF6B6B' },
-  { value: 'featured', label: 'Featured Product', icon: '⭐', color: '#FFD93D' },
+  { value: 'new-arrival', label: 'New Arrival', icon: '⭐', color: '#FFD93D' },
   { value: 'trending', label: 'Trending Now', icon: '🔥', color: '#FF8C42' },
   { value: 'clearance', label: 'Clearance Sale', icon: '💨', color: '#4ECDC4' },
   { value: 'holiday-special', label: 'Holiday Special', icon: '🎄', color: '#2ECC71' },

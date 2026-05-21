@@ -154,15 +154,15 @@ export default function ParentsTrustSection() {
   };
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-white to-[#FFF9F0] overflow-hidden">
-      <div className="container mx-auto px-4 max-w-7xl">
+    <section className="py-12 md:py-16  lg:py-20 bg-[#ECFEFF] overflow-hidden">
+      <div className="container mx-auto pb-4 max-w-7xl">
         
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10 md:mb-14"
+          className="text-center  mb-10 md:mb-14"
         >
           <div className="inline-flex items-center gap-2 mb-3">
             <Heart className="w-5 h-5 text-[#FFB6C1] fill-[#FFB6C1]" />

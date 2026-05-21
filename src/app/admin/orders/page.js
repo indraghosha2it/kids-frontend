@@ -2129,6 +2129,164 @@ const StatusUpdateModal = ({ isOpen, onClose, order, onUpdate }) => {
 };
 
 // Payment Status Modal
+// const PaymentStatusModal = ({ isOpen, onClose, order, onUpdate }) => {
+//   const [selectedStatus, setSelectedStatus] = useState('');
+//   const [loading, setLoading] = useState(false);
+
+//   useEffect(() => {
+//     if (order) {
+//       setSelectedStatus(order.paymentStatus);
+//     }
+//   }, [order]);
+
+//   const handleSubmit = async () => {
+//     if (!selectedStatus) {
+//       toast.error('Please select a payment status');
+//       return;
+//     }
+
+//     if (selectedStatus === order.paymentStatus) {
+//       toast.error('Please select a different status');
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/orders/${order._id}/payment`, {
+//         method: 'PUT',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': `Bearer ${token}`
+//         },
+//         body: JSON.stringify({ paymentStatus: selectedStatus })
+//       });
+
+//       const data = await response.json();
+//       if (data.success) {
+//         toast.success(`Payment status updated to ${selectedStatus}`);
+//         onUpdate();
+//         onClose();
+//       } else {
+//         toast.error(data.error || 'Failed to update payment status');
+//       }
+//     } catch (error) {
+//       console.error('Payment status update error:', error);
+//       toast.error('Network error');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const currentPaymentInfo = PAYMENT_STATUSES.find(p => p.value === order?.paymentStatus);
+  
+//   const getAvailableStatuses = () => {
+//     const currentStatus = order?.paymentStatus;
+    
+//     switch (currentStatus) {
+//       case 'pending':
+//         return PAYMENT_STATUSES.filter(status => 
+//           status.value === 'paid' || status.value === 'failed'
+//         );
+//       case 'failed':
+//         return PAYMENT_STATUSES.filter(status => 
+//           status.value === 'paid'
+//         );
+//       case 'paid':
+//         return PAYMENT_STATUSES.filter(status => 
+//           status.value === 'refunded'
+//         );
+//       case 'refunded':
+//         return [];
+//       default:
+//         return [];
+//     }
+//   };
+
+//   const availableStatuses = getAvailableStatuses();
+//   const canChange = availableStatuses.length > 0;
+
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+//       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+//         <div className="p-4 bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white">
+//           <div className="flex items-center justify-between">
+//             <div className="flex items-center gap-2">
+//               <FaMoneyBillWave className="w-5 h-5" />
+//               <h2 className="text-lg font-bold">Update Payment Status</h2>
+//             </div>
+//             <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
+//               <FaTimes className="w-4 h-4" />
+//             </button>
+//           </div>
+//           <p className="text-xs text-white/80 mt-1">Order #{order?.orderNumber || order?._id?.slice(-8).toUpperCase()}</p>
+//         </div>
+
+//         <div className="p-4 space-y-3">
+//           <div>
+//             <label className="block text-xs font-medium text-gray-700 mb-1">Current Payment Status</label>
+//             <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${currentPaymentInfo?.color || 'bg-gray-100'}`}>
+//               <FaMoneyBillWave className="w-3 h-3" />
+//               <span>{currentPaymentInfo?.label || order?.paymentStatus}</span>
+//             </div>
+//           </div>
+
+//           <div>
+//             <label className="block text-xs font-medium text-gray-700 mb-1">Change Payment Status To</label>
+//             {canChange ? (
+//               <select
+//                 value={selectedStatus}
+//                 onChange={(e) => setSelectedStatus(e.target.value)}
+//                 className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent"
+//               >
+//                 {availableStatuses.map(status => (
+//                   <option key={status.value} value={status.value}>
+//                     {status.label}
+//                   </option>
+//                 ))}
+//               </select>
+//             ) : (
+//               <div className="px-3 py-1.5 text-sm bg-gray-100 text-gray-500 rounded-lg">
+//                 No further changes allowed
+//               </div>
+//             )}
+            
+//             {order?.paymentStatus === 'pending' && (
+//               <p className="text-xs text-blue-600 mt-1">→ Can change to: Paid or Failed</p>
+//             )}
+//             {order?.paymentStatus === 'failed' && (
+//               <p className="text-xs text-blue-600 mt-1">→ Can change to: Paid</p>
+//             )}
+//             {order?.paymentStatus === 'paid' && (
+//               <p className="text-xs text-blue-600 mt-1">→ Can change to: Refunded</p>
+//             )}
+//             {order?.paymentStatus === 'refunded' && (
+//               <p className="text-xs text-gray-500 mt-1">→ This order has been refunded. No further changes allowed.</p>
+//             )}
+//           </div>
+//         </div>
+
+//         <div className="p-4 border-t border-gray-200 bg-gray-50 flex gap-3">
+//           <button onClick={onClose} className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+//             Cancel
+//           </button>
+//           <button
+//             onClick={handleSubmit}
+//             disabled={loading || !canChange || selectedStatus === order?.paymentStatus}
+//             className="flex-1 px-3 py-2 bg-[#4A8A90] text-white rounded-lg hover:bg-[#3A7A80] disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+//           >
+//             {loading ? <FaSpinner className="w-3 h-3 animate-spin" /> : <FaSave className="w-3 h-3" />}
+//             Update Payment
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// Payment Status Modal
 const PaymentStatusModal = ({ isOpen, onClose, order, onUpdate }) => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [loading, setLoading] = useState(false);
@@ -2136,6 +2294,11 @@ const PaymentStatusModal = ({ isOpen, onClose, order, onUpdate }) => {
   useEffect(() => {
     if (order) {
       setSelectedStatus(order.paymentStatus);
+      console.log('Order in modal:', { 
+        paymentStatus: order.paymentStatus, 
+        orderStatus: order.orderStatus,
+        paymentMethod: order.paymentMethod
+      });
     }
   }, [order]);
 
@@ -2180,23 +2343,46 @@ const PaymentStatusModal = ({ isOpen, onClose, order, onUpdate }) => {
 
   const currentPaymentInfo = PAYMENT_STATUSES.find(p => p.value === order?.paymentStatus);
   
+  // Get available payment status options based on current status, order status, and payment method
   const getAvailableStatuses = () => {
     const currentStatus = order?.paymentStatus;
+    const orderStatus = order?.orderStatus;
+    const paymentMethod = order?.paymentMethod;
+    
+    console.log('Getting available statuses:', { currentStatus, orderStatus, paymentMethod });
     
     switch (currentStatus) {
       case 'pending':
+        // Pending → Can change to Paid or Failed (for both COD and Online)
         return PAYMENT_STATUSES.filter(status => 
           status.value === 'paid' || status.value === 'failed'
         );
       case 'failed':
+        // Failed → Can change to Paid only (for both COD and Online)
         return PAYMENT_STATUSES.filter(status => 
           status.value === 'paid'
         );
       case 'paid':
-        return PAYMENT_STATUSES.filter(status => 
-          status.value === 'refunded'
-        );
+        // For paid orders - rules depend on payment method
+        if (paymentMethod === 'cod') {
+          // COD orders: Cannot refund after delivery
+          // Only allow refund if order is cancelled (not delivered)
+          if (orderStatus === 'cancelled') {
+            return PAYMENT_STATUSES.filter(status => 
+              status.value === 'refunded'
+            );
+          }
+          // COD delivered orders cannot be refunded
+          return [];
+        } else {
+          // Online payments: Can refund for cancelled or delivered orders
+          // Also allow manual refund for admins
+          return PAYMENT_STATUSES.filter(status => 
+            status.value === 'refunded'
+          );
+        }
       case 'refunded':
+        // Refunded → No changes allowed
         return [];
       default:
         return [];
@@ -2231,6 +2417,10 @@ const PaymentStatusModal = ({ isOpen, onClose, order, onUpdate }) => {
               <FaMoneyBillWave className="w-3 h-3" />
               <span>{currentPaymentInfo?.label || order?.paymentStatus}</span>
             </div>
+            <div className="mt-1 text-xs text-gray-500">
+              Order Status: <span className="font-medium">{order?.orderStatus}</span> | 
+              Payment Method: <span className="font-medium">{order?.paymentMethod === 'cod' ? 'COD' : 'Online'}</span>
+            </div>
           </div>
 
           <div>
@@ -2241,9 +2431,10 @@ const PaymentStatusModal = ({ isOpen, onClose, order, onUpdate }) => {
                 onChange={(e) => setSelectedStatus(e.target.value)}
                 className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent"
               >
+                <option value={order.paymentStatus}>Current: {currentPaymentInfo?.label}</option>
                 {availableStatuses.map(status => (
                   <option key={status.value} value={status.value}>
-                    {status.label}
+                    → {status.label}
                   </option>
                 ))}
               </select>
@@ -2253,14 +2444,21 @@ const PaymentStatusModal = ({ isOpen, onClose, order, onUpdate }) => {
               </div>
             )}
             
+            {/* Status flow information */}
             {order?.paymentStatus === 'pending' && (
               <p className="text-xs text-blue-600 mt-1">→ Can change to: Paid or Failed</p>
             )}
             {order?.paymentStatus === 'failed' && (
               <p className="text-xs text-blue-600 mt-1">→ Can change to: Paid</p>
             )}
-            {order?.paymentStatus === 'paid' && (
-              <p className="text-xs text-blue-600 mt-1">→ Can change to: Refunded</p>
+            {order?.paymentStatus === 'paid' && order?.paymentMethod === 'cod' && order?.orderStatus === 'cancelled' && (
+              <p className="text-xs text-blue-600 mt-1">→ COD order is cancelled. Can change to: Refunded</p>
+            )}
+            {order?.paymentStatus === 'paid' && order?.paymentMethod === 'cod' && order?.orderStatus === 'delivered' && (
+              <p className="text-xs text-red-600 mt-1">→ COD order is delivered and paid. Cannot be refunded.</p>
+            )}
+            {order?.paymentStatus === 'paid' && order?.paymentMethod === 'online' && (
+              <p className="text-xs text-blue-600 mt-1">→ Online payment. Can change to: Refunded</p>
             )}
             {order?.paymentStatus === 'refunded' && (
               <p className="text-xs text-gray-500 mt-1">→ This order has been refunded. No further changes allowed.</p>
@@ -2896,10 +3094,10 @@ const fetchOrders = useCallback(async () => {
                           {order.orderStatus === 'delivered' && order.deliveredAt ? (
                             <div className="flex flex-col gap-0.5">
                               <div className="text-gray-600">
-                                <span className="text-gray-400 text-[10px]">Ordered:</span> {formatDate(order.createdAt)}
+                                <span className="text-gray-400 text-[10px]">📦</span> {formatDate(order.createdAt)}
                               </div>
                               <div className="text-green-600 font-medium">
-                                <span className="text-green-500 text-[10px]">Delivered:</span> {new Date(order.deliveredAt).toLocaleDateString('en-BD', {
+                                <span className="text-green-500 text-[10px]">✅</span> {new Date(order.deliveredAt).toLocaleDateString('en-BD', {
                                   day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
                                 })}
                               </div>
@@ -2907,10 +3105,10 @@ const fetchOrders = useCallback(async () => {
                           ) : order.orderStatus === 'cancelled' && order.cancelledAt ? (
                             <div className="flex flex-col gap-0.5">
                               <div className="text-gray-600">
-                                <span className="text-gray-400 text-[10px]">Ordered:</span> {formatDate(order.createdAt)}
+                                <span className="text-gray-400 text-[10px]">📦</span> {formatDate(order.createdAt)}
                               </div>
                               <div className="text-red-600 font-medium">
-                                <span className="text-red-500 text-[10px]">Cancelled:</span> {new Date(order.cancelledAt).toLocaleDateString('en-BD', {
+                                <span className="text-red-500 text-[10px]">❌</span> {new Date(order.cancelledAt).toLocaleDateString('en-BD', {
                                   day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
                                 })}
                               </div>

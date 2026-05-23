@@ -475,6 +475,8 @@
 //     </div>
 //   );
 // }
+
+
 // app/about/AboutClient.js
 'use client';
 

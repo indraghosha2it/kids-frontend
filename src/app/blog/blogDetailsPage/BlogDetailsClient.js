@@ -39,6 +39,7 @@ import Footer from '@/app/components/layout/Footer';
 import Navbar from '@/app/components/layout/Navbar';
 import WhatsAppButton from '@/app/components/layout/WhatsAppButton';
 import { motion, AnimatePresence } from 'framer-motion';
+import BlogMetadataUpdater from './MetadataUpdater';
 
 // ToyMart Brand Colors
 const COLORS = {
@@ -79,7 +80,7 @@ const floatingElements = [
   { icon: '⭐', left: '88%', top: '45%', delay: 2.5, duration: 12 },
 ];
 
-export default function BlogDetailsPage() {
+export default function BlogDetailsClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const blogId = searchParams.get('id');
@@ -113,7 +114,7 @@ export default function BlogDetailsPage() {
     const fetchBlog = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
+        const response = await fetch(`https://kids-backend.vercel.app/api/blogs/${blogId}`);
         const data = await response.json();
         
         if (data.success) {
@@ -155,7 +156,7 @@ export default function BlogDetailsPage() {
   // Fetch related posts
   const fetchRelatedPosts = async (category, currentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/blogs?category=${category}&limit=3`);
+      const response = await fetch(`https://kids-backend.vercel.app/api/blogs?category=${category}&limit=3`);
       const data = await response.json();
       if (data.success) {
         setRelatedPosts(data.data.filter(post => post._id !== currentId).slice(0, 3));
@@ -323,6 +324,7 @@ export default function BlogDetailsPage() {
 
   return (
     <>
+    {blog && <BlogMetadataUpdater blog={blog} />}
       <Navbar />
       
       <main className=" -mt-18 min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #FFF9F0 0%, #D4EDEE 100%)' }}>
@@ -383,10 +385,7 @@ export default function BlogDetailsPage() {
                 >
                   {category.icon} {category.label}
                 </span>
-                <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-sm text-white flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  {readingTime} min read
-                </span>
+              
               </div>
               
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 leading-tight max-w-4xl" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
@@ -400,10 +399,7 @@ export default function BlogDetailsPage() {
                   </div>
                   <span>{blog.author}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>{formatDate(blog.publishDate)}</span>
-                </div>
+              
               </div>
             </div>
           </div>
@@ -627,8 +623,7 @@ export default function BlogDetailsPage() {
                     </h4>
                     <div className="flex items-center gap-2 text-xs mt-1 text-gray-400">
                       <span>{post.author}</span>
-                      <span>•</span>
-                      <span>{getReadingTime(post.content)} min read</span>
+                   
                     </div>
                   </div>
                 </div>

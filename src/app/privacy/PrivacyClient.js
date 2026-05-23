@@ -18,8 +18,10 @@ import {
   Smartphone,
   CreditCard
 } from 'lucide-react';
+import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
 
-export default function PrivacyPage() {
+export default function PrivacyClient() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -164,6 +166,9 @@ export default function PrivacyPage() {
   }
 
   return (
+    <>
+    <Navbar />
+  
     <div className="min-h-screen bg-gradient-to-br from-[#FFF9F0] to-[#D4EDEE]">
       {/* Hero Section */}
       <section className="relative pt-20 pb-12 md:pt-28 md:pb-16 overflow-hidden">
@@ -307,5 +312,7 @@ export default function PrivacyPage() {
         </div>
       </section>
     </div>
+    <Footer />
+      </>
   );
 }

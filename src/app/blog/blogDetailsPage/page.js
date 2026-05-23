@@ -1,20 +1,24 @@
-
-
 import { Suspense } from 'react';
 import BlogDetailsClient from './BlogDetailsClient';
 
-// Loading fallback component
+// Import for loading state
+import Navbar from '@/app/components/layout/Navbar';
+import Footer from '@/app/components/layout/Footer';
+
+// Loading fallback component for Blog Details page
 function BlogDetailsLoading() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-white pt-32 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#FFF9F0] to-[#D4EDEE] flex items-center justify-center">
         <div className="text-center">
-          <div className="relative w-20 h-20 mx-auto mb-4">
-            <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-200 rounded-full"></div>
-            <div className="absolute top-0 left-0 w-full h-full border-4 border-[#E39A65] rounded-full border-t-transparent animate-spin"></div>
+          <div className="relative w-16 h-16 mx-auto">
+            <div className="w-16 h-16 border-4 border-[#D4EDEE] border-t-[#4A8A90] rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-5 h-5 bg-[#4A8A90] rounded-full animate-pulse"></div>
+            </div>
           </div>
-          <p className="text-gray-500">Loading amazing content...</p>
+          <p className="mt-4 text-sm text-gray-500">Loading fun story... 🎈</p>
         </div>
       </div>
       <Footer />
@@ -22,18 +26,52 @@ function BlogDetailsLoading() {
   );
 }
 
-// Import Navbar and Footer for loading state
-import Navbar from '@/app/components/layout/Navbar';
-import Footer from '@/app/components/layout/Footer';
-
+// ToyMart Blog Details Page SEO Metadata
+// Note: Dynamic metadata is handled client-side by MetadataUpdater component
 export const metadata = {
-  title: "Blog Details - Asian Clothify",
-  description: "Read our latest blog posts about fashion, wholesale tips, and industry insights.",
-  keywords: ["fashion blog", "wholesale tips", "clothing trends"],
+  title: "Blog Post | Kids Stories & Parenting Tips | ToyMart Bangladesh",
+  description: "Read engaging articles about kids toys, parenting tips, child development, and fun activities. Expert advice for parents in Bangladesh.",
+  keywords: [
+    "kids blog bangladesh",
+    "parenting articles",
+    "toy stories",
+    "child development tips",
+    "kids activities bd"
+  ],
   openGraph: {
-    title: "Blog Details - Asian Clothify",
-    description: "Read our latest blog posts about fashion, wholesale tips, and industry insights.",
-    images: ['/blog-og.jpg'],
+    title: "ToyMart Blog - Kids Stories & Parenting Tips",
+    description: "Discover engaging articles about toys, parenting, and child development.",
+    url: process.env.NEXT_PUBLIC_BASE_URL + '/blog/blogDetailsPage' || 'https://toymart.com.bd/blog/blogDetailsPage',
+    siteName: "ToyMart",
+    images: [
+      {
+        url: '/blog-details-og.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'ToyMart Blog Post',
+      },
+    ],
+    type: 'article',
+    locale: 'en_BD',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@ToyMartBD',
+    creator: '@ToyMartBD',
+    title: "ToyMart Blog | Kids Stories",
+    description: "Read engaging articles for parents and kids.",
+    images: ['/blog-details-twitter.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
   },
 };
 

@@ -34,7 +34,7 @@ export default function PaymentSuccessPage() {
           const headers = {};
           if (token) headers['Authorization'] = `Bearer ${token}`;
           if (sessionId) headers['x-session-id'] = sessionId;
-          await fetch('http://localhost:5000/api/cart', { method: 'DELETE', headers });
+          await fetch('https://kids-backend.vercel.app/api/cart', { method: 'DELETE', headers });
           window.dispatchEvent(new Event('cart-update'));
         } else {
           setPaymentStatus('failed');

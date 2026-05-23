@@ -85,7 +85,7 @@ const EditOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/orders/${order._id}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -223,7 +223,7 @@ const DeleteConfirmModal = ({ isOpen, onClose, order, onDelete }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/orders/${order._id}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -316,7 +316,7 @@ const StatusUpdateModal = ({ isOpen, onClose, order, onUpdate }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/orders/${order._id}/status`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -335,7 +335,7 @@ const StatusUpdateModal = ({ isOpen, onClose, order, onUpdate }) => {
         toast.success(`Order status updated to ${selectedStatus}`);
         
         if (selectedStatus === 'delivered' && order.paymentStatus !== 'paid') {
-          await fetch(`http://localhost:5000/api/orders/${order._id}/payment`, {
+          await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}/payment`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -502,7 +502,7 @@ const PaymentStatusModal = ({ isOpen, onClose, order, onUpdate }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/orders/${order._id}/payment`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}/payment`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -939,7 +939,7 @@ export default function ModeratorOrdersPage() {
 
       const queryParams = new URLSearchParams({
         page: currentPage,
-        limit: 20,
+        limit: 15,
         sort: sortBy
       });
       if (searchTerm) queryParams.append('search', searchTerm);
@@ -948,7 +948,7 @@ export default function ModeratorOrdersPage() {
       if (paymentFilter) queryParams.append('paymentStatus', paymentFilter);
       if (orderTypeFilter) queryParams.append('paymentMethod', orderTypeFilter);
 
-      const response = await fetch(`http://localhost:5000/api/orders/admin/all?${queryParams}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/orders/admin/all?${queryParams}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -968,21 +968,80 @@ export default function ModeratorOrdersPage() {
     }
   }, [currentPage, searchTerm, activeStatusTab, statusFilter, paymentFilter, orderTypeFilter, sortBy, router]);
 
-  const fetchStats = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/orders/admin/stats', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setStats(data.data);
-      }
-    } catch (error) {
-      console.error('Fetch stats error:', error);
-    }
-  }, []);
+  // const fetchStats = useCallback(async () => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     const response = await fetch('https://kids-backend.vercel.app/api/orders/admin/stats', {
+  //       headers: { 'Authorization': `Bearer ${token}` }
+  //     });
+  //     const data = await response.json();
+  //     if (data.success) {
+  //       setStats(data.data);
+  //     }
+  //   } catch (error) {
+  //     console.error('Fetch stats error:', error);
+  //   }
+  // }, []);
 
+
+  // Calculate stats from orders data (since moderators can't access /admin/stats)
+const calculateStatsFromOrders = (ordersList) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const thisMonth = new Date();
+  thisMonth.setDate(1);
+  thisMonth.setHours(0, 0, 0, 0);
+  
+  const placedOrders = ordersList.filter(o => o.orderStatus === 'placed').length;
+  const confirmedOrders = ordersList.filter(o => o.orderStatus === 'confirmed').length;
+  const processingOrders = ordersList.filter(o => o.orderStatus === 'processing').length;
+  const shippedOrders = ordersList.filter(o => o.orderStatus === 'shipped').length;
+  const deliveredOrders = ordersList.filter(o => o.orderStatus === 'delivered').length;
+  const cancelledOrders = ordersList.filter(o => o.orderStatus === 'cancelled').length;
+  
+  const todayOrders = ordersList.filter(o => new Date(o.createdAt) >= today).length;
+  const monthOrders = ordersList.filter(o => new Date(o.createdAt) >= thisMonth).length;
+  
+  const paidOrders = ordersList.filter(o => o.paymentStatus === 'paid');
+  const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const monthRevenue = paidOrders
+    .filter(o => new Date(o.createdAt) >= thisMonth)
+    .reduce((sum, o) => sum + (o.total || 0), 0);
+  
+  return {
+    totalOrders: ordersList.length,
+    placedOrders,
+    confirmedOrders,
+    processingOrders,
+    shippedOrders,
+    deliveredOrders,
+    cancelledOrders,
+    todayOrders,
+    monthOrders,
+    totalRevenue,
+    monthRevenue,
+    pendingOrders: ordersList.filter(o => o.paymentStatus === 'pending').length,
+    processingOrdersCount: processingOrders + shippedOrders
+  };
+};
+
+const fetchStats = useCallback(async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('https://kids-backend.vercel.app/api/orders/admin/all', {
+      headers: { 'Authorization': `Bearer ${token}` },
+      params: { limit: 1000 }
+    });
+    const data = await response.json();
+    if (data.success) {
+      const calculatedStats = calculateStatsFromOrders(data.data);
+      setStats(calculatedStats);
+    }
+  } catch (error) {
+    console.error('Fetch stats error:', error);
+  }
+}, []); 
   useEffect(() => {
     fetchOrders();
     fetchStats();
@@ -1082,19 +1141,19 @@ export default function ModeratorOrdersPage() {
     );
   };
 
-  const StatCard = ({ title, value, icon, color }) => (
-    <div className="bg-white rounded-xl border-2 border-[#FFE0E6] p-4 shadow-md">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className="text-2xl font-bold text-[#2D3A5C]">{value?.toLocaleString() || 0}</p>
-        </div>
-        <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center`}>
-          {icon}
-        </div>
+const StatCard = ({ title, value, icon, color }) => (
+  <div className="bg-white rounded-xl border-2 border-[#FFE0E6] p-4 shadow-md">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-500">{title}</p>
+        <p className="text-2xl font-bold text-[#2D3A5C]">{value?.toLocaleString() || 0}</p>
+      </div>
+      <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center`}>
+        {icon}
       </div>
     </div>
-  );
+  </div>
+);
 
   return (
     <>
@@ -1108,25 +1167,19 @@ export default function ModeratorOrdersPage() {
                 Order Management
               </h1>
             </div>
-            <button
-              onClick={exportToCSV}
-              className="flex items-center gap-2 px-4 py-2 bg-[#4A8A90] text-white rounded-lg hover:bg-[#3A7A80] transition-colors"
-            >
-              <FaDownload className="w-4 h-4" />
-              Export CSV
-            </button>
+           
           </div>
 
           {/* Stats Cards */}
           {stats && (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
-              <StatCard title="Total Orders" value={stats.totalOrders} icon={<FaBox className="w-5 h-5 text-blue-500" />} color="bg-blue-100" />
-              <StatCard title="Pending Payment" value={stats.pendingOrders} icon={<FaClock className="w-5 h-5 text-yellow-500" />} color="bg-yellow-100" />
-              <StatCard title="Processing" value={stats.processingOrders} icon={<FaSpinner className="w-5 h-5 text-purple-500" />} color="bg-purple-100" />
-              <StatCard title="Delivered" value={stats.deliveredOrders || 0} icon={<FaCheckCircle className="w-5 h-5 text-green-500" />} color="bg-green-100" />
-              <StatCard title="Cancelled" value={stats.cancelledOrders} icon={<FaTimesCircle className="w-5 h-5 text-red-500" />} color="bg-red-100" />
-              <StatCard title="Today" value={stats.todayOrders} icon={<FaCalendarAlt className="w-5 h-5 text-cyan-500" />} color="bg-cyan-100" />
-              <StatCard title="Revenue" value={stats.totalRevenue} icon={<FaMoneyBillWave className="w-5 h-5 text-emerald-500" />} color="bg-emerald-100" />
+           <StatCard title="Total Orders" value={stats?.totalOrders || 0} icon={<FaBox className="w-5 h-5 text-blue-500" />} color="bg-blue-100" />
+<StatCard title="Pending Payment" value={stats?.pendingOrders || 0} icon={<FaClock className="w-5 h-5 text-yellow-500" />} color="bg-yellow-100" />
+<StatCard title="Processing" value={stats?.processingOrdersCount || stats?.processingOrders || 0} icon={<FaSpinner className="w-5 h-5 text-purple-500" />} color="bg-purple-100" />
+<StatCard title="Delivered" value={stats?.deliveredOrders || 0} icon={<FaCheckCircle className="w-5 h-5 text-green-500" />} color="bg-green-100" />
+<StatCard title="Cancelled" value={stats?.cancelledOrders || 0} icon={<FaTimesCircle className="w-5 h-5 text-red-500" />} color="bg-red-100" />
+<StatCard title="Today" value={stats?.todayOrders || 0} icon={<FaCalendarAlt className="w-5 h-5 text-cyan-500" />} color="bg-cyan-100" />
+<StatCard title="Revenue" value={stats?.totalRevenue || 0} icon={<FaMoneyBillWave className="w-5 h-5 text-emerald-500" />} color="bg-emerald-100" />
             </div>
           )}
 
@@ -1452,7 +1505,7 @@ export default function ModeratorOrdersPage() {
 //     setLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/orders/${order._id}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1590,7 +1643,7 @@ export default function ModeratorOrdersPage() {
 //     setLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/orders/${order._id}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}`, {
 //         method: 'DELETE',
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
@@ -1683,7 +1736,7 @@ export default function ModeratorOrdersPage() {
 //     setLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/orders/${order._id}/status`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}/status`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1702,7 +1755,7 @@ export default function ModeratorOrdersPage() {
 //         toast.success(`Order status updated to ${selectedStatus}`);
         
 //         if (selectedStatus === 'delivered' && order.paymentStatus !== 'paid') {
-//           await fetch(`http://localhost:5000/api/orders/${order._id}/payment`, {
+//           await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}/payment`, {
 //             method: 'PUT',
 //             headers: {
 //               'Content-Type': 'application/json',
@@ -1869,7 +1922,7 @@ export default function ModeratorOrdersPage() {
 //     setLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/orders/${order._id}/payment`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/orders/${order._id}/payment`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -2330,7 +2383,7 @@ export default function ModeratorOrdersPage() {
 //       if (paymentFilter) queryParams.append('paymentStatus', paymentFilter);
 //       if (orderTypeFilter) queryParams.append('paymentMethod', orderTypeFilter);
 
-//       const response = await fetch(`http://localhost:5000/api/orders/admin/all?${queryParams}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/orders/admin/all?${queryParams}`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 
@@ -2353,7 +2406,7 @@ export default function ModeratorOrdersPage() {
 //   const fetchStats = useCallback(async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/orders/admin/stats', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/orders/admin/stats', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();

@@ -106,7 +106,7 @@
 //   const fetchProducts = async () => {
 //     setLoadingProducts(true);
 //     try {
-//       const response = await fetch('http://localhost:5000/api/products?limit=100');
+//       const response = await fetch('https://kids-backend.vercel.app/api/products?limit=100');
 //       const data = await response.json();
 //       let productsList = [];
 //       if (data.success) {
@@ -471,7 +471,7 @@
 //         requestBody.productName = formData.productName;
 //       }
 
-//       const response = await fetch('http://localhost:5000/api/reviews', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/reviews', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1107,7 +1107,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted }) {
   const fetchProducts = async () => {
     setLoadingProducts(true);
     try {
-      const response = await fetch('http://localhost:5000/api/products?limit=100');
+      const response = await fetch('https://kids-backend.vercel.app/api/products?limit=100');
       const data = await response.json();
       let productsList = [];
       if (data.success) {
@@ -1472,7 +1472,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted }) {
         requestBody.productName = formData.productName;
       }
 
-      const response = await fetch('http://localhost:5000/api/reviews', {
+      const response = await fetch('https://kids-backend.vercel.app/api/reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

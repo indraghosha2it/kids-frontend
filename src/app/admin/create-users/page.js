@@ -75,7 +75,7 @@
 //       // Get the admin token from localStorage
 //       const token = localStorage.getItem('token');
 
-//       const response = await fetch('http://localhost:5000/api/admin/users', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/admin/users', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -624,7 +624,7 @@ export default function CreateUsers() {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('http://localhost:5000/api/admin/users', {
+      const response = await fetch('https://kids-backend.vercel.app/api/admin/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

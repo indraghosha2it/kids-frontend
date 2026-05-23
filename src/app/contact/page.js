@@ -1,111 +1,131 @@
+import { Suspense } from 'react';
+import ContactClient from './ContactClient';
 
+// Import for loading state
+import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
 
+// Loading fallback component for Contact page
+function ContactLoading() {
+  return (
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-br from-[#FFF9F0] to-[#D4EDEE] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto bg-[#4A8A90]/20 rounded-full animate-pulse mb-4"></div>
+          <div className="h-6 w-48 bg-[#4A8A90]/20 rounded mx-auto animate-pulse"></div>
+          <div className="h-4 w-64 bg-[#4A8A90]/20 rounded mx-auto mt-3 animate-pulse"></div>
+        </div>
+      </div>
+      <Footer />
+    </>
+  );
+}
 
-// // app/contact/page.js
-
-// import ContactClient from "./ContactClient";
-// // Metadata for Contact page
-// export const metadata = {
-//   title: "Contact us - Clothing Inquiries",
-//   description: "Get in touch with Asian Clothify for wholesale clothing inquiries. Quick response within 2 hours. Call, email, or visit our facility in Savar, Dhaka, Bangladesh.",
-//   keywords: [
-//     "contact asian clothify",
-//     "wholesale clothing inquiry",
-//     "b2b clothing contact",
-//     "clothing manufacturer bangladesh contact",
-//     "bulk order inquiry",
-//     "custom clothing manufacturing contact"
-//   ],
-//   openGraph: {
-//     title: "Contact Asian Clothify - Clothing Inquiries",
-//     description: "Reach out to us for wholesale clothing orders. Quick response within 2 hours. Phone: +8801305-785685 | Email: info@asianclothify.com",
-//     url: "https://asianclothify.com/contact",
-//     siteName: "Asian Clothify",
-//     images: [
-//       {
-//         url: "/contact-og.jpg",
-//         width: 1200,
-//         height: 630,
-//         alt: "Contact Asian Clothify - Wholesale Clothing"
-//       }
-//     ],
-//     locale: "en_US",
-//     type: "website",
-//   },
-//   twitter: {
-//     card: "summary_large_image",
-//     title: "Contact Asian Clothify - Wholesale Clothing Inquiries",
-//     description: "Get quick quotes for bulk clothing orders. Response within 2 hours.",
-//     images: ["/contact-og.jpg"],
-//     site: "@asianclothify",
-//   },
-//   alternates: {
-//     canonical: "/contact"
-//   },
-//   robots: {
-//     index: true,
-//     follow: true,
-//   }
-// };
-
-// // Simple server component that renders the client component
-// export default function ContactPage() {
-//   return <ContactClient />;
-// }
-
-
-// app/contact/page.js
-import ContactClient from "./ContactClient";
-
-// Metadata for Contact page - Jute Craftify
+// ToyMart Contact Us Page SEO Metadata
 export const metadata = {
-  title: "Contact Us - Request Quote for Jute Products",
-  description: "Get in touch with Jute Craftify for premium jute product inquiries. Bulk orders, custom manufacturing, and global shipping. Response within 24 hours. Contact our B2B sales team.",
+  title: "Contact Us | Get in Touch with ToyMart - Kids Toy Store Bangladesh",
+  description: "Contact ToyMart customer support for questions about toys, orders, delivery, or returns. Call, email, or visit us in Dhaka. We're here to help 24/7!",
   keywords: [
-    "contact jute craftify",
-    "jute products inquiry",
-    "bulk jute order bangladesh",
-    "jute manufacturer contact",
-    "wholesale jute supplier",
-    "custom jute manufacturing",
-    "jute bag quote",
-    "eco-friendly products inquiry",
-    "jute export Bangladesh",
-    "RFQ jute products"
+    // Contact specific
+    "contact toymart",
+    "toy store customer care bd",
+    "kids toy support bangladesh",
+    "toymart helpline",
+    "customer service toys bd",
+    
+    // Contact methods
+    "toy shop phone number",
+    "toymart email address",
+    "toy store location dhaka",
+    "customer care number toys",
+    "24/7 toy support bd",
+    
+    // Support inquiries
+    "toy order help",
+    "delivery support bangladesh",
+    "toy return contact",
+    "product inquiry toys",
+    "toy warranty support",
+    
+    // Business inquiries
+    "toy business contact",
+    "wholesale toys inquiry",
+    "toy supplier bangladesh",
+    "partnership toys bd",
+    
+    // Social media
+    "toymart facebook",
+    "toymart instagram",
+    "toy store social media",
+    
+    // Location
+    "toy store dhaka address",
+    "kids shop gulshan",
+    "toymart office location"
   ],
   openGraph: {
-    title: "Contact Jute Craftify - Request a Quote for Jute Products",
-    description: "Looking for premium jute products? Contact our B2B sales team for bulk orders, custom manufacturing, and global shipping. Quick response guaranteed.",
-    url: "https://jutecraftify.com/contact",
-    siteName: "Jute Craftify",
+    title: "Contact ToyMart - We're Here to Help | Kids Toy Store Bangladesh",
+    description: "Need help with your toy order? Have questions about our products? Contact our friendly customer support team via phone, email, or visit our Dhaka store.",
+    url: process.env.NEXT_PUBLIC_BASE_URL + '/contact' || 'https://toymart.com.bd/contact',
+    siteName: "ToyMart",
     images: [
       {
-        url: "/contact-og.jpg",
+        url: '/contact-og.jpg',
         width: 1200,
         height: 630,
-        alt: "Contact Jute Craftify - Premium Jute Products from Bangladesh"
-      }
+        alt: 'Contact ToyMart - Customer Support for Kids Toys',
+      },
     ],
-    locale: "en_US",
-    type: "website",
+    type: 'website',
+    locale: 'en_BD',
+    alternateLocale: ['bn_BD'],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Contact Jute Craftify - Bulk Jute Product Inquiries",
-    description: "Get quotes for wholesale jute orders. Custom manufacturing available. Global shipping. Response within 24 hours.",
-    images: ["/contact-og.jpg"],
-    site: "@JuteCraftify",
+    card: 'summary_large_image',
+    site: '@ToyMartBD',
+    creator: '@ToyMartBD',
+    title: "Contact ToyMart | Customer Support",
+    description: "Questions about toys or orders? Contact our friendly team. Call, email, or visit us in Dhaka.",
+    images: ['/contact-twitter.jpg'],
   },
   alternates: {
-    canonical: "/contact"
+    canonical: '/contact',
+    languages: {
+      'en': '/contact',
+      'bn': '/bn/contact',
+    },
   },
   robots: {
     index: true,
     follow: true,
-  }
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
+  // Contact page specific metadata
+  other: {
+    'application-name': 'ToyMart Contact',
+    'msapplication-TileColor': '#FF6B35',
+    'theme-color': '#FF6B35',
+    'page-type': 'contact-us',
+    'contact-email': 'support@toymart.com',
+    'contact-phone': '+8801234567890',
+    'business-hours': 'Mon-Fri 9AM-8PM, Sat 10AM-6PM',
+    'address-locality': 'Dhaka',
+    'address-country': 'BD',
+  },
 };
 
-// Simple server component that renders the client component
+// Server component with Suspense
 export default function ContactPage() {
-  return <ContactClient />;
+  return (
+    <Suspense fallback={<ContactLoading />}>
+      <ContactClient />
+    </Suspense>
+  );
 }

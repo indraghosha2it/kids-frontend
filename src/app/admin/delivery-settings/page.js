@@ -19,7 +19,7 @@ export default function DeliverySettingsPage() {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/delivery/settings');
+      const response = await fetch('https://kids-backend.vercel.app/api/delivery/settings');
       const result = await response.json();
       if (result.success) {
         setSettings({
@@ -50,7 +50,7 @@ export default function DeliverySettingsPage() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/delivery/settings', {
+      const response = await fetch('https://kids-backend.vercel.app/api/delivery/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

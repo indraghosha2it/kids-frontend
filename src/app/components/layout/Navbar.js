@@ -63,7 +63,7 @@
 //   const fetchCategories = async () => {
 //     setCategoriesLoading(true);
 //     try {
-//       const response = await fetch('http://localhost:5000/api/categories');
+//       const response = await fetch('https://kids-backend.vercel.app/api/categories');
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -181,7 +181,7 @@
 //         }
 //       }
       
-//       const response = await fetch('http://localhost:5000/api/cart', { headers });
+//       const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
       
 //       if (response.ok) {
 //         const data = await response.json();
@@ -213,7 +213,7 @@
 //       return;
 //     }
     
-//     const response = await fetch('http://localhost:5000/api/wishlist', { headers });
+//     const response = await fetch('https://kids-backend.vercel.app/api/wishlist', { headers });
     
 //     if (response.ok) {
 //       const data = await response.json();
@@ -307,7 +307,7 @@
 //   setSearchLoading(true);
 //   try {
 //     // Use the products endpoint with search parameter
-//     const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(query)}&limit=5`);
+//     const response = await fetch(`https://kids-backend.vercel.app/api/products?search=${encodeURIComponent(query)}&limit=5`);
 //     const data = await response.json();
     
 //     console.log('Search response:', data); // Debug log to see the structure
@@ -1127,7 +1127,7 @@ export default function Navbar() {
   const fetchCategories = async () => {
     setCategoriesLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/categories');
+      const response = await fetch('https://kids-backend.vercel.app/api/categories');
       const data = await response.json();
       
       if (data.success) {
@@ -1258,7 +1258,7 @@ export default function Navbar() {
         }
       }
       
-      const response = await fetch('http://localhost:5000/api/cart', { headers });
+      const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
       
       if (response.ok) {
         const data = await response.json();
@@ -1288,7 +1288,7 @@ export default function Navbar() {
         return;
       }
       
-      const response = await fetch('http://localhost:5000/api/wishlist', { headers });
+      const response = await fetch('https://kids-backend.vercel.app/api/wishlist', { headers });
       
       if (response.ok) {
         const data = await response.json();
@@ -1360,6 +1360,7 @@ export default function Navbar() {
     { name: 'Home', href: '/', icon: Home },
     { name: 'Toys', href: '/products', icon: Gift, highlight: true },
     { name: 'Flash Sale', href: '/flash-sale', icon: Flame, badge: 'HOT' },
+   { name: 'Blog', href: '/blog', icon: Info },
     { name: 'About', href: '/about', icon: Info },
     { name: 'Contact', href: '/contact', icon: Phone },
   ];
@@ -1378,7 +1379,7 @@ export default function Navbar() {
     
     setSearchLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(query)}&limit=5`);
+      const response = await fetch(`https://kids-backend.vercel.app/api/products?search=${encodeURIComponent(query)}&limit=5`);
       const data = await response.json();
       
       if (data.success && data.data && data.data.length > 0) {
@@ -1882,6 +1883,23 @@ export default function Navbar() {
                   </span>
                 </div>
               </Link>
+              <Link
+                href="/blog"
+                className={`relative px-4 py-1.5 rounded-full font-bold transition-all duration-300 ${
+                  isActive('/blog')
+                    ? 'text-[#4A8A90] bg-[#D4EDEE] shadow-sm'
+                    : 'text-[#4A8A90] hover:text-[#FFB6C1] hover:bg-[#D4EDEE]/50'
+                }`}
+                style={{ fontFamily: "'Comic Neue', 'Fredoka One', 'Poppins', cursive" }}
+              >
+                <div className="flex items-center gap-2 text-sm">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  </svg>
+                  <span>Blog</span>
+                </div>
+              </Link>
+
 
               <Link
                 href="/about"

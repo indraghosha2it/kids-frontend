@@ -1,1054 +1,919 @@
-// 'use client';
+"use client";
 
-// import { useState, useEffect } from 'react';
-// import Link from 'next/link';
-// import { useRouter } from 'next/navigation';
-// import {
-//   LayoutDashboard,
-//   FileText,
-//   ShoppingBag,
-//   DollarSign,
-//   TrendingUp,
-//   TrendingDown,
-//   Activity,
-//   Clock,
-//   CheckCircle,
-//   XCircle,
-//   AlertCircle,
-//   Package,
-//   Users,
-//   Eye,
-//   ArrowRight,
-//   RefreshCw,
-//   Loader2,
-//   Calendar,
-//   MessageCircle,
-//   PieChart,
-//   CreditCard,
-//   PlusCircle,
-//   FileOutput,
-//   Download,
-//   Mail,
-//   Phone,
-//   Building2,
-//   User,
-//   MapPin,
-//   Filter,
-//   Search,
-//   AlertTriangle,
-//   CheckSquare,
-//   XSquare,
-//   Inbox,
-//   Send,
-//   Settings,
-//   Star,
-//   Award,
-//   Target,
-//   Zap,
-//   Shield,
-//   Truck,
-//   Globe,
-//   Wallet,
-//   ArrowUpRight,
-//   ArrowDownRight,
-//   Minus,
-//   Layers,
-//   UploadCloud,
-//   Link as LinkIcon,
-//   ExternalLink,
-//   CalendarRange,
-//   ChevronLeft,
-//   ChevronRight,
-//   Image as ImageIcon,
-//   Tag,
-//   Grid,
-//   List,
-//   Plus,
-//   Filter as FilterIcon,
-//   BarChart3,
-//   Edit
-// } from 'lucide-react';
-// import { toast } from 'sonner';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { 
+  Package, 
+  ShoppingBag, 
+  CheckCircle, 
+  XCircle,
+  Clock,
+  TrendingUp,
+  AlertCircle,
+  Calendar,
+  DollarSign,
+  Truck,
+  RefreshCw,
+  Download,
+  Eye,
+  Edit,
+  PlusCircle,
+  Star,
+  Filter,
+  ChevronDown,
+  Search,
+  MoreVertical
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-// // ==================== JUTE THEME COLORS ====================
-// const JUTE = {
-//   primary: '#6B4F3A',
-//   secondary: '#F5E6D3',
-//   accent: '#4A7C59',
-//   accentLight: '#C6A43B',
-//   background: '#FAF7F2',
-//   text: '#2C2420',
-//   textLight: '#8B7355',
-//   border: '#E5D5C0',
-//   white: '#FFFFFF',
-//   warning: '#E39A65'
-// };
-
-// // ==================== HELPER FUNCTIONS ====================
-
-// const formatPrice = (price) => {
-//   return new Intl.NumberFormat('en-US', {
-//     style: 'currency',
-//     currency: 'USD',
-//     minimumFractionDigits: 2
-//   }).format(price || 0);
-// };
-
-// const formatDate = (dateString) => {
-//   const date = new Date(dateString);
-//   const now = new Date();
-//   const diffTime = Math.abs(now - date);
-//   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+export default function ModeratorDashboard() {
+   const router = useRouter();
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    products: {
+      active: 0,
+      outOfStock: 0,
+      lowStock: 0,
+      featured: 0,
+      onSale: 0,
+      pendingReviews: 0
+    },
+    orders: {
+      placed: 0,
+      confirmed: 0,
+      processing: 0,
+      shipped: 0,
+      delivered: 0,
+      cancelled: 0,
+      total: 0
+    },
+    revenue: {
+      filtered: 0
+    }
+  });
   
-//   if (diffDays === 0) {
-//     return 'Today';
-//   } else if (diffDays === 1) {
-//     return 'Yesterday';
-//   } else if (diffDays < 7) {
-//     return `${diffDays} days ago`;
-//   } else {
-//     return date.toLocaleDateString('en-US', {
-//       month: 'short',
-//       day: 'numeric',
-//       year: 'numeric'
-//     });
-//   }
-// };
-
-// const getRelativeTime = (dateString) => {
-//   const date = new Date(dateString);
-//   const now = new Date();
-//   const diffMs = now - date;
-//   const diffMins = Math.floor(diffMs / (1000 * 60));
-//   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-//   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-//   if (diffMins < 1) return 'Just now';
-//   if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`;
-//   if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
-//   return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
-// };
-
-// const getMonthName = (monthIndex) => {
-//   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-//   return months[monthIndex];
-// };
-
-// // ==================== STATUS BADGES ====================
-
-// const InquiryStatusBadge = ({ status }) => {
-//   const config = {
-//     submitted: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Submitted', dot: 'bg-amber-500' },
-//     quoted: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Quoted', dot: 'bg-blue-500' },
-//     accepted: { bg: 'bg-emerald-100', text: 'text-emerald-700', label: 'Accepted', dot: 'bg-emerald-500' },
-//     invoiced: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Invoiced', dot: 'bg-purple-500' },
-//     paid: { bg: 'bg-green-100', text: 'text-green-700', label: 'Paid', dot: 'bg-green-500' },
-//     cancelled: { bg: 'bg-rose-100', text: 'text-rose-700', label: 'Cancelled', dot: 'bg-rose-500' }
-//   };
-
-//   const statusKey = status?.toLowerCase() || 'submitted';
-//   const { bg, text, label, dot } = config[statusKey] || config.submitted;
-
-//   return (
-//     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${bg}`}>
-//       <span className={`w-1.5 h-1.5 rounded-full ${dot}`}></span>
-//       <span className={`text-xs font-medium ${text}`}>{label}</span>
-//     </div>
-//   );
-// };
-
-// // ==================== STAT CARD COMPONENT ====================
-
-// const StatCard = ({ 
-//   title, 
-//   value, 
-//   icon: Icon, 
-//   color = 'jute', 
-//   subtitle,
-//   onClick,
-//   link,
-//   loading = false
-// }) => {
-//   const colors = {
-//     jute: {
-//       bg: `bg-gradient-to-br from-[${JUTE.secondary}] to-[${JUTE.background}]`,
-//       iconBg: JUTE.primary,
-//       iconColor: 'text-white',
-//       border: `border-[${JUTE.border}]`,
-//       text: `text-[${JUTE.primary}]`
-//     },
-//     emerald: {
-//       bg: 'bg-gradient-to-br from-emerald-50 to-emerald-100/50',
-//       iconBg: JUTE.accent,
-//       iconColor: 'text-white',
-//       border: 'border-emerald-200',
-//       text: 'text-emerald-700'
-//     },
-//     amber: {
-//       bg: 'bg-gradient-to-br from-amber-50 to-amber-100/50',
-//       iconBg: JUTE.accentLight,
-//       iconColor: 'text-white',
-//       border: 'border-amber-200',
-//       text: 'text-amber-700'
-//     },
-//     purple: {
-//       bg: 'bg-gradient-to-br from-purple-50 to-purple-100/50',
-//       iconBg: '#8B6B51',
-//       iconColor: 'text-white',
-//       border: 'border-purple-200',
-//       text: 'text-purple-700'
-//     },
-//     rose: {
-//       bg: 'bg-gradient-to-br from-rose-50 to-rose-100/50',
-//       iconBg: JUTE.warning,
-//       iconColor: 'text-white',
-//       border: 'border-rose-200',
-//       text: 'text-rose-700'
-//     },
-//     blue: {
-//       bg: 'bg-gradient-to-br from-blue-50 to-blue-100/50',
-//       iconBg: '#4A7C59',
-//       iconColor: 'text-white',
-//       border: 'border-blue-200',
-//       text: 'text-blue-700'
-//     }
-//   };
-
-//   const theme = colors[color] || colors.jute;
-
-//   const CardWrapper = ({ children }) => {
-//     if (link) {
-//       return (
-//         <Link href={link} className="block cursor-pointer h-full">
-//           {children}
-//         </Link>
-//       );
-//     }
-//     if (onClick) {
-//       return (
-//         <button onClick={onClick} className="w-full text-left cursor-pointer h-full">
-//           {children}
-//         </button>
-//       );
-//     }
-//     return <div className="h-full">{children}</div>;
-//   };
-
-//   return (
-//     <CardWrapper>
-//       <div className={`relative overflow-hidden rounded-xl border ${theme.border} ${theme.bg} p-4 hover:shadow-lg transition-all duration-300 group h-full flex flex-col ${(link || onClick) ? 'hover:scale-[1.02]' : ''}`}>
-//         <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full -translate-y-8 translate-x-8 group-hover:scale-110 transition-transform duration-500"></div>
-//         <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8 group-hover:scale-110 transition-transform duration-500"></div>
-        
-//         <div className="relative z-10 flex-1 flex flex-col">
-//           <div className="flex items-start justify-between mb-3">
-//             <div className={`p-2.5 rounded-xl shadow-lg`} style={{ backgroundColor: theme.iconBg }}>
-//               <Icon className={`w-4 h-4 ${theme.iconColor}`} />
-//             </div>
-//           </div>
-          
-//           {loading ? (
-//             <div className="space-y-2 flex-1">
-//               <div className="h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
-//               <div className="h-4 w-32 bg-gray-200 animate-pulse rounded"></div>
-//             </div>
-//           ) : (
-//             <>
-//               <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
-//               <p className={`text-xs font-medium ${theme.text} uppercase tracking-wider`}>{title}</p>
-//               {subtitle && <p className="text-[10px] text-gray-400 mt-2">{subtitle}</p>}
-//             </>
-//           )}
-//         </div>
-
-//         {(link || onClick) && (
-//           <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-//             <ArrowRight className="w-4 h-4 text-gray-400" />
-//           </div>
-//         )}
-//       </div>
-//     </CardWrapper>
-//   );
-// };
-
-// // ==================== QUICK ACTION CARD ====================
-
-// const QuickActionCard = ({ title, icon: Icon, description, href, color = 'jute' }) => {
-//   const colors = {
-//     jute: `bg-[${JUTE.secondary}] hover:bg-[${JUTE.border}] text-[${JUTE.primary}]`,
-//     emerald: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600',
-//     amber: 'bg-amber-50 hover:bg-amber-100 text-amber-600',
-//     purple: 'bg-purple-50 hover:bg-purple-100 text-purple-600'
-//   };
-
-//   return (
-//     <Link href={href} className="block">
-//       <div className={`flex items-center gap-3 p-3 rounded-xl bg-[${JUTE.secondary}] hover:bg-[${JUTE.border}] transition-all duration-200 hover:shadow-md`} style={{ backgroundColor: JUTE.secondary }}>
-//         <div className="p-2 bg-white rounded-lg shadow-sm">
-//           <Icon className="w-4 h-4" style={{ color: JUTE.primary }} />
-//         </div>
-//         <div className="flex-1 min-w-0">
-//           <p className="text-sm font-medium text-gray-900">{title}</p>
-//           <p className="text-xs text-gray-500 truncate">{description}</p>
-//         </div>
-//         <ArrowRight className="w-4 h-4 text-gray-400" />
-//       </div>
-//     </Link>
-//   );
-// };
-
-// // ==================== PRODUCT CARD ====================
-
-// const ProductCard = ({ product, onEdit }) => {
-//   const getProductName = () => {
-//     return product.productName || 'Unnamed Product';
-//   };
-
-//   const getProductCategory = () => {
-//     if (product.category && typeof product.category === 'object') {
-//       return product.category.name || 'Uncategorized';
-//     }
-//     return 'Uncategorized';
-//   };
-
-//   const getProductImage = () => {
-//     if (product.images && product.images.length > 0) {
-//       return product.images[0].url || product.images[0];
-//     }
-//     return null;
-//   };
-
-//   const getProductPrice = () => {
-//     return product.pricePerUnit || 0;
-//   };
-
-//   const getProductMOQ = () => {
-//     return product.moq || 100;
-//   };
-
-//   const productName = getProductName();
-//   const productCategory = getProductCategory();
-//   const productImage = getProductImage();
-//   const productPrice = getProductPrice();
-//   const productMOQ = getProductMOQ();
-
-//   return (
-//     <div className="bg-white rounded-xl border hover:shadow-md transition-all duration-300" style={{ borderColor: JUTE.border }}>
-//       <div className="aspect-square bg-[#FAF7F2] relative rounded-t-xl overflow-hidden">
-//         {productImage ? (
-//           <img 
-//             src={productImage} 
-//             alt={productName}
-//             className="w-full h-full object-cover"
-//             onError={(e) => {
-//               e.target.onerror = null;
-//               e.target.src = 'https://via.placeholder.com/200?text=No+Image';
-//             }}
-//           />
-//         ) : (
-//           <div className="w-full h-full flex items-center justify-center">
-//             <ImageIcon className="w-12 h-12" style={{ color: JUTE.textLight }} />
-//           </div>
-//         )}
-//       </div>
-      
-//       <div className="p-3">
-//         <h3 className="font-medium text-gray-900 truncate" style={{ fontFamily: 'Playfair Display, serif' }} title={productName}>
-//           {productName}
-//         </h3>
-//         <p className="text-xs text-gray-500 mt-1 truncate" title={productCategory}>
-//           {productCategory}
-//         </p>
-        
-//         <div className="flex items-center justify-between mt-2">
-//           <div>
-//             <p className="text-xs text-gray-500">Starting from</p>
-//             <p className="font-semibold" style={{ color: JUTE.primary }}>{formatPrice(productPrice)}</p>
-//           </div>
-//           <p className="text-xs text-gray-500">MOQ: {productMOQ} pcs</p>
-//         </div>
-        
-//         <div className="flex items-center gap-2 mt-3">
-//           <button
-//             onClick={() => onEdit(product)}
-//             className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs rounded-lg transition-colors"
-//             style={{ backgroundColor: JUTE.secondary, color: JUTE.primary }}
-//           >
-//             <Edit className="w-3 h-3" />
-//             Edit
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// // ==================== INQUIRY CARD (MODERATOR VIEW) ====================
-
-// // ==================== INQUIRY CARD (MODERATOR VIEW) ====================
-
-// const ModeratorInquiryCard = ({ inquiry }) => {
-//   const [showDetails, setShowDetails] = useState(false);
-
-//   const getCompanyName = () => {
-//     return inquiry.userDetails?.companyName || 
-//            inquiry.customer?.companyName || 
-//            'N/A';
-//   };
-
-//   const getContactPerson = () => {
-//     return inquiry.userDetails?.contactPerson || 
-//            inquiry.customer?.contactPerson || 
-//            'N/A';
-//   };
-
-//   const getWhatsApp = () => {
-//     return inquiry.userDetails?.whatsapp || 
-//            inquiry.customer?.whatsapp || 
-//            null;
-//   };
-
-//   const getItems = () => {
-//     return inquiry.items || [];
-//   };
-
-//   // Helper function to get unit label
-//   const getUnitLabel = (orderUnit) => {
-//     switch(orderUnit) {
-//       case 'kg': return 'kg';
-//       case 'ton': return 'MT';
-//       default: return 'pcs';
-//     }
-//   };
-
-//   // Format quantity with its unit
-//   const formatQuantity = (item) => {
-//     const unit = getUnitLabel(item.orderUnit);
-//     const quantity = item.totalQuantity || 0;
-//     return `${quantity} ${unit}`;
-//   };
-
-//   // Calculate total quantity with proper unit display (if all items have same unit)
-//   const getTotalQuantityDisplay = () => {
-//     const items = getItems();
-//     if (items.length === 0) return '0 pcs';
-    
-//     // Check if all items have the same unit
-//     const firstUnit = items[0]?.orderUnit;
-//     const allSameUnit = items.every(item => item.orderUnit === firstUnit);
-    
-//     if (allSameUnit && firstUnit) {
-//       const totalQty = items.reduce((sum, item) => sum + (item.totalQuantity || 0), 0);
-//       const unitLabel = getUnitLabel(firstUnit);
-//       return `${totalQty} ${unitLabel}`;
-//     }
-    
-//     // If different units, show as "X items"
-//     return `${items.length} items`;
-//   };
-
-//   const getSubtotal = () => {
-//     return inquiry.subtotal || 0;
-//   };
-
-//   const items = getItems();
-//   const totalQuantityDisplay = getTotalQuantityDisplay();
-
-//   return (
-//     <div className="bg-white rounded-xl border overflow-hidden hover:shadow-md transition-shadow" style={{ borderColor: JUTE.border }}>
-//       <div className="px-4 py-3 border-b" style={{ backgroundColor: JUTE.secondary, borderColor: JUTE.border }}>
-//         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-//           <div className="flex items-center gap-3">
-//             <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md" style={{ backgroundColor: JUTE.primary }}>
-//               <FileText className="w-4 h-4 text-white" />
-//             </div>
-//             <div>
-//               <div className="flex flex-wrap items-center gap-2">
-//                 <h3 className="font-semibold text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>{inquiry.inquiryNumber || 'N/A'}</h3>
-//                 <InquiryStatusBadge status={inquiry.status} />
-//               </div>
-//               <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mt-0.5">
-//                 <span>{formatDate(inquiry.createdAt)}</span>
-//                 <span>•</span>
-//                 <span>{items.length} products</span>
-//                 <span>•</span>
-//                 <span>{totalQuantityDisplay}</span>
-//               </div>
-//             </div>
-//           </div>
-          
-//           <button
-//             onClick={() => setShowDetails(!showDetails)}
-//             className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg transition-colors"
-//             style={{ backgroundColor: JUTE.background, color: JUTE.text }}
-//           >
-//             <Eye className="w-3.5 h-3.5" />
-//             {showDetails ? 'Hide Details' : 'View Details'}
-//           </button>
-//         </div>
-
-//         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
-//           <div className="flex items-center gap-1.5" style={{ color: JUTE.text }}>
-//             <Building2 className="w-3.5 h-3.5" style={{ color: JUTE.primary }} />
-//             <span className="truncate">{getCompanyName()}</span>
-//           </div>
-//           <div className="flex items-center gap-1.5" style={{ color: JUTE.text }}>
-//             <User className="w-3.5 h-3.5" style={{ color: JUTE.primary }} />
-//             <span className="truncate">{getContactPerson()}</span>
-//           </div>
-//         </div>
-//       </div>
-
-//       {showDetails && (
-//         <div className="p-4 border-b" style={{ borderColor: JUTE.border, backgroundColor: JUTE.background }}>
-//           <div className="mb-4">
-//             <h4 className="text-xs font-semibold text-gray-700 mb-2">Products</h4>
-//             <div className="space-y-2">
-//               {items.map((product, idx) => {
-//                 const unitLabel = getUnitLabel(product.orderUnit);
-//                 const quantity = product.totalQuantity || 0;
-//                 const isWeightBased = product.orderUnit === 'kg' || product.orderUnit === 'ton';
-                
-//                 return (
-//                   <div key={idx} className="bg-white rounded-lg p-3 border" style={{ borderColor: JUTE.border }}>
-//                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-//                       <div>
-//                         <p className="text-xs font-medium text-gray-900">
-//                           {product.productName || 'Product'}
-//                         </p>
-//                         <p className="text-xs text-gray-500 mt-0.5">
-//                           Unit: {unitLabel === 'pcs' ? 'Pieces' : unitLabel.toUpperCase()}
-//                         </p>
-//                       </div>
-//                       <div className="text-right">
-//                         <p className="text-xs font-semibold" style={{ color: JUTE.primary }}>
-//                           {quantity} {unitLabel}
-//                         </p>
-//                       </div>
-//                     </div>
-                    
-//                     {/* Show color details if available */}
-//                     {product.colors && product.colors.length > 0 && (
-//                       <div className="mt-2 pt-2 border-t" style={{ borderColor: JUTE.border }}>
-//                         <p className="text-[10px] text-gray-500 mb-1">Color Details:</p>
-//                         <div className="space-y-1">
-//                           {product.colors.map((color, cIdx) => {
-//                             let colorQuantity = 0;
-//                             if (isWeightBased) {
-//                               colorQuantity = color.quantity || color.totalQuantity || color.totalForColor || 0;
-//                             } else {
-//                               colorQuantity = color.sizeQuantities?.reduce((sum, sq) => sum + (sq.quantity || 0), 0) || 0;
-//                             }
-                            
-//                             if (colorQuantity === 0) return null;
-                            
-//                             return (
-//                               <div key={cIdx} className="flex items-center gap-2 text-[10px]">
-//                                 <div 
-//                                   className="w-3 h-3 rounded-full border border-gray-200"
-//                                   style={{ backgroundColor: color.color?.code || '#CCCCCC' }}
-//                                 />
-//                                 <span className="text-gray-600">
-//                               {colorQuantity} {unitLabel}
-//                                 </span>
-//                               </div>
-//                             );
-//                           })}
-//                         </div>
-//                       </div>
-//                     )}
-//                   </div>
-//                 );
-//               })}
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       <div className="px-4 py-2 flex flex-wrap items-center justify-between gap-2" style={{ backgroundColor: JUTE.background }}>
-//         <div className="flex items-center gap-4 text-xs">
-//           <span className="text-gray-500">Total Value:</span>
-//           <span className="font-semibold" style={{ color: JUTE.primary }}>{formatPrice(getSubtotal())}</span>
-//         </div>
-        
-//         {getWhatsApp() && (
-//           <button
-//             onClick={() => window.open(`https://wa.me/${getWhatsApp().replace(/[^0-9+]/g, '')}`, '_blank')}
-//             className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg transition-colors"
-//             style={{ backgroundColor: '#25D366', color: 'white' }}
-//           >
-//             <MessageCircle className="w-3.5 h-3.5" />
-//             WhatsApp Customer
-//           </button>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-// // ==================== MAIN MODERATOR DASHBOARD ====================
-
-// export default function ModeratorDashboardPage() {
-//   const [loading, setLoading] = useState(true);
-//   const [refreshing, setRefreshing] = useState(false);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [recentProducts, setRecentProducts] = useState([]);
+  const [pendingReviews, setPendingReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
   
-//   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-//   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-//   const [filterType, setFilterType] = useState('month');
-  
-//   const [products, setProducts] = useState([]);
-//   const [inquiries, setInquiries] = useState([]);
-//   const [stats, setStats] = useState({
-//     totalProducts: 0,
-//     totalInquiries: 0,
-//     pendingQuotations: 0,
-//     pendingInvoices: 0,
-//     submitted: 0,
-//     quoted: 0,
-//     accepted: 0,
-//     invoiced: 0,
-//     cancelled: 0
-//   });
+  // Filter states
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [filterType, setFilterType] = useState('month');
+  const [availableYears, setAvailableYears] = useState([]);
+  const [error, setError] = useState(null);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('all');
 
-//   const router = useRouter();
+  // Months array
+  const months = [
+    { value: 1, name: 'January' },
+    { value: 2, name: 'February' },
+    { value: 3, name: 'March' },
+    { value: 4, name: 'April' },
+    { value: 5, name: 'May' },
+    { value: 6, name: 'June' },
+    { value: 7, name: 'July' },
+    { value: 8, name: 'August' },
+    { value: 9, name: 'September' },
+    { value: 10, name: 'October' },
+    { value: 11, name: 'November' },
+    { value: 12, name: 'December' }
+  ];
 
-//   const fetchDashboardData = async () => {
-//     try {
-//       setLoading(true);
-//       const token = localStorage.getItem('token');
-//       if (!token) {
-//         router.push('/login');
-//         return;
-//       }
-
-//       let statsUrl = 'http://localhost:5000/api/moderator/inquiries?limit=10000';
-//       let recentUrl = 'http://localhost:5000/api/moderator/inquiries?limit=10';
+  // Fetch all products (PUBLIC route - no auth needed)
+  const fetchProductsData = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/products`, {
+        params: { limit: 999 }
+      });
       
-//       if (filterType === 'month') {
-//         statsUrl += `&year=${selectedYear}&month=${selectedMonth + 1}`;
-//         recentUrl += `&year=${selectedYear}&month=${selectedMonth + 1}`;
-//       } else if (filterType === 'year') {
-//         statsUrl += `&year=${selectedYear}`;
-//         recentUrl += `&year=${selectedYear}`;
-//       }
+      const products = response.data.data;
+      const totalProducts = products.length;
+      const activeProducts = products.filter(p => p.isActive).length;
+      const outOfStock = products.filter(p => p.stockQuantity === 0 && p.isActive).length;
+      const lowStock = products.filter(p => p.stockQuantity > 0 && p.stockQuantity <= 10).length;
+      const featured = products.filter(p => p.isFeatured).length;
+      const onSale = products.filter(p => p.discountPrice > 0 && p.discountPrice < p.regularPrice).length;
+      
+      // Get pending reviews count
+      const pendingReviewsCount = products.reduce((total, product) => {
+        return total + (product.reviews?.filter(r => !r.isApproved).length || 0);
+      }, 0);
+      
+      // Get recent products (last 5)
+      const recentProductsList = [...products]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
+        .map(p => ({
+          id: p._id,
+          name: p.productName,
+          price: p.discountPrice || p.regularPrice,
+          stock: p.stockQuantity,
+          image: p.images?.[0]?.url || '',
+          status: p.isActive ? 'Active' : 'Inactive'
+        }));
+      
+      // Get pending reviews list
+      const reviewsList = [];
+      products.forEach(product => {
+        if (product.reviews && product.reviews.length > 0) {
+          product.reviews.forEach(review => {
+            if (!review.isApproved) {
+              reviewsList.push({
+                id: review._id,
+                productId: product._id,
+                productName: product.productName,
+                userName: review.userName,
+                rating: review.rating,
+                comment: review.comment,
+                date: review.createdAt
+              });
+            }
+          });
+        }
+      });
+      
+      return { 
+        totalProducts, 
+        activeProducts, 
+        outOfStock, 
+        lowStock, 
+        featured, 
+        onSale,
+        pendingReviews: pendingReviewsCount,
+        recentProducts: recentProductsList,
+        pendingReviewsList: reviewsList.slice(0, 5)
+      };
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      return { 
+        totalProducts: 0, 
+        activeProducts: 0, 
+        outOfStock: 0, 
+        lowStock: 0, 
+        featured: 0, 
+        onSale: 0,
+        pendingReviews: 0,
+        recentProducts: [],
+        pendingReviewsList: []
+      };
+    }
+  };
 
-//       const statsResponse = await fetch(statsUrl, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       });
+  // Fetch orders data (Moderator can access /api/orders/admin/all)
+  const fetchOrdersData = async () => {
+    try {
+      const token = localStorage.getItem('token');
       
-//       const statsData = await statsResponse.json();
-
-//       const recentResponse = await fetch(recentUrl, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       });
+      if (!token) {
+        console.error('No token found');
+        return {
+          orders: { placed: 0, confirmed: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0, total: 0 },
+          revenue: 0,
+          recentOrders: []
+        };
+      }
       
-//       const recentData = await recentResponse.json();
+      // Build date range based on filter
+      let startDate, endDate;
       
-//       const productsResponse = await fetch('http://localhost:5000/api/products?limit=1000&includeInactive=true', {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       });
+      if (filterType === 'month') {
+        startDate = new Date(selectedYear, selectedMonth - 1, 1);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(selectedYear, selectedMonth, 0);
+        endDate.setHours(23, 59, 59, 999);
+      } else {
+        startDate = new Date(selectedYear, 0, 1);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(selectedYear, 11, 31);
+        endDate.setHours(23, 59, 59, 999);
+      }
       
-//       const productsData = await productsResponse.json();
-
-//       if (statsData.success) {
-//         const apiStats = statsData.data?.stats || [];
+      const params = {
+        limit: 999,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+      
+      // This endpoint is accessible by moderators (isModeratorOrAdmin)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders/admin/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params
+      });
+      
+      if (response.data.success) {
+        const orders = response.data.data;
         
-//         const submittedCount = apiStats.find(s => s._id === 'submitted')?.count || 0;
-//         const quotedCount = apiStats.find(s => s._id === 'quoted')?.count || 0;
-//         const acceptedCount = apiStats.find(s => s._id === 'accepted')?.count || 0;
-//         const invoicedCount = apiStats.find(s => s._id === 'invoiced')?.count || 0;
-//         const paidCount = apiStats.find(s => s._id === 'paid')?.count || 0;
-//         const cancelledCount = apiStats.find(s => s._id === 'cancelled')?.count || 0;
+        // Calculate order status counts
+        const placedOrders = orders.filter(o => o.orderStatus === 'placed').length;
+        const confirmedOrders = orders.filter(o => o.orderStatus === 'confirmed').length;
+        const processingOrders = orders.filter(o => o.orderStatus === 'processing').length;
+        const shippedOrders = orders.filter(o => o.orderStatus === 'shipped').length;
+        const deliveredOrders = orders.filter(o => o.orderStatus === 'delivered').length;
+        const cancelledOrders = orders.filter(o => o.orderStatus === 'cancelled').length;
         
-//         const totalInquiries = statsData.data?.pagination?.total || 0;
-//         const pendingQuotations = submittedCount;
-//         const pendingInvoices = acceptedCount;
+        // Calculate revenue from paid orders only
+        const paidOrders = orders.filter(order => order.paymentStatus === 'paid');
+        const filteredRevenue = paidOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+        
+        // Get recent orders with search filter
+        let filteredOrders = orders;
+        if (searchTerm) {
+          filteredOrders = orders.filter(order => 
+            order.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.customerInfo?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.customerInfo?.phone?.includes(searchTerm)
+          );
+        }
+        if (selectedStatus !== 'all') {
+          filteredOrders = filteredOrders.filter(order => order.orderStatus === selectedStatus);
+        }
+        
+        const recentFilteredOrders = filteredOrders.slice(0, 10);
+        
+        return {
+          orders: {
+            placed: placedOrders,
+            confirmed: confirmedOrders,
+            processing: processingOrders,
+            shipped: shippedOrders,
+            delivered: deliveredOrders,
+            cancelled: cancelledOrders,
+            total: orders.length
+          },
+          revenue: filteredRevenue,
+          recentOrders: recentFilteredOrders
+        };
+      }
+      
+      return {
+        orders: { placed: 0, confirmed: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0, total: 0 },
+        revenue: 0,
+        recentOrders: []
+      };
+    } catch (err) {
+      console.error('Error fetching orders data:', err);
+      if (err.response?.status === 403) {
+        console.error('Access denied. Make sure you are logged in as moderator or admin.');
+      }
+      return {
+        orders: { placed: 0, confirmed: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0, total: 0 },
+        revenue: 0,
+        recentOrders: []
+      };
+    }
+  };
 
-//         setStats({
-//           totalProducts: productsData.pagination?.total || productsData.data?.length || 0,
-//           totalInquiries,
-//           pendingQuotations,
-//           pendingInvoices,
-//           submitted: submittedCount,
-//           quoted: quotedCount,
-//           accepted: acceptedCount,
-//           invoiced: invoicedCount,
-//           paid: paidCount,
-//           cancelled: cancelledCount
-//         });
-//       }
-
-//       if (recentData.success) {
-//         setInquiries(recentData.data?.inquiries || []);
-//       }
-
-//       if (productsData.success) {
-//         setProducts(productsData.data || []);
-//       }
-
-//     } catch (error) {
-//       console.error('Error fetching dashboard data:', error);
-//       toast.error('Failed to load dashboard data');
-//     } finally {
-//       setLoading(false);
-//       setRefreshing(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchDashboardData();
-//   }, [filterType, selectedMonth, selectedYear]);
-
-//   const handleRefresh = () => {
-//     setRefreshing(true);
-//     fetchDashboardData();
-//   };
-
-//   const handleMonthChange = (increment) => {
-//     let newMonth = selectedMonth + increment;
-//     let newYear = selectedYear;
+  // Load all data
+  const loadDashboardData = async () => {
+    setLoading(true);
+    setError(null);
     
-//     if (newMonth < 0) {
-//       newMonth = 11;
-//       newYear = selectedYear - 1;
-//     } else if (newMonth > 11) {
-//       newMonth = 0;
-//       newYear = selectedYear + 1;
-//     }
-    
-//     setSelectedMonth(newMonth);
-//     setSelectedYear(newYear);
-//     setFilterType('month');
-//   };
+    try {
+      const [productsData, ordersData] = await Promise.all([
+        fetchProductsData(),
+        fetchOrdersData()
+      ]);
+      
+      setStats({
+        totalProducts: productsData.totalProducts,
+        products: {
+          active: productsData.activeProducts,
+          outOfStock: productsData.outOfStock,
+          lowStock: productsData.lowStock,
+          featured: productsData.featured,
+          onSale: productsData.onSale,
+          pendingReviews: productsData.pendingReviews
+        },
+        orders: ordersData.orders,
+        revenue: {
+          filtered: ordersData.revenue
+        }
+      });
+      
+      setRecentProducts(productsData.recentProducts);
+      setRecentOrders(ordersData.recentOrders);
+      setPendingReviews(productsData.pendingReviewsList);
+      
+      // Generate available years (last 5 years)
+      const currentYear = new Date().getFullYear();
+      const years = [];
+      for (let i = currentYear; i >= currentYear - 5; i--) {
+        years.push(i);
+      }
+      setAvailableYears(years);
+      
+    } catch (err) {
+      console.error('Error loading dashboard:', err);
+      setError('Failed to load dashboard data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//   const handleYearChange = (increment) => {
-//     setSelectedYear(selectedYear + increment);
-//     setFilterType('year');
-//   };
+  // Load data when filters change
+  useEffect(() => {
+    loadDashboardData();
+  }, [selectedYear, selectedMonth, filterType, searchTerm, selectedStatus]);
 
-//   const handleFilterTypeChange = (type) => {
-//     setFilterType(type);
-//   };
+  // Initial load
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
 
-//   const handleEditProduct = (product) => {
-//     router.push(`/moderator/editProduct?id=${product._id}`);
-//   };
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'BDT',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
 
-//   const handleAddProduct = () => {
-//     router.push('/moderator/products/new');
-//   };
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
-//   const getFilterDisplayText = () => {
-//     if (filterType === 'all') {
-//       return 'All Time';
-//     } else if (filterType === 'year') {
-//       return `Year: ${selectedYear}`;
-//     } else {
-//       return `${getMonthName(selectedMonth)} ${selectedYear}`;
-//     }
-//   };
+  const getStatusColor = (status) => {
+    const colors = {
+      placed: 'bg-yellow-100 text-yellow-800',
+      confirmed: 'bg-blue-100 text-blue-800',
+      processing: 'bg-purple-100 text-purple-800',
+      shipped: 'bg-indigo-100 text-indigo-800',
+      delivered: 'bg-green-100 text-green-800',
+      cancelled: 'bg-red-100 text-red-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
 
-//   if (loading) {
-//     return (
-//       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: JUTE.background }}>
-//         <div className="text-center">
-//           <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4" style={{ color: JUTE.primary }} />
-//           <p className="text-sm text-gray-500">Loading moderator dashboard...</p>
-//         </div>
-//       </div>
-//     );
-//   }
+  const getStatusLabel = (status) => {
+    const labels = {
+      placed: 'Placed',
+      confirmed: 'Confirmed',
+      processing: 'Processing',
+      shipped: 'Shipped',
+      delivered: 'Delivered',
+      cancelled: 'Cancelled'
+    };
+    return labels[status] || status;
+  };
 
-//   return (
-//     <div className="min-h-screen" style={{ backgroundColor: JUTE.background }}>
-//       {/* Header */}
-//       <div className="bg-white border-b sticky top-20 z-10" style={{ borderColor: JUTE.border }}>
-//         <div className="container mx-auto px-3 sm:px-4 max-w-7xl py-3 sm:py-4">
-//           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-//             <div>
-//               <h1 className="text-xl sm:text-2xl font-bold" style={{ color: JUTE.text, fontFamily: 'Playfair Display, serif' }}>Moderator Dashboard</h1>
-//               <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-0.5">
-//                 Manage products and view inquiries
-//               </p>
-//             </div>
-            
-//             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-//               <div className="flex items-center gap-0.5 sm:gap-1 border rounded-lg overflow-hidden" style={{ borderColor: JUTE.border }}>
-//                 <button
-//                   onClick={() => handleFilterTypeChange('all')}
-//                   className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
-//                     filterType === 'all' 
-//                       ? 'text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
-//                   }`}
-//                   style={filterType === 'all' ? { backgroundColor: JUTE.primary } : {}}
-//                 >
-//                   All
-//                 </button>
-//                 <button
-//                   onClick={() => handleFilterTypeChange('year')}
-//                   className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
-//                     filterType === 'year' 
-//                       ? 'text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
-//                   }`}
-//                   style={filterType === 'year' ? { backgroundColor: JUTE.primary } : {}}
-//                 >
-//                   Year
-//                 </button>
-//                 <button
-//                   onClick={() => handleFilterTypeChange('month')}
-//                   className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
-//                     filterType === 'month' 
-//                       ? 'text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
-//                   }`}
-//                   style={filterType === 'month' ? { backgroundColor: JUTE.primary } : {}}
-//                 >
-//                   Month
-//                 </button>
-//               </div>
+  const getFilterLabel = () => {
+    if (filterType === 'month') {
+      const month = months.find(m => m.value === selectedMonth);
+      return `${month?.name} ${selectedYear}`;
+    } else {
+      return `Year ${selectedYear}`;
+    }
+  };
 
-//               {filterType === 'month' && (
-//                 <div className="flex items-center gap-0.5 sm:gap-1 border rounded-lg overflow-hidden" style={{ borderColor: JUTE.border }}>
-//                   <button
-//                     onClick={() => handleMonthChange(-1)}
-//                     className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-//                   >
-//                     <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-//                   </button>
-//                   <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium bg-white text-gray-700 border-x whitespace-nowrap" style={{ borderColor: JUTE.border }}>
-//                     {getMonthName(selectedMonth)} {selectedYear}
-//                   </span>
-//                   <button
-//                     onClick={() => handleMonthChange(1)}
-//                     className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-//                   >
-//                     <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
-//                   </button>
-//                 </div>
-//               )}
+  const getStockBadge = (stock) => {
+    if (stock <= 0) return <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">Out of Stock</span>;
+    if (stock <= 10) return <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700">Low Stock</span>;
+    return <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">In Stock</span>;
+  };
 
-//               {filterType === 'year' && (
-//                 <div className="flex items-center gap-0.5 sm:gap-1 border rounded-lg overflow-hidden" style={{ borderColor: JUTE.border }}>
-//                   <button
-//                     onClick={() => handleYearChange(-1)}
-//                     className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-//                   >
-//                     <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-//                   </button>
-//                   <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium bg-white text-gray-700 border-x" style={{ borderColor: JUTE.border }}>
-//                     {selectedYear}
-//                   </span>
-//                   <button
-//                     onClick={() => handleYearChange(1)}
-//                     className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-//                   >
-//                     <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
-//                   </button>
-//                 </div>
-//               )}
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading moderator dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
-//               <button
-//                 onClick={handleRefresh}
-//                 disabled={refreshing}
-//                 className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1 sm:py-2 text-[10px] sm:text-sm rounded-lg transition-colors"
-//                 style={{ backgroundColor: JUTE.secondary, color: JUTE.text }}
-//               >
-//                 <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-//                 <span className="hidden xs:inline">Refresh</span>
-//               </button>
-              
-//               <button
-//                 onClick={() => router.push('/moderator/settings')}
-//                 className="p-1.5 sm:p-2 rounded-lg transition-colors"
-//                 style={{ color: JUTE.text }}
-//               >
-//                 <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-//               </button>
-//             </div>
-//           </div>
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+        <div className="text-center bg-red-50 p-6 rounded-xl max-w-md w-full">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600">{error}</p>
+          <button
+            onClick={loadDashboardData}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-//           <p className="text-[10px] sm:text-xs text-gray-500 mt-2 flex items-center gap-1">
-//             <CalendarRange className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-//             Showing data for: <span className="font-medium" style={{ color: JUTE.primary }}>{getFilterDisplayText()}</span>
-//           </p>
-//         </div>
-//       </div>
-
-//       {/* Main Content */}
-//       <div className="container mx-auto px-4 max-w-7xl py-4">
-//         {/* Stats Cards */}
-//         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
-//           <StatCard
-//             title="Total Products"
-//             value={stats.totalProducts}
-//             icon={Package}
-//             color="blue"
-//             subtitle="In catalog"
-//             link="/moderator/all-products"
-//           />
-//           <StatCard
-//             title="Total Inquiries"
-//             value={stats.totalInquiries}
-//             icon={Inbox}
-//             color="purple"
-//             subtitle={`${filterType !== 'all' ? getFilterDisplayText() : 'All time'}`}
-//             link="/moderator/inquiries"
-//           />
-//           <StatCard
-//             title="Pending Quotations"
-//             value={stats.pendingQuotations}
-//             icon={Clock}
-//             color="amber"
-//             subtitle="Awaiting quote"
-//             link="/moderator/inquiries?filter=submitted"
-//           />
-//           <StatCard
-//             title="Quoted"
-//             value={stats.quoted}
-//             icon={FileText}
-//             color="blue"
-//             subtitle="Awaiting customer"
-//             link="/moderator/inquiries?filter=quoted"
-//           />
-//           <StatCard
-//             title="Pending Invoices"
-//             value={stats.pendingInvoices}
-//             icon={CreditCard}
-//             color="rose"
-//             subtitle="Ready to invoice"
-//             link="/moderator/inquiries?filter=accepted"
-//           />
-//           <StatCard
-//             title="Invoiced"
-//             value={stats.invoiced}
-//             icon={CheckCircle}
-//             color="emerald"
-//             subtitle="Invoices sent"
-//             link="/moderator/inquiries?filter=invoiced"
-//           />
-//         </div>
-
-//         {/* Recent Products */}
-//         <div className="mb-6">
-//           <div className="flex items-center justify-between mb-3">
-//             <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//               <Package className="w-4 h-4" style={{ color: JUTE.primary }} />
-//               Recent Products
-//             </h2>
-//             <Link 
-//               href="/moderator/all-products" 
-//               className="text-xs font-medium flex items-center gap-1" 
-//               style={{ color: JUTE.primary }}
-//             >
-//               View all
-//               <ArrowRight className="w-3 h-3" />
-//             </Link>
-//           </div>
-          
-//           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-//             {products.slice(0, 5).map((product) => (
-//               <ProductCard
-//                 key={product._id}
-//                 product={product}
-//                 onEdit={handleEditProduct}
-//               />
-//             ))}
-//             {products.length === 0 && (
-//               <div className="col-span-full p-8 text-center bg-white rounded-xl border" style={{ borderColor: JUTE.border }}>
-//                 <Package className="w-12 h-12 mx-auto mb-3" style={{ color: JUTE.textLight }} />
-//                 <p className="text-sm text-gray-500">No products yet</p>
-//                 <button
-//                   onClick={handleAddProduct}
-//                   className="mt-2 text-xs font-medium"
-//                   style={{ color: JUTE.primary }}
-//                 >
-//                   Add your first product
-//                 </button>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Recent Inquiries */}
-//         <div className="mb-6">
-//           <div className="flex items-center justify-between mb-3">
-//             <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//               <Inbox className="w-4 h-4" style={{ color: JUTE.primary }} />
-//               Recent Inquiries
-//             </h2>
-//             <Link 
-//               href="/moderator/inquiries" 
-//               className="text-xs font-medium flex items-center gap-1" 
-//               style={{ color: JUTE.primary }}
-//             >
-//               View all
-//               <ArrowRight className="w-3 h-3" />
-//             </Link>
-//           </div>
-          
-//           <div className="space-y-3">
-//             {inquiries.slice(0, 5).map((inquiry) => (
-//               <ModeratorInquiryCard
-//                 key={inquiry._id}
-//                 inquiry={inquiry}
-//               />
-//             ))}
-//             {inquiries.length === 0 && (
-//               <div className="p-8 text-center bg-white rounded-xl border" style={{ borderColor: JUTE.border }}>
-//                 <Inbox className="w-12 h-12 mx-auto mb-3" style={{ color: JUTE.textLight }} />
-//                 <p className="text-sm text-gray-500">No inquiries yet</p>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Quick Actions */}
-//         <div className="mb-6">
-//           <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//             <Zap className="w-4 h-4" style={{ color: JUTE.primary }} />
-//             Quick Actions
-//           </h2>
-//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-//             <QuickActionCard
-//               title="Add New Product"
-//               description="Create product listing"
-//               icon={PlusCircle}
-//               href="/moderator/create-products"
-//               color="jute"
-//             />
-//             <QuickActionCard
-//               title="Manage Products"
-//               description="Edit or update products"
-//               icon={Package}
-//               href="/moderator/all-products"
-//               color="jute"
-//             />
-//             <QuickActionCard
-//               title="View Inquiries"
-//               description="Check customer requests"
-//               icon={Inbox}
-//               href="/moderator/inquiries"
-//               color="jute"
-//             />
-//             <QuickActionCard
-//               title="Create Blog"
-//               description="Create blog posts"
-//               icon={FileText}
-//               href="/moderator/create-blog"
-//               color="jute"
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-import React from 'react'
-
-export default function dashboard() {
   return (
-    <div>
-      moderator dashboard
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Moderator Dashboard</h1>
+                <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Moderator Access</span>
+              </div>
+              <p className="text-gray-500 text-sm mt-1">
+                Manage products, track orders, and moderate reviews.
+              </p>
+            </div>
+         
+          </div>
+        </div>
+      </div>
+
+  
+
+      <div className="p-4 sm:p-6">
+        {/* Filter Section */}
+        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+              <div className="flex gap-2 bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
+                <button
+                  onClick={() => setFilterType('month')}
+                  className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    filterType === 'month' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setFilterType('year')}
+                  className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    filterType === 'year' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Yearly
+                </button>
+              </div>
+
+              {filterType === 'month' && (
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  <select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto"
+                  >
+                    {months.map(month => (
+                      <option key={month.value} value={month.value}>
+                        {month.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto"
+                  >
+                    {availableYears.map(year => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {filterType === 'year' && (
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto"
+                >
+                  {availableYears.map(year => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 w-full lg:w-auto justify-start lg:justify-end">
+              <Calendar className="h-5 w-5 text-gray-400 flex-shrink-0" />
+              <span className="text-sm text-gray-600">
+                Showing: <strong className="text-gray-800">{getFilterLabel()}</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-4 sm:p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-100 text-xs sm:text-sm">Total Products</p>
+                <p className="text-xl sm:text-3xl font-bold mt-1">{stats.totalProducts}</p>
+                <p className="text-blue-100 text-xs mt-2">In catalog</p>
+              </div>
+              <div className="h-10 w-10 sm:h-12 sm:w-12 bg-white/20 rounded-lg flex items-center justify-center">
+                <Package className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-4 sm:p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-100 text-xs sm:text-sm">Total Orders</p>
+                <p className="text-xl sm:text-3xl font-bold mt-1">{stats.orders.total}</p>
+                <p className="text-green-100 text-xs mt-2">All time orders</p>
+              </div>
+              <div className="h-10 w-10 sm:h-12 sm:w-12 bg-white/20 rounded-lg flex items-center justify-center">
+                <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg p-4 sm:p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100 text-xs sm:text-sm">Revenue ({getFilterLabel()})</p>
+                <p className="text-xl sm:text-3xl font-bold mt-1">{formatCurrency(stats.revenue.filtered)}</p>
+                <p className="text-purple-100 text-xs mt-2">From paid orders</p>
+              </div>
+              <div className="h-10 w-10 sm:h-12 sm:w-12 bg-white/20 rounded-lg flex items-center justify-center">
+                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg p-4 sm:p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-orange-100 text-xs sm:text-sm">Pending Reviews</p>
+                <p className="text-xl sm:text-3xl font-bold mt-1">{stats.products.pendingReviews}</p>
+                <p className="text-orange-100 text-xs mt-2">Awaiting moderation</p>
+              </div>
+              <div className="h-10 w-10 sm:h-12 sm:w-12 bg-white/20 rounded-lg flex items-center justify-center">
+                <Star className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Status Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Order Status Overview</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-yellow-50 rounded-lg p-3 sm:p-4 border border-yellow-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-yellow-600 text-xs sm:text-sm">Placed</p>
+                    <p className="text-xl sm:text-2xl font-bold text-yellow-700">{stats.orders.placed}</p>
+                  </div>
+                  <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500" />
+                </div>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-3 sm:p-4 border border-blue-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-600 text-xs sm:text-sm">Confirmed</p>
+                    <p className="text-xl sm:text-2xl font-bold text-blue-700">{stats.orders.confirmed}</p>
+                  </div>
+                  <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
+                </div>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-3 sm:p-4 border border-purple-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-600 text-xs sm:text-sm">Processing</p>
+                    <p className="text-xl sm:text-2xl font-bold text-purple-700">{stats.orders.processing}</p>
+                  </div>
+                  <Package className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500" />
+                </div>
+              </div>
+              <div className="bg-indigo-50 rounded-lg p-3 sm:p-4 border border-indigo-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-indigo-600 text-xs sm:text-sm">Shipped</p>
+                    <p className="text-xl sm:text-2xl font-bold text-indigo-700">{stats.orders.shipped}</p>
+                  </div>
+                  <Truck className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-500" />
+                </div>
+              </div>
+              <div className="bg-green-50 rounded-lg p-3 sm:p-4 border border-green-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-600 text-xs sm:text-sm">Delivered</p>
+                    <p className="text-xl sm:text-2xl font-bold text-green-700">{stats.orders.delivered}</p>
+                  </div>
+                  <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
+                </div>
+              </div>
+              <div className="bg-red-50 rounded-lg p-3 sm:p-4 border border-red-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-red-600 text-xs sm:text-sm">Cancelled</p>
+                    <p className="text-xl sm:text-2xl font-bold text-red-700">{stats.orders.cancelled}</p>
+                  </div>
+                  <XCircle className="h-6 w-6 sm:h-8 sm:w-8 text-red-500" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Overview</h2>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600">Active Products</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.products.active}</p>
+                </div>
+                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Package className="h-5 w-5 text-green-600" />
+                </div>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600">Low Stock Alert</p>
+                  <p className="text-2xl font-bold text-orange-600">{stats.products.lowStock}</p>
+                </div>
+                <div className="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-5 w-5 text-orange-600" />
+                </div>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600">Featured Products</p>
+                  <p className="text-2xl font-bold text-purple-600">{stats.products.featured}</p>
+                </div>
+                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Star className="h-5 w-5 text-purple-600" />
+                </div>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600">Products on Sale</p>
+                  <p className="text-2xl font-bold text-blue-600">{stats.products.onSale}</p>
+                </div>
+                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                </div>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600">Out of Stock</p>
+                  <p className="text-2xl font-bold text-red-600">{stats.products.outOfStock}</p>
+                </div>
+                <div className="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Products and Pending Reviews */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Recent Products */}
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Recent Products</h2>
+           <button 
+  onClick={() => router.push('/moderator/all-products')}
+  className="text-blue-600 hover:text-blue-700 text-sm"
+>
+  View All
+</button>
+            </div>
+            <div className="space-y-3">
+              {recentProducts.map((product, index) => (
+                <div key={product.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-xs">
+                    {index + 1}
+                  </div>
+                  {product.image ? (
+                    <img src={product.image} alt={product.name} className="w-12 h-12 rounded-lg object-cover" />
+                  ) : (
+                    <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <Package className="h-6 w-6 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-800 text-sm truncate">{product.name}</p>
+                    <p className="text-xs text-gray-500">{formatCurrency(product.price)}</p>
+                  </div>
+                  <div className="text-right">
+                    {getStockBadge(product.stock)}
+                    <button className="ml-2 text-blue-600 hover:text-blue-800">
+                      <Edit className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {recentProducts.length === 0 && (
+                <p className="text-center text-gray-500 py-8">No products found</p>
+              )}
+            </div>
+          </div>
+
+          {/* Pending Reviews */}
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Pending Reviews</h2>
+        <button 
+  onClick={() => router.push('/moderator/manage-reviews')}
+  className="text-blue-600 hover:text-blue-700 text-sm"
+>
+  Moderate All
+</button>
+            </div>
+            <div className="space-y-3">
+              {pendingReviews.map((review) => (
+                <div key={review.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-medium text-gray-800 text-sm">{review.userName}</p>
+                      <p className="text-xs text-gray-500">on {review.productName}</p>
+                    </div>
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`h-3 w-3 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">{review.comment}</p>
+                
+                </div>
+              ))}
+              {pendingReviews.length === 0 && (
+                <p className="text-center text-gray-500 py-8">No pending reviews</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Search and Filter Bar for Orders */}
+        <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by order ID, customer name, or phone..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">All Status</option>
+              <option value="placed">Placed</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Recent Orders Table - Desktop */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <h2 className="text-lg font-semibold text-gray-800">Recent Orders ({getFilterLabel()})</h2>
+              <button 
+  onClick={() => router.push('/moderator/orders')}
+  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+>
+  View All Orders
+</button>
+            </div>
+          </div>
+          
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {recentOrders.map((order) => (
+                  <tr key={order._id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                      {order.orderNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{order.customerInfo?.fullName}</div>
+                      <div className="text-xs text-gray-500">{order.customerInfo?.phone}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                      {formatCurrency(order.total)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        order.paymentMethod === 'cod' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                      }`}>
+                        {order.paymentMethod === 'cod' ? 'COD' : 'Online'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.orderStatus)}`}>
+                        {getStatusLabel(order.orderStatus)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(order.createdAt)}
+                    </td>
+                  
+                  </tr>
+                ))}
+                {recentOrders.length === 0 && (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                      No orders found for {getFilterLabel()}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden divide-y divide-gray-200">
+            {recentOrders.map((order) => (
+              <div key={order._id} className="p-4 hover:bg-gray-50 transition">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-sm font-medium text-blue-600">{order.orderNumber}</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.orderStatus)}`}>
+                    {getStatusLabel(order.orderStatus)}
+                  </span>
+                </div>
+                <div className="mb-2">
+                  <p className="text-sm text-gray-900 font-medium">{order.customerInfo?.fullName}</p>
+                  <p className="text-xs text-gray-500">{order.customerInfo?.phone}</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      order.paymentMethod === 'cod' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                    }`}>
+                      {order.paymentMethod === 'cod' ? 'COD' : 'Online'}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-gray-900">{formatCurrency(order.total)}</p>
+                    <p className="text-xs text-gray-500">{formatDate(order.createdAt)}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {recentOrders.length === 0 && (
+              <div className="p-8 text-center text-gray-500">
+                No orders found for {getFilterLabel()}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Summary Footer */}
+        <div className="mt-6 bg-white rounded-xl shadow-sm p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <p className="text-2xl font-bold text-blue-600">{stats.orders.delivered}</p>
+              <p className="text-xs text-gray-500">Delivered Orders</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-yellow-600">{stats.orders.placed + stats.orders.confirmed + stats.orders.processing + stats.orders.shipped}</p>
+              <p className="text-xs text-gray-500">Order Placed</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-green-600">{stats.products.active}</p>
+              <p className="text-xs text-gray-500">Active Products</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-purple-600">{stats.products.featured}</p>
+              <p className="text-xs text-gray-500">Featured Items</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  )
+  );
 }

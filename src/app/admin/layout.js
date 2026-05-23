@@ -1196,10 +1196,10 @@ export default function AdminLayout({ children }) {
     }
     
     // Manage Certifications
-    if (href === '/admin/certifications') {
-      if (currentPath === '/admin/certifications') return true;
-      return false;
-    }
+    // if (href === '/admin/certifications') {
+    //   if (currentPath === '/admin/certifications') return true;
+    //   return false;
+    // }
     
     // Create Users
     if (href === '/admin/create-users') {
@@ -1311,7 +1311,7 @@ export default function AdminLayout({ children }) {
     { name: 'Create Category', href: '/admin/create-categories', icon: FolderPlus, color: '#4A8A90' },
     { name: 'Create Coupon', href: '/admin/coupon', icon: Ticket, color: '#4A8A90' },
     { name: 'Delivery Settings', href: '/admin/delivery-settings', icon: Truck, color: '#4A8A90' }, 
-    { name: 'Manage Certifications', href: '/admin/certifications', icon: Award, color: '#4A8A90' },
+    // { name: 'Manage Certifications', href: '/admin/certifications', icon: Award, color: '#4A8A90' },
     { name: 'Create Users', href: '/admin/create-users', icon: UserPlus, color: '#4A8A90' },
     { name: 'Manage Users', href: '/admin/manage-users', icon: UserCog, color: '#4A8A90' },
     { name: 'Create & Manage Customers', href: '/admin/all-customers', icon: Users, color: '#4A8A90' },

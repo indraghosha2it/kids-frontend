@@ -1,187 +1,3 @@
-// // app/productDetails/MetadataUpdater.jsx
-// 'use client';
-
-// import { useEffect } from 'react';
-
-// export default function MetadataUpdater({ product }) {
-//   useEffect(() => {
-//     if (!product) return;
-    
-//     const updateMetadata = () => {
-//       try {
-//         // Get SEO data from product metaSettings or generate fallback
-//         const metaTitle = product.metaSettings?.metaTitle || `${product.productName} - Asian Clothify`;
-//         const metaDescription = product.metaSettings?.metaDescription || 
-//           `Shop ${product.productName}. ${product.fabric || 'Premium quality'} clothing. MOQ: ${product.moq} pieces.`;
-        
-//         const metaKeywords = product.metaSettings?.metaKeywords || [
-//           product.productName,
-//           product.category?.name,
-//           product.fabric,
-//           'clothing',
-//           'fashion'
-//         ].filter(Boolean);
-        
-//         // Get primary image
-//         const primaryImage = product.images?.find(img => img.isPrimary)?.url || 
-//                              product.images?.[0]?.url || 
-//                              '/product-default-og.jpg';
-        
-//         // Update document title
-//         document.title = metaTitle;
-        
-//         // Helper function to update or create meta tags
-//         const updateOrCreateMetaTag = (name, content, isProperty = false) => {
-//           if (!content) return;
-          
-//           let meta;
-//           if (isProperty) {
-//             meta = document.querySelector(`meta[property="${name}"]`);
-//           } else {
-//             meta = document.querySelector(`meta[name="${name}"]`);
-//           }
-          
-//           if (meta) {
-//             meta.setAttribute('content', content);
-//           } else {
-//             meta = document.createElement('meta');
-//             if (isProperty) {
-//               meta.setAttribute('property', name);
-//             } else {
-//               meta.setAttribute('name', name);
-//             }
-//             meta.setAttribute('content', content);
-//             document.head.appendChild(meta);
-//           }
-//         };
-        
-//         // Update basic meta tags
-//         updateOrCreateMetaTag('description', metaDescription);
-//         updateOrCreateMetaTag('keywords', metaKeywords.join(', '));
-        
-//         // Open Graph tags
-//         updateOrCreateMetaTag('og:title', metaTitle, true);
-//         updateOrCreateMetaTag('og:description', metaDescription, true);
-//         updateOrCreateMetaTag('og:url', `https://asianclothify.com/productDetails?id=${product._id}`, true);
-//         updateOrCreateMetaTag('og:image', primaryImage, true);
-//         updateOrCreateMetaTag('og:type', 'product', true);
-        
-//         // Twitter tags
-//         updateOrCreateMetaTag('twitter:title', metaTitle);
-//         updateOrCreateMetaTag('twitter:description', metaDescription);
-//         updateOrCreateMetaTag('twitter:image', primaryImage);
-        
-//         // Canonical link
-//         let canonical = document.querySelector('link[rel="canonical"]');
-//         if (canonical) {
-//           canonical.setAttribute('href', `https://asianclothify.com/productDetails?id=${product._id}`);
-//         } else {
-//           canonical = document.createElement('link');
-//           canonical.setAttribute('rel', 'canonical');
-//           canonical.setAttribute('href', `https://asianclothify.com/productDetails?id=${product._id}`);
-//           document.head.appendChild(canonical);
-//         }
-        
-//         // Remove existing JSON-LD if any
-//         const existingJsonLd = document.querySelector('#product-json-ld');
-//         if (existingJsonLd) {
-//           existingJsonLd.remove();
-//         }
-        
-//         // Add JSON-LD structured data for better SEO
-//         const jsonLd = {
-//           "@context": "https://schema.org",
-//           "@type": "Product",
-//           "name": product.productName,
-//           "description": metaDescription,
-//           "image": primaryImage,
-//           "sku": product._id,
-//           "brand": {
-//             "@type": "Brand",
-//             "name": "Asian Clothify"
-//           },
-//           "offers": {
-//             "@type": "Offer",
-//             "price": product.pricePerUnit,
-//             "priceCurrency": "USD",
-//             "availability": product.isActive !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-//             "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]
-//           },
-//           "additionalProperty": [
-//             {
-//               "@type": "PropertyValue",
-//               "name": "MOQ",
-//               "value": product.moq
-//             },
-//             {
-//               "@type": "PropertyValue",
-//               "name": "Fabric",
-//               "value": product.fabric || "Premium Quality"
-//             },
-//             {
-//               "@type": "PropertyValue",
-//               "name": "Target Audience",
-//               "value": product.targetedCustomer || "Unisex"
-//             }
-//           ]
-//         };
-        
-//         // Add sizes if available
-//         if (product.sizes && product.sizes.length > 0) {
-//           jsonLd.size = product.sizes.filter(s => s.trim());
-//         }
-        
-//         // Add colors if available
-//         if (product.colors && product.colors.length > 0) {
-//           jsonLd.color = product.colors.map(c => c.code);
-//         }
-        
-//         // Add reviews if available
-//         if (product.reviewStats && product.reviewStats.totalReviews > 0) {
-//           jsonLd.aggregateRating = {
-//             "@type": "AggregateRating",
-//             "ratingValue": product.reviewStats.averageRating,
-//             "reviewCount": product.reviewStats.totalReviews
-//           };
-//         }
-        
-//         // Add price spec
-//         if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-//           jsonLd.offers = product.quantityBasedPricing.map(tier => ({
-//             "@type": "Offer",
-//             "price": tier.price,
-//             "priceCurrency": "USD",
-//             "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-//             "eligibleQuantity": {
-//               "@type": "QuantitativeValue",
-//               "value": tier.range,
-//               "unitText": "Pieces"
-//             }
-//           }));
-//         }
-        
-//         // Add the JSON-LD script to head
-//         const script = document.createElement('script');
-//         script.id = 'product-json-ld';
-//         script.type = 'application/ld+json';
-//         script.textContent = JSON.stringify(jsonLd);
-//         document.head.appendChild(script);
-        
-//         console.log('Metadata updated for product:', product.productName);
-//         console.log('JSON-LD added for product:', product.productName);
-        
-//       } catch (error) {
-//         console.error('Error updating metadata:', error);
-//       }
-//     };
-    
-//     updateMetadata();
-//   }, [product]);
-  
-//   return null;
-// }
-
-// app/productDetails/MetadataUpdater.jsx
 'use client';
 
 import { useEffect } from 'react';
@@ -192,29 +8,28 @@ export default function MetadataUpdater({ product }) {
     
     const updateMetadata = () => {
       try {
-        // Get SEO data from product metaSettings or generate fallback for Jute Craftify
+        // Get SEO data from product metaSettings or generate fallback for ToyMart
         const metaTitle = product.metaSettings?.metaTitle || 
-          `${product.productName} - Premium Jute Product | Jute Craftify`;
+          `${product.productName} - Premium Kids Toy | ToyMart Bangladesh`;
         
         const metaDescription = product.metaSettings?.metaDescription || 
-          `${product.productName} - Premium quality jute product from Bangladesh. ${product.description?.substring(0, 150) || 'Eco-friendly, sustainable, and perfect for bulk orders.'} MOQ: ${product.moq || 'Contact us'} units. Wholesale pricing available.`;
+          `${product.productName} - Premium quality kids toy from ToyMart Bangladesh. ${product.shortDescription?.substring(0, 150) || ''} Safe, educational, and fun for children ages ${product.ageGroup || '3+'}. ✓COD ✓bKash/Nagad ✓Free Delivery.`;
         
         const metaKeywords = product.metaSettings?.metaKeywords || [
           product.productName,
           product.category?.name,
-          'jute products',
-          'eco-friendly',
-          'sustainable',
-          'bulk jute order',
-          'wholesale jute',
-          'Bangladesh jute',
+          product.tags,
+          'kids toys',
+          'educational toys',
+          'Bangladesh toy store',
+          'toymart',
           ...(product.tags || [])
-        ].filter(Boolean);
+        ].flat().filter(Boolean);
         
         // Get primary image
         const primaryImage = product.images?.find(img => img.isPrimary)?.url || 
                              product.images?.[0]?.url || 
-                             '/product-default-og.jpg';
+                             '/toy-default-og.jpg';
         
         // Update document title
         document.title = metaTitle;
@@ -246,32 +61,35 @@ export default function MetadataUpdater({ product }) {
         
         // Update basic meta tags
         updateOrCreateMetaTag('description', metaDescription);
-        updateOrCreateMetaTag('keywords', metaKeywords.join(', '));
+        updateOrCreateMetaTag('keywords', Array.isArray(metaKeywords) ? metaKeywords.join(', ') : metaKeywords);
         
         // Open Graph tags
         updateOrCreateMetaTag('og:title', metaTitle, true);
         updateOrCreateMetaTag('og:description', metaDescription, true);
-        updateOrCreateMetaTag('og:url', `https://jutecraftify.com/productDetails?id=${product._id}`, true);
+        updateOrCreateMetaTag('og:url', `https://toymart.com.bd/productDetails?id=${product._id}`, true);
         updateOrCreateMetaTag('og:image', primaryImage, true);
         updateOrCreateMetaTag('og:type', 'product', true);
-        updateOrCreateMetaTag('og:site_name', 'Jute Craftify', true);
-        updateOrCreateMetaTag('og:availability', product.isActive !== false ? 'in stock' : 'out of stock', true);
+        updateOrCreateMetaTag('og:site_name', 'ToyMart', true);
+        updateOrCreateMetaTag('og:availability', product.stockQuantity > 0 ? 'in stock' : 'out of stock', true);
+        updateOrCreateMetaTag('og:price:amount', product.discountPrice || product.regularPrice, true);
+        updateOrCreateMetaTag('og:price:currency', 'BDT', true);
         
         // Twitter tags
         updateOrCreateMetaTag('twitter:title', metaTitle);
         updateOrCreateMetaTag('twitter:description', metaDescription);
         updateOrCreateMetaTag('twitter:image', primaryImage);
         updateOrCreateMetaTag('twitter:card', 'summary_large_image');
-        updateOrCreateMetaTag('twitter:site', '@JuteCraftify');
+        updateOrCreateMetaTag('twitter:site', '@ToyMartBD');
         
         // Canonical link
         let canonical = document.querySelector('link[rel="canonical"]');
+        const canonicalUrl = `https://toymart.com.bd/productDetails?id=${product._id}`;
         if (canonical) {
-          canonical.setAttribute('href', `https://jutecraftify.com/productDetails?id=${product._id}`);
+          canonical.setAttribute('href', canonicalUrl);
         } else {
           canonical = document.createElement('link');
           canonical.setAttribute('rel', 'canonical');
-          canonical.setAttribute('href', `https://jutecraftify.com/productDetails?id=${product._id}`);
+          canonical.setAttribute('href', canonicalUrl);
           document.head.appendChild(canonical);
         }
         
@@ -281,23 +99,27 @@ export default function MetadataUpdater({ product }) {
           existingJsonLd.remove();
         }
         
-        // Add JSON-LD structured data for better SEO - Jute Craftify specific
+        // Add JSON-LD structured data for better SEO - ToyMart specific
+        const currentPrice = product.discountPrice && product.discountPrice < product.regularPrice 
+          ? product.discountPrice 
+          : product.regularPrice;
+        
         const jsonLd = {
           "@context": "https://schema.org",
           "@type": "Product",
           "name": product.productName,
           "description": metaDescription,
           "image": primaryImage,
-          "sku": product._id,
-          "mpn": product.sku || product._id,
+          "sku": product.skuCode || product._id,
+          "mpn": product.skuCode || product._id,
           "brand": {
             "@type": "Brand",
-            "name": "Jute Craftify",
-            "logo": "https://jutecraftify.com/logo.png"
+            "name": product.brand || "ToyMart",
+            "logo": "https://toymart.com.bd/logo.png"
           },
           "manufacturer": {
             "@type": "Organization",
-            "name": "Jute Craftify",
+            "name": "ToyMart",
             "address": {
               "@type": "PostalAddress",
               "addressCountry": "BD",
@@ -307,30 +129,43 @@ export default function MetadataUpdater({ product }) {
           },
           "offers": {
             "@type": "Offer",
-            "price": product.pricePerUnit || "Contact for pricing",
-            "priceCurrency": "USD",
-            "availability": product.isActive !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "price": currentPrice,
+            "priceCurrency": "BDT",
+            "availability": product.stockQuantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-            "availabilityStarts": new Date().toISOString().split('T')[0],
+            "url": `https://toymart.com.bd/productDetails?id=${product._id}`,
             "shippingDetails": {
               "@type": "OfferShippingDetails",
               "shippingDestination": {
                 "@type": "DefinedRegion",
-                "addressCountry": "WW"
+                "addressCountry": "BD"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "businessDays": {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                  "opens": "09:00",
+                  "closes": "18:00"
+                }
               }
             }
           },
           "additionalProperty": [
             {
               "@type": "PropertyValue",
-              "name": "MOQ (Minimum Order Quantity)",
-              "value": product.moq || "Contact for details",
-              "unitText": "Units"
+              "name": "Age Group",
+              "value": product.ageGroup || "3+ years"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "Category",
+              "value": product.category?.name || product.categoryName || "Kids Toy"
             },
             {
               "@type": "PropertyValue",
               "name": "Material",
-              "value": product.material || "Premium Jute Fiber"
+              "value": product.materials || "Non-toxic, Child-safe materials"
             },
             {
               "@type": "PropertyValue",
@@ -339,20 +174,28 @@ export default function MetadataUpdater({ product }) {
             },
             {
               "@type": "PropertyValue",
-              "name": "Sustainability",
-              "value": "100% Biodegradable & Eco-Friendly"
-            },
-            {
-              "@type": "PropertyValue",
-              "name": "Customization Available",
-              "value": product.customizationAvailable !== false ? "Yes" : "No"
+              "name": "Safety Certified",
+              "value": "ASTM, EN71 Certified"
             }
           ]
         };
         
-        // Add material specific info
-        if (product.materialType) {
-          jsonLd.material = product.materialType;
+        // Add subcategory info if available
+        if (product.subcategoryName) {
+          jsonLd.additionalProperty.push({
+            "@type": "PropertyValue",
+            "name": "Subcategory",
+            "value": product.subcategoryName
+          });
+        }
+        
+        // Add educational benefits if available
+        if (product.educationalBenefits) {
+          jsonLd.additionalProperty.push({
+            "@type": "PropertyValue",
+            "name": "Educational Benefits",
+            "value": product.educationalBenefits
+          });
         }
         
         // Add dimensions if available
@@ -374,64 +217,41 @@ export default function MetadataUpdater({ product }) {
           });
         }
         
-        // Add color options if available
+        // Add colors if available
         if (product.colors && product.colors.length > 0) {
-          jsonLd.color = product.colors.map(c => typeof c === 'string' ? c : c.name || c.code);
+          jsonLd.color = product.colors;
         }
         
-        // Add sizes if available
-        if (product.sizes && product.sizes.length > 0) {
-          jsonLd.size = product.sizes.filter(s => s.trim());
-        }
-        
-        // Add reviews if available
-        if (product.reviewStats && product.reviewStats.totalReviews > 0) {
+        // Add rating if available
+        if (product.rating && product.rating > 0) {
           jsonLd.aggregateRating = {
             "@type": "AggregateRating",
-            "ratingValue": product.reviewStats.averageRating,
-            "reviewCount": product.reviewStats.totalReviews
+            "ratingValue": product.rating,
+            "reviewCount": product.reviewCount || 0,
+            "bestRating": "5",
+            "worstRating": "1"
           };
         }
         
-        // Add quantity-based pricing if available
-        if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-          jsonLd.offers = product.quantityBasedPricing.map(tier => ({
-            "@type": "Offer",
-            "price": tier.price,
-            "priceCurrency": "USD",
-            "priceValidUntil": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-            "eligibleQuantity": {
-              "@type": "QuantitativeValue",
-              "value": tier.range,
-              "unitText": tier.unit || "Pieces"
-            },
-            "availability": tier.inStock !== false ? "https://schema.org/InStock" : "https://schema.org/LimitedAvailability"
-          }));
-        }
-        
-        // Add lead time information
-        if (product.productionLeadTime) {
-          jsonLd.additionalProperty.push({
-            "@type": "PropertyValue",
-            "name": "Production Lead Time",
-            "value": product.productionLeadTime
-          });
-        }
-        
-        // Add certificate information if available
-        if (product.certifications && product.certifications.length > 0) {
-          jsonLd.additionalProperty.push({
-            "@type": "PropertyValue",
-            "name": "Certifications",
-            "value": product.certifications.join(', ')
-          });
-        }
-        
-        // Add export information
+        // Add COD availability
         jsonLd.additionalProperty.push({
           "@type": "PropertyValue",
-          "name": "Export Capability",
-          "value": "Worldwide shipping available"
+          "name": "Cash on Delivery",
+          "value": product.codAvailable !== false ? "Available" : "Not Available"
+        });
+        
+        // Add warranty information
+        jsonLd.additionalProperty.push({
+          "@type": "PropertyValue",
+          "name": "Warranty",
+          "value": "30 Days Manufacturing Warranty"
+        });
+        
+        // Add return policy
+        jsonLd.additionalProperty.push({
+          "@type": "PropertyValue",
+          "name": "Return Policy",
+          "value": "7 Days Return Policy for defective products"
         });
         
         // Add the JSON-LD script to head
@@ -441,16 +261,16 @@ export default function MetadataUpdater({ product }) {
         script.textContent = JSON.stringify(jsonLd);
         document.head.appendChild(script);
         
-        // Add manufacturer JSON-LD if not present
-        const existingManufacturerJsonLd = document.querySelector('#manufacturer-json-ld');
-        if (!existingManufacturerJsonLd) {
-          const manufacturerJsonLd = {
+        // Add organization JSON-LD if not present
+        const existingOrgJsonLd = document.querySelector('#organization-json-ld');
+        if (!existingOrgJsonLd) {
+          const orgJsonLd = {
             "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Jute Craftify",
-            "url": "https://jutecraftify.com",
-            "logo": "https://jutecraftify.com/logo.png",
-            "description": "Premium jute products supplier from Bangladesh. Eco-friendly, sustainable, handcrafted jute products for global B2B buyers.",
+            "@type": "Store",
+            "name": "ToyMart",
+            "url": "https://toymart.com.bd",
+            "logo": "https://toymart.com.bd/logo.png",
+            "description": "Bangladesh's premier kids toy e-commerce website. Shop educational toys, Montessori toys, STEM kits, RC cars, outdoor toys, dolls and more.",
             "address": {
               "@type": "PostalAddress",
               "addressCountry": "BD",
@@ -460,23 +280,28 @@ export default function MetadataUpdater({ product }) {
             },
             "contactPoint": {
               "@type": "ContactPoint",
-              "contactType": "Sales",
-              "email": "info@jutecraftify.com",
+              "contactType": "Customer Service",
+              "telephone": "+8801234567890",
+              "email": "support@toymart.com.bd",
               "availableLanguage": ["English", "Bengali"]
             },
             "sameAs": [
-              "https://www.facebook.com/JuteCraftify"
-            ]
+              "https://www.facebook.com/toymartbd",
+              "https://www.instagram.com/toymart.bd"
+            ],
+            "priceRange": "৳200 - ৳20000",
+            "currenciesAccepted": "BDT",
+            "paymentAccepted": "Cash on Delivery, bKash, Nagad, Credit Card"
           };
           
-          const manufacturerScript = document.createElement('script');
-          manufacturerScript.id = 'manufacturer-json-ld';
-          manufacturerScript.type = 'application/ld+json';
-          manufacturerScript.textContent = JSON.stringify(manufacturerJsonLd);
-          document.head.appendChild(manufacturerScript);
+          const orgScript = document.createElement('script');
+          orgScript.id = 'organization-json-ld';
+          orgScript.type = 'application/ld+json';
+          orgScript.textContent = JSON.stringify(orgJsonLd);
+          document.head.appendChild(orgScript);
         }
         
-        console.log('Metadata updated for jute product:', product.productName);
+        console.log('Metadata updated for ToyMart product:', product.productName);
         console.log('JSON-LD added for product:', product.productName);
         
       } catch (error) {

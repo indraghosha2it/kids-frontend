@@ -69,7 +69,7 @@ const floatingElements = [
   { icon: '🎵', left: '85%', top: '85%', delay: 0.8, duration: 9 },
 ];
 
-export default function BlogPage() {
+export default function BlogClient() {
   const [blogs, setBlogs] = useState([]);
   const [latestFeaturedPost, setLatestFeaturedPost] = useState(null);
   const [moreFeaturedPosts, setMoreFeaturedPosts] = useState([]);
@@ -86,7 +86,7 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchFeaturedPosts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/blogs?limit=4&sort=-publishDate');
+        const response = await fetch('https://kids-backend.vercel.app/api/blogs?limit=4&sort=-publishDate');
         const data = await response.json();
         if (data.success && data.data.length > 0) {
           setLatestFeaturedPost(data.data[0]);
@@ -111,7 +111,7 @@ export default function BlogPage() {
           ...(searchTerm && { search: searchTerm })
         });
 
-        const response = await fetch(`http://localhost:5000/api/blogs?${params}`);
+        const response = await fetch(`https://kids-backend.vercel.app/api/blogs?${params}`);
         const data = await response.json();
 
         if (data.success) {
@@ -289,10 +289,7 @@ export default function BlogPage() {
                           <User className="w-3.5 h-3.5" />
                           <span>{latestFeaturedPost.author}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span>{formatDate(latestFeaturedPost.publishDate)}</span>
-                        </div>
+                      
                       </div>
                       
                       <motion.div 
@@ -357,11 +354,7 @@ export default function BlogPage() {
                                 <User className="w-3 h-3" />
                                 <span className="truncate max-w-[80px]">{post.author}</span>
                               </div>
-                              <div className="w-1 h-1 rounded-full bg-gray-300"></div>
-                              <div className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                <span>{formatDate(post.publishDate)}</span>
-                              </div>
+                             
                             </div>
                           </div>
                         </div>
@@ -540,11 +533,7 @@ export default function BlogPage() {
                                 <User className="w-3 h-3" />
                                 <span>{blog.author}</span>
                               </div>
-                              <div className="w-1 h-1 rounded-full bg-gray-300"></div>
-                              <div className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                <span>{formatDate(blog.publishDate)}</span>
-                              </div>
+                             
                             </div>
                             
                             {/* Title */}
@@ -638,26 +627,34 @@ export default function BlogPage() {
           )}
 
           {/* Fun Footer Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-16 p-6 bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] rounded-2xl text-center"
-          >
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Gift className="w-6 h-6 text-white" />
-              <h3 className="text-xl font-bold text-white" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
-                Want More Toy Magic?
-              </h3>
-              <Gift className="w-6 h-6 text-white" />
-            </div>
-            <p className="text-white/90 text-sm mb-3">
-              Subscribe to our newsletter and never miss a fun story or toy update!
-            </p>
-            <button className="px-6 py-2 bg-white text-[#4A8A90] rounded-full font-semibold text-sm hover:shadow-lg transition-all">
-              Subscribe Now 🎈
-            </button>
-          </motion.div>
+       <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  className="mt-16 p-6 bg-gradient-to-r from-[#4A8A90] to-[#FFB6C1] rounded-2xl text-center"
+>
+  <div className="flex items-center justify-center gap-2 mb-2">
+    <Gift className="w-6 h-6 text-white" />
+    <h3
+      className="text-xl font-bold text-white"
+      style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}
+    >
+      Discover Amazing Toys!
+    </h3>
+    <Gift className="w-6 h-6 text-white" />
+  </div>
+
+  <p className="text-white/90 text-sm mb-5">
+    Explore fun, educational, and magical toys for every child.
+  </p>
+
+  <a
+    href="/products"
+    className="inline-block px-6 py-2 bg-white text-[#4A8A90] rounded-full font-semibold text-sm hover:shadow-lg hover:scale-105 transition-all duration-300"
+  >
+    Shop Now 🛍️
+  </a>
+</motion.div>
         </div>
       </main>
 

@@ -86,7 +86,7 @@ export default function ModeratorDashboard() {
   // Fetch all products (PUBLIC route - no auth needed)
   const fetchProductsData = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/products`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/products`, {
         params: { limit: 999 }
       });
       
@@ -199,7 +199,7 @@ export default function ModeratorDashboard() {
       };
       
       // This endpoint is accessible by moderators (isModeratorOrAdmin)
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders/admin/all`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/admin/all`, {
         headers: { Authorization: `Bearer ${token}` },
         params
       });

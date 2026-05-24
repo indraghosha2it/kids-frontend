@@ -337,7 +337,7 @@ export default function ModeratorProductDetails() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://kids-backend.vercel.app/api/products/${productId}`, {
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -483,7 +483,7 @@ export default function ModeratorProductDetails() {
                   if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
                   try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch(`https://kids-backend.vercel.app/api/products/${productId}`, {
+                    const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
                       method: 'DELETE',
                       headers: { 'Authorization': `Bearer ${token}` }
                     });

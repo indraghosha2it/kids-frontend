@@ -63,7 +63,7 @@
 //   const fetchCategories = async () => {
 //     setCategoriesLoading(true);
 //     try {
-//       const response = await fetch('https://kids-backend.vercel.app/api/categories');
+//       const response = await fetch('http://localhost:5000/api/categories');
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -181,7 +181,7 @@
 //         }
 //       }
       
-//       const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
+//       const response = await fetch('http://localhost:5000/api/cart', { headers });
       
 //       if (response.ok) {
 //         const data = await response.json();
@@ -213,7 +213,7 @@
 //       return;
 //     }
     
-//     const response = await fetch('https://kids-backend.vercel.app/api/wishlist', { headers });
+//     const response = await fetch('http://localhost:5000/api/wishlist', { headers });
     
 //     if (response.ok) {
 //       const data = await response.json();
@@ -307,7 +307,7 @@
 //   setSearchLoading(true);
 //   try {
 //     // Use the products endpoint with search parameter
-//     const response = await fetch(`https://kids-backend.vercel.app/api/products?search=${encodeURIComponent(query)}&limit=5`);
+//     const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(query)}&limit=5`);
 //     const data = await response.json();
     
 //     console.log('Search response:', data); // Debug log to see the structure
@@ -1127,7 +1127,7 @@ export default function Navbar() {
   const fetchCategories = async () => {
     setCategoriesLoading(true);
     try {
-      const response = await fetch('https://kids-backend.vercel.app/api/categories');
+      const response = await fetch('http://localhost:5000/api/categories');
       const data = await response.json();
       
       if (data.success) {
@@ -1258,7 +1258,7 @@ export default function Navbar() {
         }
       }
       
-      const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
+      const response = await fetch('http://localhost:5000/api/cart', { headers });
       
       if (response.ok) {
         const data = await response.json();
@@ -1288,7 +1288,7 @@ export default function Navbar() {
         return;
       }
       
-      const response = await fetch('https://kids-backend.vercel.app/api/wishlist', { headers });
+      const response = await fetch('http://localhost:5000/api/wishlist', { headers });
       
       if (response.ok) {
         const data = await response.json();
@@ -1379,7 +1379,7 @@ export default function Navbar() {
     
     setSearchLoading(true);
     try {
-      const response = await fetch(`https://kids-backend.vercel.app/api/products?search=${encodeURIComponent(query)}&limit=5`);
+      const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(query)}&limit=5`);
       const data = await response.json();
       
       if (data.success && data.data && data.data.length > 0) {

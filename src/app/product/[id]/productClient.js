@@ -999,7 +999,7 @@
 //   const fetchProduct = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch(`https://kids-backend.vercel.app/api/products/${productId}`);
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -1050,7 +1050,7 @@
 //       if (categoryId) queryParams.append('category', categoryId);
 //       if (targetedCustomer) queryParams.append('targetedCustomer', targetedCustomer);
       
-//       const response = await fetch(`https://kids-backend.vercel.app/api/products?${queryParams.toString()}`);
+//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -1068,7 +1068,7 @@
     
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://kids-backend.vercel.app/api/inquiry-cart', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -1291,7 +1291,7 @@
 //         specialInstructions: specialInstructions
 //       };
 
-//       const response = await fetch('https://kids-backend.vercel.app/api/inquiry-cart/add', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,

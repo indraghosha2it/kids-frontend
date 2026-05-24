@@ -74,7 +74,7 @@
 //   const fetchFeaturedReviews = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/featured?limit=9`);
+//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/featured?limit=9`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -669,7 +669,7 @@ export default function Testimonials() {
   const fetchFeaturedReviews = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/featured?limit=9`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/featured?limit=9`);
       const data = await response.json();
       
       if (data.success) {

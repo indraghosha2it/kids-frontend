@@ -712,7 +712,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 //       if (token) {
-//         const response = await fetch('https://kids-backend.vercel.app/api/auth/me', {
+//         const response = await fetch('http://localhost:5000/api/auth/me', {
 //           headers: { 'Authorization': `Bearer ${token}` }
 //         });
 //         const data = await response.json();
@@ -726,7 +726,7 @@
 
 //   const fetchShippingRates = async () => {
 //   try {
-//     const response = await fetch('https://kids-backend.vercel.app/api/delivery/settings');
+//     const response = await fetch('http://localhost:5000/api/delivery/settings');
 //     const data = await response.json();
 //     if (data.success) {
 //       setShippingRates({
@@ -749,7 +749,7 @@
 //       if (token) headers['Authorization'] = `Bearer ${token}`;
 //       else if (sessionId) headers['x-session-id'] = sessionId;
       
-//       const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
+//       const response = await fetch('http://localhost:5000/api/cart', { headers });
 //       const data = await response.json();
       
 //       if (data.success && data.data.items?.length > 0) {
@@ -774,7 +774,7 @@
 //       const subtotal = calculateSubtotal();
 //       const productIds = cart?.items.map(item => item.productId) || [];
       
-//       const response = await fetch('https://kids-backend.vercel.app/api/coupons/available', {
+//       const response = await fetch('http://localhost:5000/api/coupons/available', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -818,7 +818,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 //       const subtotal = calculateSubtotal();
-//       const response = await fetch('https://kids-backend.vercel.app/api/coupons/validate', {
+//       const response = await fetch('http://localhost:5000/api/coupons/validate', {
 //         method: 'POST',
 //         headers: { 
 //           'Content-Type': 'application/json',
@@ -854,7 +854,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 //       const subtotal = calculateSubtotal();
-//       const response = await fetch('https://kids-backend.vercel.app/api/coupons/validate', {
+//       const response = await fetch('http://localhost:5000/api/coupons/validate', {
 //         method: 'POST',
 //         headers: { 
 //           'Content-Type': 'application/json',
@@ -952,7 +952,7 @@
 //         freeShipping: discountDetails?.freeShipping || false
 //       };
       
-//       const response = await fetch('https://kids-backend.vercel.app/api/orders', {
+//       const response = await fetch('http://localhost:5000/api/orders', {
 //         method: 'POST',
 //         headers,
 //         body: JSON.stringify(orderData)
@@ -961,7 +961,7 @@
 //       const data = await response.json();
       
 //       if (data.success) {
-//         await fetch('https://kids-backend.vercel.app/api/cart', { method: 'DELETE', headers });
+//         await fetch('http://localhost:5000/api/cart', { method: 'DELETE', headers });
 //         window.dispatchEvent(new Event('cart-update'));
 //         const orderId = data.orderId || data.data?._id || data.data?.id;
         
@@ -1027,7 +1027,7 @@
 //       console.log('Preparing order for online payment:', orderData);
       
 //       // First, prepare the order data (this doesn't save to DB)
-//       const prepareResponse = await fetch('https://kids-backend.vercel.app/api/orders/prepare', {
+//       const prepareResponse = await fetch('http://localhost:5000/api/orders/prepare', {
 //         method: 'POST',
 //         headers,
 //         body: JSON.stringify(orderData)
@@ -2253,7 +2253,7 @@ export default function CheckoutClient() {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const response = await fetch('https://kids-backend.vercel.app/api/auth/me', {
+        const response = await fetch('http://localhost:5000/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -2266,7 +2266,7 @@ export default function CheckoutClient() {
 
   const fetchShippingRates = async () => {
     try {
-      const response = await fetch('https://kids-backend.vercel.app/api/delivery/settings');
+      const response = await fetch('http://localhost:5000/api/delivery/settings');
       const data = await response.json();
       if (data.success) {
         setShippingRates({
@@ -2287,7 +2287,7 @@ export default function CheckoutClient() {
       if (token) headers['Authorization'] = `Bearer ${token}`;
       else if (sessionId) headers['x-session-id'] = sessionId;
       
-      const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
+      const response = await fetch('http://localhost:5000/api/cart', { headers });
       const data = await response.json();
       
       if (data.success && data.data.items?.length > 0) {
@@ -2312,7 +2312,7 @@ export default function CheckoutClient() {
       const subtotal = calculateSubtotal();
       const productIds = cart?.items.map(item => item.productId) || [];
       
-      const response = await fetch('https://kids-backend.vercel.app/api/coupons/available', {
+      const response = await fetch('http://localhost:5000/api/coupons/available', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2356,7 +2356,7 @@ export default function CheckoutClient() {
     try {
       const token = localStorage.getItem('token');
       const subtotal = calculateSubtotal();
-      const response = await fetch('https://kids-backend.vercel.app/api/coupons/validate', {
+      const response = await fetch('http://localhost:5000/api/coupons/validate', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -2392,7 +2392,7 @@ export default function CheckoutClient() {
     try {
       const token = localStorage.getItem('token');
       const subtotal = calculateSubtotal();
-      const response = await fetch('https://kids-backend.vercel.app/api/coupons/validate', {
+      const response = await fetch('http://localhost:5000/api/coupons/validate', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -2487,7 +2487,7 @@ export default function CheckoutClient() {
         freeShipping: discountDetails?.freeShipping || false
       };
       
-      const response = await fetch('https://kids-backend.vercel.app/api/orders', {
+      const response = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
         headers,
         body: JSON.stringify(orderData)
@@ -2496,7 +2496,7 @@ export default function CheckoutClient() {
       const data = await response.json();
       
       if (data.success) {
-        await fetch('https://kids-backend.vercel.app/api/cart', { method: 'DELETE', headers });
+        await fetch('http://localhost:5000/api/cart', { method: 'DELETE', headers });
         window.dispatchEvent(new Event('cart-update'));
         const orderId = data.orderId || data.data?._id || data.data?.id;
         
@@ -2559,7 +2559,7 @@ export default function CheckoutClient() {
       
       console.log('Preparing order for online payment:', orderData);
       
-      const prepareResponse = await fetch('https://kids-backend.vercel.app/api/orders/prepare', {
+      const prepareResponse = await fetch('http://localhost:5000/api/orders/prepare', {
         method: 'POST',
         headers,
         body: JSON.stringify(orderData)

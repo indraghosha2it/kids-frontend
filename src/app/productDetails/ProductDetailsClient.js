@@ -429,7 +429,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch('https://kids-backend.vercel.app/api/wishlist', {
+//       const response = await fetch('http://localhost:5000/api/wishlist', {
 //         method: 'POST',
 //         headers: headers,
 //         body: JSON.stringify({ productId: product._id })
@@ -480,7 +480,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch('https://kids-backend.vercel.app/api/cart', {
+//       const response = await fetch('http://localhost:5000/api/cart', {
 //         method: 'POST',
 //         headers: headers,
 //         body: JSON.stringify({
@@ -972,7 +972,7 @@
 //     }
     
 //     try {
-//       const cartResponse = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
+//       const cartResponse = await fetch('http://localhost:5000/api/cart/check-status', {
 //         method: 'POST',
 //         headers: { ...cartHeaders, 'Content-Type': 'application/json' },
 //         body: JSON.stringify({ productIds })
@@ -995,7 +995,7 @@
 //     }
     
 //     try {
-//       const wishlistResponse = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
+//       const wishlistResponse = await fetch('http://localhost:5000/api/wishlist/check-status', {
 //         method: 'POST',
 //         headers: { ...wishlistHeaders, 'Content-Type': 'application/json' },
 //         body: JSON.stringify({ productIds })
@@ -1074,7 +1074,7 @@
 //   const fetchProductDetails = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch(`https://kids-backend.vercel.app/api/products/${productId}`);
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
 //       const data = await response.json();
 //       if (data.success) {
 //         setProduct(data.data.product);
@@ -1104,7 +1104,7 @@
 // //     }
     
 // //     // Fetch reviews for this specific product
-// //     const response = await fetch(`https://kids-backend.vercel.app/api/reviews?productId=${productId}&status=approved&limit=50`, {
+// //     const response = await fetch(`http://localhost:5000/api/reviews?productId=${productId}&status=approved&limit=50`, {
 // //       headers
 // //     });
     
@@ -1112,13 +1112,13 @@
     
 // //     if (data.success) {
 // //       // Get current user ID to check for own pending reviews
-// //       const currentUserId = token ? (await fetch('https://kids-backend.vercel.app/api/auth/me', { headers }).then(res => res.json()).catch(() => null))?.user?._id : null;
+// //       const currentUserId = token ? (await fetch('http://localhost:5000/api/auth/me', { headers }).then(res => res.json()).catch(() => null))?.user?._id : null;
       
 // //       let allReviews = data.data || [];
       
 // //       // If user is logged in, also fetch their pending reviews for this product
 // //       if (token && currentUserId) {
-// //         const userReviewsResponse = await fetch(`https://kids-backend.vercel.app/api/reviews?productId=${productId}&userId=${currentUserId}`, {
+// //         const userReviewsResponse = await fetch(`http://localhost:5000/api/reviews?productId=${productId}&userId=${currentUserId}`, {
 // //           headers
 // //         });
 // //         const userReviewsData = await userReviewsResponse.json();
@@ -1155,7 +1155,7 @@
 //     }
     
 //     // Fetch reviews for this product
-//     const response = await fetch(`https://kids-backend.vercel.app/api/reviews?productId=${productId}&limit=50`, {
+//     const response = await fetch(`http://localhost:5000/api/reviews?productId=${productId}&limit=50`, {
 //       headers
 //     });
     
@@ -1206,7 +1206,7 @@
 //     }
 
 //     console.log('Calling wishlist check API for product:', id);
-//     const response = await fetch(`https://kids-backend.vercel.app/api/wishlist/check/${id}`, { headers });
+//     const response = await fetch(`http://localhost:5000/api/wishlist/check/${id}`, { headers });
 //     const data = await response.json();
 //     console.log('Wishlist check response:', data);
     
@@ -1233,7 +1233,7 @@
 //         return;
 //       }
 
-//       const response = await fetch('https://kids-backend.vercel.app/api/wishlist', {
+//       const response = await fetch('http://localhost:5000/api/wishlist', {
 //         method: 'POST',
 //         headers,
 //         body: JSON.stringify({ productId: product._id })
@@ -1266,7 +1266,7 @@
 //     if (token) headers['Authorization'] = `Bearer ${token}`;
 //     else if (sessionId) headers['x-session-id'] = sessionId;
 
-//     const response = await fetch('https://kids-backend.vercel.app/api/cart', {
+//     const response = await fetch('http://localhost:5000/api/cart', {
 //       method: 'POST',
 //       headers,
 //       body: JSON.stringify({ productId: product._id, quantity: quantity })
@@ -1307,7 +1307,7 @@
 //     else if (sessionId) headers['x-session-id'] = sessionId;
 
 //     // First, check if product is already in cart
-//     const checkResponse = await fetch(`https://kids-backend.vercel.app/api/cart/check/${product._id}`, { headers });
+//     const checkResponse = await fetch(`http://localhost:5000/api/cart/check/${product._id}`, { headers });
 //     const checkData = await checkResponse.json();
     
 //     let alreadyInCart = false;
@@ -1317,7 +1317,7 @@
     
 //     if (!alreadyInCart) {
 //       // Only add to cart if not already in cart
-//       const response = await fetch('https://kids-backend.vercel.app/api/cart', {
+//       const response = await fetch('http://localhost:5000/api/cart', {
 //         method: 'POST',
 //         headers,
 //         body: JSON.stringify({ productId: product._id, quantity: quantity })
@@ -1372,7 +1372,7 @@
 //       return;
 //     }
     
-//     const response = await fetch(`https://kids-backend.vercel.app/api/cart/check/${product._id}`, { headers });
+//     const response = await fetch(`http://localhost:5000/api/cart/check/${product._id}`, { headers });
 //     const data = await response.json();
 //     if (data.success) {
 //       setIsInCart(data.data.inCart);
@@ -2724,7 +2724,7 @@ const RelatedProductCard = ({ product, router, isInCart: propIsInCart, isInWishl
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('https://kids-backend.vercel.app/api/wishlist', {
+      const response = await fetch('http://localhost:5000/api/wishlist', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ productId: product._id })
@@ -2775,7 +2775,7 @@ const RelatedProductCard = ({ product, router, isInCart: propIsInCart, isInWishl
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('https://kids-backend.vercel.app/api/cart', {
+      const response = await fetch('http://localhost:5000/api/cart', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
@@ -3300,7 +3300,7 @@ export default function ProductDetailsClient() {
   //     }
       
   //     try {
-  //       const cartResponse = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
+  //       const cartResponse = await fetch('http://localhost:5000/api/cart/check-status', {
   //         method: 'POST',
   //         headers: { ...cartHeaders, 'Content-Type': 'application/json' },
   //         body: JSON.stringify({ productIds })
@@ -3322,7 +3322,7 @@ export default function ProductDetailsClient() {
   //     }
       
   //     try {
-  //       const wishlistResponse = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
+  //       const wishlistResponse = await fetch('http://localhost:5000/api/wishlist/check-status', {
   //         method: 'POST',
   //         headers: { ...wishlistHeaders, 'Content-Type': 'application/json' },
   //         body: JSON.stringify({ productIds })
@@ -3360,7 +3360,7 @@ export default function ProductDetailsClient() {
 //     }
     
 //     try {
-//       const cartResponse = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
+//       const cartResponse = await fetch('http://localhost:5000/api/cart/check-status', {
 //         method: 'POST',
 //         headers: { ...cartHeaders, 'Content-Type': 'application/json' },
 //         body: JSON.stringify({ productIds })
@@ -3383,7 +3383,7 @@ export default function ProductDetailsClient() {
 //     }
     
 //     try {
-//       const wishlistResponse = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
+//       const wishlistResponse = await fetch('http://localhost:5000/api/wishlist/check-status', {
 //         method: 'POST',
 //         headers: { ...wishlistHeaders, 'Content-Type': 'application/json' },
 //         body: JSON.stringify({ productIds })
@@ -3459,7 +3459,7 @@ export default function ProductDetailsClient() {
 //     }
     
 //     try {
-//       const cartResponse = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
+//       const cartResponse = await fetch('http://localhost:5000/api/cart/check-status', {
 //         method: 'POST',
 //         headers: { ...cartHeaders, 'Content-Type': 'application/json' },
 //         body: JSON.stringify({ productIds })
@@ -3481,7 +3481,7 @@ export default function ProductDetailsClient() {
 //     }
     
 //     try {
-//       const wishlistResponse = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
+//       const wishlistResponse = await fetch('http://localhost:5000/api/wishlist/check-status', {
 //         method: 'POST',
 //         headers: { ...wishlistHeaders, 'Content-Type': 'application/json' },
 //         body: JSON.stringify({ productIds })
@@ -3541,7 +3541,7 @@ useEffect(() => {
     }
     
     try {
-      const cartResponse = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
+      const cartResponse = await fetch('http://localhost:5000/api/cart/check-status', {
         method: 'POST',
         headers: { ...cartHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ productIds })
@@ -3562,7 +3562,7 @@ useEffect(() => {
     }
     
     try {
-      const wishlistResponse = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
+      const wishlistResponse = await fetch('http://localhost:5000/api/wishlist/check-status', {
         method: 'POST',
         headers: { ...wishlistHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ productIds })
@@ -3620,7 +3620,7 @@ useEffect(() => {
   const fetchProductDetails = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`https://kids-backend.vercel.app/api/products/${productId}`);
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
       const data = await response.json();
       if (data.success) {
         setProduct(data.data.product);
@@ -3648,7 +3648,7 @@ useEffect(() => {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      const response = await fetch(`https://kids-backend.vercel.app/api/reviews?productId=${productId}&limit=50`, {
+      const response = await fetch(`http://localhost:5000/api/reviews?productId=${productId}&limit=50`, {
         headers
       });
       
@@ -3698,7 +3698,7 @@ useEffect(() => {
       }
 
       console.log('Calling wishlist check API for product:', id);
-      const response = await fetch(`https://kids-backend.vercel.app/api/wishlist/check/${id}`, { headers });
+      const response = await fetch(`http://localhost:5000/api/wishlist/check/${id}`, { headers });
       const data = await response.json();
       console.log('Wishlist check response:', data);
       
@@ -3725,7 +3725,7 @@ useEffect(() => {
         return;
       }
 
-      const response = await fetch('https://kids-backend.vercel.app/api/wishlist', {
+      const response = await fetch('http://localhost:5000/api/wishlist', {
         method: 'POST',
         headers,
         body: JSON.stringify({ productId: product._id })
@@ -3758,7 +3758,7 @@ useEffect(() => {
       if (token) headers['Authorization'] = `Bearer ${token}`;
       else if (sessionId) headers['x-session-id'] = sessionId;
 
-      const response = await fetch('https://kids-backend.vercel.app/api/cart', {
+      const response = await fetch('http://localhost:5000/api/cart', {
         method: 'POST',
         headers,
         body: JSON.stringify({ productId: product._id, quantity: quantity })
@@ -3797,7 +3797,7 @@ useEffect(() => {
       if (token) headers['Authorization'] = `Bearer ${token}`;
       else if (sessionId) headers['x-session-id'] = sessionId;
 
-      const checkResponse = await fetch(`https://kids-backend.vercel.app/api/cart/check/${product._id}`, { headers });
+      const checkResponse = await fetch(`http://localhost:5000/api/cart/check/${product._id}`, { headers });
       const checkData = await checkResponse.json();
       
       let alreadyInCart = false;
@@ -3806,7 +3806,7 @@ useEffect(() => {
       }
       
       if (!alreadyInCart) {
-        const response = await fetch('https://kids-backend.vercel.app/api/cart', {
+        const response = await fetch('http://localhost:5000/api/cart', {
           method: 'POST',
           headers,
           body: JSON.stringify({ productId: product._id, quantity: quantity })
@@ -3858,7 +3858,7 @@ useEffect(() => {
         return;
       }
       
-      const response = await fetch(`https://kids-backend.vercel.app/api/cart/check/${product._id}`, { headers });
+      const response = await fetch(`http://localhost:5000/api/cart/check/${product._id}`, { headers });
       const data = await response.json();
       if (data.success) {
         setIsInCart(data.data.inCart);

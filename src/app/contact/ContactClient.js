@@ -104,7 +104,7 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app';
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       
       const response = await fetch(`${API_URL}/api/contact`, {
         method: 'POST',

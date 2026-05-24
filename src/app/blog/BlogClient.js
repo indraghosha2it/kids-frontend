@@ -86,7 +86,7 @@ export default function BlogClient() {
   useEffect(() => {
     const fetchFeaturedPosts = async () => {
       try {
-        const response = await fetch('https://kids-backend.vercel.app/api/blogs?limit=4&sort=-publishDate');
+        const response = await fetch('http://localhost:5000/api/blogs?limit=4&sort=-publishDate');
         const data = await response.json();
         if (data.success && data.data.length > 0) {
           setLatestFeaturedPost(data.data[0]);
@@ -111,7 +111,7 @@ export default function BlogClient() {
           ...(searchTerm && { search: searchTerm })
         });
 
-        const response = await fetch(`https://kids-backend.vercel.app/api/blogs?${params}`);
+        const response = await fetch(`http://localhost:5000/api/blogs?${params}`);
         const data = await response.json();
 
         if (data.success) {

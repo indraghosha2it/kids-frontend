@@ -17,7 +17,7 @@ export const useCartStatus = (productId) => {
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
+      const response = await fetch('http://localhost:5000/api/cart', { headers });
       
       if (response.ok) {
         const data = await response.json();

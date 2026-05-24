@@ -63,7 +63,7 @@
       
 //       if (token && userData) {
 //         setIsLoggedIn(true);
-//         const response = await fetch('https://kids-backend.vercel.app/api/auth/subscription-status', {
+//         const response = await fetch('http://localhost:5000/api/auth/subscription-status', {
 //           headers: { 'Authorization': `Bearer ${token}` }
 //         });
 //         const data = await response.json();
@@ -168,7 +168,7 @@
 //       }
       
 //       console.log('📦 Fetching product details for ID:', productId);
-//       const response = await fetch(`https://kids-backend.vercel.app/api/products/${productId}`);
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
 //       const data = await response.json();
       
 //       if (data.success && data.data) {
@@ -198,7 +198,7 @@
 //   //     console.log('Category filter:', currentCategoryId);
       
 //   //     // Build URL with query params
-//   //     let url = 'https://kids-backend.vercel.app/api/promotional';
+//   //     let url = 'http://localhost:5000/api/promotional';
 //   //     if (currentCategoryId) {
 //   //       url += `?categoryId=${currentCategoryId}`;
 //   //       console.log('🔍 Filtering by category ID:', currentCategoryId);
@@ -287,7 +287,7 @@
 // //     console.log('Is product details page:', isProductDetails);
     
 // //     // Build URL with query params
-// //     let url = 'https://kids-backend.vercel.app/api/promotional';
+// //     let url = 'http://localhost:5000/api/promotional';
 // //     const params = new URLSearchParams();
     
 // //     if (currentCategoryId) {
@@ -395,7 +395,7 @@
 //     console.log('========================================');
     
 //     // Build URL with query params
-//     let url = 'https://kids-backend.vercel.app/api/promotional';
+//     let url = 'http://localhost:5000/api/promotional';
 //     const params = new URLSearchParams();
     
 //     // ALWAYS pass the current path for page filtering
@@ -807,7 +807,7 @@
       
 //       try {
 //         console.log('📡 Fetching popup config from API...');
-//         const response = await fetch('https://kids-backend.vercel.app/api/popup-config');
+//         const response = await fetch('http://localhost:5000/api/popup-config');
 //         const data = await response.json();
         
 //         if (data.success && isActive) {
@@ -949,7 +949,7 @@ export default function UnifiedPopupManager() {
       
       if (token && userData) {
         setIsLoggedIn(true);
-        const response = await fetch('https://kids-backend.vercel.app/api/auth/subscription-status', {
+        const response = await fetch('http://localhost:5000/api/auth/subscription-status', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -1054,7 +1054,7 @@ export default function UnifiedPopupManager() {
       }
       
       console.log('📦 Fetching product details for ID:', productId);
-      const response = await fetch(`https://kids-backend.vercel.app/api/products/${productId}`);
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
       const data = await response.json();
       
       if (data.success && data.data) {
@@ -1087,7 +1087,7 @@ export default function UnifiedPopupManager() {
       console.log('========================================');
       
       // Build URL with query params
-      let url = 'https://kids-backend.vercel.app/api/promotional';
+      let url = 'http://localhost:5000/api/promotional';
       const params = new URLSearchParams();
       
       // ALWAYS pass the current path for page filtering
@@ -1444,7 +1444,7 @@ export default function UnifiedPopupManager() {
       
       try {
         console.log('📡 Fetching popup config from API...');
-        const response = await fetch('https://kids-backend.vercel.app/api/popup-config');
+        const response = await fetch('http://localhost:5000/api/popup-config');
         const data = await response.json();
         
         if (data.success && isActive) {

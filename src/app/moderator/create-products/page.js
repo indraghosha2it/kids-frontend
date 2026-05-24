@@ -308,7 +308,7 @@
 //     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://kids-backend.vercel.app/api/categories', {
+//       const response = await fetch('http://localhost:5000/api/categories', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
       
@@ -327,7 +327,7 @@
 //   const fetchSubcategories = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}/subcategories`, {
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -346,7 +346,7 @@
 //   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -368,7 +368,7 @@
 //   const fetchCategoryDetails = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}`, {
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
       
@@ -1033,7 +1033,7 @@
 //         metaSettings: formData.metaSettings
 //       };
 
-//       const response = await fetch('https://kids-backend.vercel.app/api/products', {
+//       const response = await fetch('http://localhost:5000/api/products', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -2272,10 +2272,97 @@ const PROMOTION_OPTIONS = [
   { value: 'limited-stock', label: 'Limited Stock', icon: '⚠️', color: '#E74C3C' }
 ];
 
+
+const compressImageSmart = async (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // MORE AGGRESSIVE compression - target under 300KB
+        let quality = 0.4; // Default 40% quality
+        
+        if (file.size > 5 * 1024 * 1024) {
+          quality = 0.25; // 25% quality for 5MB+ files
+        } else if (file.size > 2 * 1024 * 1024) {
+          quality = 0.3; // 30% quality for 2-5MB files
+        } else if (file.size > 1 * 1024 * 1024) {
+          quality = 0.35; // 35% quality for 1-2MB files
+        } else if (file.size > 500 * 1024) {
+          quality = 0.45; // 45% quality for 500KB-1MB files
+        } else {
+          quality = 0.55; // 55% quality for smaller files
+        }
+        
+        canvas.toBlob(
+          (blob) => {
+            const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            const reduction = ((file.size - blob.size) / file.size * 100).toFixed(1);
+            console.log(`📸 Compressed: ${(file.size / 1024).toFixed(0)}KB → ${(blob.size / 1024).toFixed(0)}KB (${reduction}% reduction)`);
+            resolve(compressedFile);
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+    };
+    
+    reader.onerror = () => reject(new Error('Failed to read file'));
+  });
+};
+
 // Cloudinary upload function for images
+// const uploadToCloudinary = async (file) => {
+//   const formData = new FormData();
+//   formData.append('file', file);
+//   formData.append('upload_preset', 'toys-products');
+  
+//   try {
+//     const response = await fetch(
+//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+//       {
+//         method: 'POST',
+//         body: formData,
+//       }
+//     );
+    
+//     const data = await response.json();
+//     if (data.secure_url) {
+//       return {
+//         url: data.secure_url,
+//         publicId: data.public_id,
+//       };
+//     } else {
+//       throw new Error(data.error?.message || 'Upload failed');
+//     }
+//   } catch (error) {
+//     console.error('Cloudinary upload error:', error);
+//     throw error;
+//   }
+// };
+
 const uploadToCloudinary = async (file) => {
+  // Client-side compression only
+  const compressedFile = await compressImageSmart(file);
+  
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('file', compressedFile);
   formData.append('upload_preset', 'toys-products');
   
   try {
@@ -2289,6 +2376,7 @@ const uploadToCloudinary = async (file) => {
     
     const data = await response.json();
     if (data.secure_url) {
+      console.log(`✅ Image uploaded successfully`);
       return {
         url: data.secure_url,
         publicId: data.public_id,
@@ -2301,17 +2389,46 @@ const uploadToCloudinary = async (file) => {
     throw error;
   }
 };
-
 // Upload video to Cloudinary
+// const uploadVideoToCloudinary = async (file) => {
+//   const formData = new FormData();
+//   formData.append('file', file);
+//   formData.append('upload_preset', 'toys-products');
+//   formData.append('resource_type', 'video');
+  
+//   try {
+//     const response = await fetch(
+//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
+//       {
+//         method: 'POST',
+//         body: formData,
+//       }
+//     );
+    
+//     const data = await response.json();
+//     if (data.secure_url) {
+//       return {
+//         url: data.secure_url,
+//         publicId: data.public_id,
+//       };
+//     } else {
+//       throw new Error(data.error?.message || 'Upload failed');
+//     }
+//   } catch (error) {
+//     console.error('Cloudinary video upload error:', error);
+//     throw error;
+//   }
+// };
+
 const uploadVideoToCloudinary = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', 'toys-products');
-  formData.append('resource_type', 'video');
+  // Do NOT include resource_type: 'video'
   
   try {
     const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`,
       {
         method: 'POST',
         body: formData,
@@ -2320,6 +2437,7 @@ const uploadVideoToCloudinary = async (file) => {
     
     const data = await response.json();
     if (data.secure_url) {
+      toast.success('Video uploaded and compressed successfully!');
       return {
         url: data.secure_url,
         publicId: data.public_id,
@@ -2329,6 +2447,7 @@ const uploadVideoToCloudinary = async (file) => {
     }
   } catch (error) {
     console.error('Cloudinary video upload error:', error);
+    toast.error('Failed to upload video');
     throw error;
   }
 };
@@ -2944,7 +3063,7 @@ useEffect(() => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://kids-backend.vercel.app/api/categories', {
+      const response = await fetch('http://localhost:5000/api/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2960,7 +3079,7 @@ useEffect(() => {
   const fetchSubcategories = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}/subcategories`, {
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2978,7 +3097,7 @@ useEffect(() => {
   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -3585,7 +3704,7 @@ const handleSaveDraft = () => {
         images: imageUrls
       };
 
-      const response = await fetch('https://kids-backend.vercel.app/api/products', {
+      const response = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

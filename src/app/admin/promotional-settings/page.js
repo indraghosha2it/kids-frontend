@@ -77,7 +77,7 @@
 //   const fetchProducts = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://kids-backend.vercel.app/api/products?limit=100', {
+//       const response = await fetch('http://localhost:5000/api/products?limit=100', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -94,7 +94,7 @@
 //     setLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://kids-backend.vercel.app/api/promotional-settings', {
+//       const response = await fetch('http://localhost:5000/api/promotional-settings', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -218,7 +218,7 @@
 //     setSaving(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://kids-backend.vercel.app/api/promotional-settings', {
+//       const response = await fetch('http://localhost:5000/api/promotional-settings', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -268,7 +268,7 @@
 //     setSaving(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://kids-backend.vercel.app/api/promotional-settings/${editingItem._id}`, {
+//       const response = await fetch(`http://localhost:5000/api/promotional-settings/${editingItem._id}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -306,7 +306,7 @@
 //     setSaving(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://kids-backend.vercel.app/api/promotional-settings/${id}`, {
+//       const response = await fetch(`http://localhost:5000/api/promotional-settings/${id}`, {
 //         method: 'DELETE',
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
@@ -938,7 +938,7 @@ export default function PromotionalSettings() {
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://kids-backend.vercel.app/api/products?limit=100', {
+      const response = await fetch('http://localhost:5000/api/products?limit=100', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -953,7 +953,7 @@ export default function PromotionalSettings() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://kids-backend.vercel.app/api/categories');
+      const response = await fetch('http://localhost:5000/api/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data);
@@ -967,7 +967,7 @@ export default function PromotionalSettings() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://kids-backend.vercel.app/api/promotional-settings', {
+      const response = await fetch('http://localhost:5000/api/promotional-settings', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -1091,7 +1091,7 @@ export default function PromotionalSettings() {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://kids-backend.vercel.app/api/promotional-settings', {
+      const response = await fetch('http://localhost:5000/api/promotional-settings', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1145,7 +1145,7 @@ export default function PromotionalSettings() {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://kids-backend.vercel.app/api/promotional-settings/${editingItem._id}`, {
+      const response = await fetch(`http://localhost:5000/api/promotional-settings/${editingItem._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1192,7 +1192,7 @@ export default function PromotionalSettings() {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://kids-backend.vercel.app/api/promotional-settings/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/promotional-settings/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

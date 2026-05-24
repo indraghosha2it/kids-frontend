@@ -120,7 +120,7 @@
 //         params.append('search', searchTerm.trim());
 //       }
 
-//       const response = await fetch(`https://kids-backend.vercel.app/api/reviews/user/me?${params.toString()}`, {
+//       const response = await fetch(`http://localhost:5000/api/reviews/user/me?${params.toString()}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -229,7 +229,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://kids-backend.vercel.app/api/reviews/${editModal.review._id}`, {
+//       const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -908,6 +908,8 @@
 //     </div>
 //   );
 // }
+
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -964,6 +966,61 @@ const EditReviewModal = ({
   const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name';
   const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'your_upload_preset';
 
+  // Add this function after the Cloudinary configuration
+const compressImageSmart = async (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // MORE AGGRESSIVE compression - target under 300KB
+        let quality = 0.4; // Default 40% quality
+        
+        if (file.size > 5 * 1024 * 1024) {
+          quality = 0.25; // 25% quality for 5MB+ files
+        } else if (file.size > 2 * 1024 * 1024) {
+          quality = 0.3; // 30% quality for 2-5MB files
+        } else if (file.size > 1 * 1024 * 1024) {
+          quality = 0.35; // 35% quality for 1-2MB files
+        } else if (file.size > 500 * 1024) {
+          quality = 0.45; // 45% quality for 500KB-1MB files
+        } else {
+          quality = 0.55; // 55% quality for smaller files
+        }
+        
+        canvas.toBlob(
+          (blob) => {
+            const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            const reduction = ((file.size - blob.size) / file.size * 100).toFixed(1);
+            console.log(`📸 Review Image Compressed: ${(file.size / 1024).toFixed(0)}KB → ${(blob.size / 1024).toFixed(0)}KB (${reduction}% reduction)`);
+            resolve(compressedFile);
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+    };
+    
+    reader.onerror = () => reject(new Error('Failed to read file'));
+  });
+};
+
   // Initialize form when review changes
   useEffect(() => {
     if (review && isOpen) {
@@ -992,44 +1049,98 @@ const EditReviewModal = ({
   }, []);
 
   // Upload to Cloudinary
-  const uploadToCloudinary = async (file, type, fileId) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  // const uploadToCloudinary = async (file, type, fileId) => {
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
     
-    const folder = type === 'image' ? 'reviews/images' : 'reviews/videos';
-    formData.append('folder', folder);
+  //   const folder = type === 'image' ? 'reviews/images' : 'reviews/videos';
+  //   formData.append('folder', folder);
 
-    const abortController = new AbortController();
-    uploadAbortControllers.current[fileId] = abortController;
+  //   const abortController = new AbortController();
+  //   uploadAbortControllers.current[fileId] = abortController;
 
+  //   try {
+  //     const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type === 'image' ? 'image' : 'video'}/upload`, {
+  //       method: 'POST',
+  //       body: formData,
+  //       signal: abortController.signal
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.error?.message || 'Upload failed');
+  //     }
+
+  //     const data = await response.json();
+  //     return {
+  //       url: data.secure_url,
+  //       publicId: data.public_id
+  //     };
+  //   } catch (error) {
+  //     if (error.name === 'AbortError') {
+  //       return null;
+  //     }
+  //     throw error;
+  //   } finally {
+  //     delete uploadAbortControllers.current[fileId];
+  //   }
+  // };
+// Upload to Cloudinary with compression
+const uploadToCloudinary = async (file, type, fileId) => {
+  let fileToUpload = file;
+  
+  // Compress images before upload
+  if (type === 'image') {
     try {
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type === 'image' ? 'image' : 'video'}/upload`, {
-        method: 'POST',
-        body: formData,
-        signal: abortController.signal
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Upload failed');
-      }
-
-      const data = await response.json();
-      return {
-        url: data.secure_url,
-        publicId: data.public_id
-      };
+      fileToUpload = await compressImageSmart(file);
     } catch (error) {
-      if (error.name === 'AbortError') {
-        return null;
-      }
-      throw error;
-    } finally {
-      delete uploadAbortControllers.current[fileId];
+      console.error('Compression error, using original file:', error);
+      fileToUpload = file;
     }
-  };
+  }
+  
+  const formData = new FormData();
+  formData.append('file', fileToUpload);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  
+  const folder = type === 'image' ? 'reviews/images' : 'reviews/videos';
+  formData.append('folder', folder);
 
+  const abortController = new AbortController();
+  uploadAbortControllers.current[fileId] = abortController;
+
+  try {
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${type === 'image' ? 'image' : 'video'}/upload`, {
+      method: 'POST',
+      body: formData,
+      signal: abortController.signal
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Upload failed');
+    }
+
+    const data = await response.json();
+    
+    if (type === 'video') {
+      console.log(`🎥 Video uploaded successfully`);
+    }
+    
+    return {
+      url: data.secure_url,
+      publicId: data.public_id
+    };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return null;
+    }
+    throw error;
+  } finally {
+    delete uploadAbortControllers.current[fileId];
+  }
+};
   // Handle image upload
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
@@ -1729,7 +1840,7 @@ export default function CustomerMyReviews() {
         return;
       }
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/my-reviews`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/my-reviews`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -1799,7 +1910,7 @@ const handleUpdateReview = async (saveData) => {
     
     console.log('Sending update data:', saveData); // Debug log
     
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${selectedReview._id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${selectedReview._id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,

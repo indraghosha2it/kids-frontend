@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://kids-backend.vercel.app/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 export const paymentService = {
  initiatePayment: async (orderData, returnUrl, cancelUrl) => {

@@ -173,7 +173,7 @@ export default function ModeratorCouponManager() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://kids-backend.vercel.app/api/categories', {
+      const response = await fetch('http://localhost:5000/api/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -188,7 +188,7 @@ export default function ModeratorCouponManager() {
   const fetchSingleCoupon = async (couponId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${couponId}`, {
+      const response = await fetch(`http://localhost:5000/api/coupons/${couponId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -246,7 +246,7 @@ export default function ModeratorCouponManager() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/check-code?code=${encodeURIComponent(code)}`, {
+      const response = await fetch(`http://localhost:5000/api/coupons/check-code?code=${encodeURIComponent(code)}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -408,7 +408,7 @@ export default function ModeratorCouponManager() {
         autoApply: formData.autoApply
       };
       
-      const response = await fetch('https://kids-backend.vercel.app/api/coupons', {
+      const response = await fetch('http://localhost:5000/api/coupons', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -495,7 +495,7 @@ export default function ModeratorCouponManager() {
         autoApply: editFormData.autoApply
       };
       
-      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${selectedCouponId}`, {
+      const response = await fetch(`http://localhost:5000/api/coupons/${selectedCouponId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -526,7 +526,7 @@ export default function ModeratorCouponManager() {
     setIsLoadingCoupons(true);
     try {
       const token = localStorage.getItem('token');
-      let url = `https://kids-backend.vercel.app/api/coupons?page=${currentPage}&limit=${itemsPerPage}`;
+      let url = `http://localhost:5000/api/coupons?page=${currentPage}&limit=${itemsPerPage}`;
       
       if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
       if (filterStatus !== 'all') {
@@ -558,7 +558,7 @@ export default function ModeratorCouponManager() {
   const handleToggleStatus = async (coupon) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${coupon._id}`, {
+      const response = await fetch(`http://localhost:5000/api/coupons/${coupon._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -607,7 +607,7 @@ export default function ModeratorCouponManager() {
         autoApply: coupon.autoApply
       };
       
-      const response = await fetch('https://kids-backend.vercel.app/api/coupons', {
+      const response = await fetch('http://localhost:5000/api/coupons', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

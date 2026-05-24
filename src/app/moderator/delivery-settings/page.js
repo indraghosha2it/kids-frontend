@@ -56,7 +56,7 @@ export default function ModeratorDeliverySettingsPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://kids-backend.vercel.app/api/delivery/settings', {
+      const response = await fetch('http://localhost:5000/api/delivery/settings', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -96,7 +96,7 @@ export default function ModeratorDeliverySettingsPage() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://kids-backend.vercel.app/api/delivery/settings', {
+      const response = await fetch('http://localhost:5000/api/delivery/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

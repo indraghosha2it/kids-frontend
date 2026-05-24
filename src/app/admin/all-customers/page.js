@@ -117,7 +117,7 @@
 //         subscription: selectedSubscription !== 'all' ? selectedSubscription : '' // NEW: Filter by subscription
 //       });
 
-//       const response = await fetch(`https://kids-backend.vercel.app/api/admin/customers?${params}`, {
+//       const response = await fetch(`http://localhost:5000/api/admin/customers?${params}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -157,7 +157,7 @@
 //       const token = localStorage.getItem('token');
 //       const endpoint = currentStatus ? 'unsubscribe' : 'subscribe';
       
-//       const response = await fetch(`https://kids-backend.vercel.app/api/auth/${endpoint}`, {
+//       const response = await fetch(`http://localhost:5000/api/auth/${endpoint}`, {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -194,7 +194,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch(`https://kids-backend.vercel.app/api/admin/customers/${deleteModal.customerId}`, {
+//       const response = await fetch(`http://localhost:5000/api/admin/customers/${deleteModal.customerId}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -271,7 +271,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch(`https://kids-backend.vercel.app/api/admin/customers/${editModal.customer._id}`, {
+//       const response = await fetch(`http://localhost:5000/api/admin/customers/${editModal.customer._id}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -350,7 +350,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch(`https://kids-backend.vercel.app/api/admin/customers/${passwordModal.customerId}/reset-password`, {
+//       const response = await fetch(`http://localhost:5000/api/admin/customers/${passwordModal.customerId}/reset-password`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -432,7 +432,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch('https://kids-backend.vercel.app/api/auth/admin/create-customer', {
+//       const response = await fetch('http://localhost:5000/api/auth/admin/create-customer', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1744,7 +1744,7 @@ export default function AllCustomers() {
         subscription: selectedSubscription !== 'all' ? selectedSubscription : ''
       });
 
-      const response = await fetch(`https://kids-backend.vercel.app/api/admin/customers?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/admin/customers?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1782,7 +1782,7 @@ export default function AllCustomers() {
       const token = localStorage.getItem('token');
       const endpoint = currentStatus ? 'unsubscribe' : 'subscribe';
       
-      const response = await fetch(`https://kids-backend.vercel.app/api/auth/${endpoint}`, {
+      const response = await fetch(`http://localhost:5000/api/auth/${endpoint}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1817,7 +1817,7 @@ export default function AllCustomers() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`https://kids-backend.vercel.app/api/admin/customers/${deleteModal.customerId}`, {
+      const response = await fetch(`http://localhost:5000/api/admin/customers/${deleteModal.customerId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1891,7 +1891,7 @@ export default function AllCustomers() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`https://kids-backend.vercel.app/api/admin/customers/${editModal.customer._id}`, {
+      const response = await fetch(`http://localhost:5000/api/admin/customers/${editModal.customer._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1968,7 +1968,7 @@ export default function AllCustomers() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`https://kids-backend.vercel.app/api/admin/customers/${passwordModal.customerId}/reset-password`, {
+      const response = await fetch(`http://localhost:5000/api/admin/customers/${passwordModal.customerId}/reset-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -2050,7 +2050,7 @@ export default function AllCustomers() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch('https://kids-backend.vercel.app/api/auth/admin/create-customer', {
+      const response = await fetch('http://localhost:5000/api/auth/admin/create-customer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

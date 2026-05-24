@@ -101,7 +101,7 @@ export default function ModeratorBlogs() {
         params.append('search', searchTerm);
       }
 
-      const response = await fetch(`https://kids-backend.vercel.app/api/blogs/admin/all?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/blogs/admin/all?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

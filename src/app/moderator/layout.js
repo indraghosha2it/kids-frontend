@@ -647,16 +647,16 @@ export default function ModeratorLayout({ children }) {
     }
 
     // Popup Settings
-    if (href === '/moderator/popup-settings') {
-      return currentPath === '/moderator/popup-settings' || 
-             currentPath.startsWith('/moderator/popup-settings/');
-    }
+    // if (href === '/moderator/popup-settings') {
+    //   return currentPath === '/moderator/popup-settings' || 
+    //          currentPath.startsWith('/moderator/popup-settings/');
+    // }
 
-    // Promotional Popup
-    if (href === '/moderator/promotional-settings') {
-      return currentPath === '/moderator/promotional-settings' || 
-             currentPath.startsWith('/moderator/promotional-settings/');
-    }
+    // // Promotional Popup
+    // if (href === '/moderator/promotional-settings') {
+    //   return currentPath === '/moderator/promotional-settings' || 
+    //          currentPath.startsWith('/moderator/promotional-settings/');
+    // }
     
     // Create Blog
     if (href === '/moderator/create-blog') {
@@ -671,11 +671,7 @@ export default function ModeratorLayout({ children }) {
              currentPath.startsWith('/moderator/allBlogs/');
     }
     
-    // Manage Certifications
-    if (href === '/moderator/certifications') {
-      return currentPath === '/moderator/certifications' || 
-             currentPath.startsWith('/moderator/certifications/');
-    }
+  
     
     // Manage Reviews
     if (href === '/moderator/manage-reviews') {
@@ -730,11 +726,11 @@ export default function ModeratorLayout({ children }) {
     { name: 'All Orders', href: '/moderator/orders', icon: MessageSquare, color: '#4A8A90' },
     { name: 'Manage Coupon', href: '/moderator/coupon', icon: Ticket, color: '#4A8A90' },
     { name: 'Delivery Settings', href: '/moderator/delivery-settings', icon: Truck, color: '#4A8A90' }, 
-    { name: 'Popup Settings', href: '/moderator/popup-settings', icon: Star, color: '#4A8A90' },
-    { name: 'Promotional Popup', href: '/moderator/promotional-settings', icon: Rocket, color: '#4A8A90' },
+    // { name: 'Popup Settings', href: '/moderator/popup-settings', icon: Star, color: '#4A8A90' },
+    // { name: 'Promotional Popup', href: '/moderator/promotional-settings', icon: Rocket, color: '#4A8A90' },
     { name: 'Create Blog', href: '/moderator/create-blog', icon: Newspaper, color: '#4A8A90' },
     { name: 'Manage Blogs', href: '/moderator/manage-blogs', icon: Edit, color: '#4A8A90' },
-    { name: 'Manage Certifications', href: '/moderator/certifications', icon: Award, color: '#4A8A90' },
+
     { name: 'Manage Reviews', href: '/moderator/manage-reviews', icon: Star, color: '#4A8A90' },
     { name: 'Settings', href: '/moderator/settings', icon: Settings, color: '#4A8A90' }
   ];

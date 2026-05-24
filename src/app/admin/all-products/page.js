@@ -1106,7 +1106,16 @@ import {
 import { toast } from 'sonner';
 
 // Age group options
+// const AGE_GROUPS = [
+//   { value: '0-2', label: '0-2 years', icon: '👶', color: 'bg-pink-100 text-pink-600' },
+//   { value: '3-5', label: '3-5 years', icon: '🧒', color: 'bg-blue-100 text-blue-600' },
+//   { value: '6-10', label: '6-10 years', icon: '👧', color: 'bg-green-100 text-green-600' },
+//   { value: '11-14', label: '11-14 years', icon: '🧑', color: 'bg-purple-100 text-purple-600' }
+// ];
+
 const AGE_GROUPS = [
+  { value: 'all', label: 'All Ages', icon: '🎂', color: 'bg-gray-100 text-gray-600' },  // Changed from '' to 'all'
+  { value: 'no-age', label: 'All Kids', icon: '🎈', color: 'bg-teal-100 text-teal-600' },  // For products with NO age group
   { value: '0-2', label: '0-2 years', icon: '👶', color: 'bg-pink-100 text-pink-600' },
   { value: '3-5', label: '3-5 years', icon: '🧒', color: 'bg-blue-100 text-blue-600' },
   { value: '6-10', label: '6-10 years', icon: '👧', color: 'bg-green-100 text-green-600' },
@@ -1145,7 +1154,15 @@ const getTagStyle = (tag) => {
 };
 
 // Helper function to get age group style
+// const getAgeGroupStyle = (ageGroup) => {
+//   const age = AGE_GROUPS.find(a => a.value === ageGroup);
+//   return age?.color || 'bg-gray-100 text-gray-600';
+// };
+
 const getAgeGroupStyle = (ageGroup) => {
+  if (!ageGroup || ageGroup === '') {
+    return 'bg-teal-100 text-teal-600';
+  }
   const age = AGE_GROUPS.find(a => a.value === ageGroup);
   return age?.color || 'bg-gray-100 text-gray-600';
 };
@@ -1427,12 +1444,25 @@ const ProductList = ({ product, onEdit, onView, onDelete, onToggleStatus }) => {
     )}
     
     {/* Age Group */}
-    {product.ageGroup && (
+    {/* {product.ageGroup && (
       <div className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium ${getAgeGroupStyle(product.ageGroup)}`}>
         <Users className="w-2.5 h-2.5" />
         Ages {product.ageGroup}
       </div>
-    )}
+    )} */}
+
+    {/* Age Group */}
+{product.ageGroup ? (
+  <div className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium ${getAgeGroupStyle(product.ageGroup)}`}>
+    <Users className="w-2.5 h-2.5" />
+    Ages {product.ageGroup}
+  </div>
+) : (
+  <div className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-teal-100 text-teal-600">
+    <Users className="w-2.5 h-2.5" />
+    All Kids
+  </div>
+)}
     
     {/* Category */}
     {product.category?.name && (
@@ -1571,7 +1601,7 @@ export default function AdminAllProducts() {
     category: '',
     subcategory: '',
     childSubcategory: '',
-    ageGroup: '',
+   ageGroup: 'all', 
     minPrice: '',
     maxPrice: '',
     status: 'all',
@@ -1702,61 +1732,136 @@ export default function AdminAllProducts() {
     }
   };
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const queryParams = new URLSearchParams();
-      queryParams.append('page', currentPage);
-      queryParams.append('limit', 10);
+//   const fetchProducts = async () => {
+//     setLoading(true);
+//     try {
+//       const token = localStorage.getItem('token');
+//       const queryParams = new URLSearchParams();
+//       queryParams.append('page', currentPage);
+//       queryParams.append('limit', 10);
       
-      if (filters.search) queryParams.append('search', filters.search);
-      if (filters.category) queryParams.append('category', filters.category);
-      if (filters.subcategory) queryParams.append('subcategory', filters.subcategory);
-      if (filters.childSubcategory) queryParams.append('childSubcategory', filters.childSubcategory);
-      if (filters.ageGroup) queryParams.append('ageGroup', filters.ageGroup);
-      if (filters.minPrice) queryParams.append('minPrice', filters.minPrice);
-      if (filters.maxPrice) queryParams.append('maxPrice', filters.maxPrice);
+//       if (filters.search) queryParams.append('search', filters.search);
+//       if (filters.category) queryParams.append('category', filters.category);
+//       if (filters.subcategory) queryParams.append('subcategory', filters.subcategory);
+//       if (filters.childSubcategory) queryParams.append('childSubcategory', filters.childSubcategory);
+//       // if (filters.ageGroup) queryParams.append('ageGroup', filters.ageGroup);
+//       // Handle age group filter - empty string means "All Kids" (no age group specified)
+// if (filters.ageGroup !== undefined && filters.ageGroup !== '') {
+//   queryParams.append('ageGroup', filters.ageGroup);
+// } else if (filters.ageGroup === '') {
+//   // This means filter for products with NO age group specified
+//   // You need to add a special parameter for this
+//   queryParams.append('noAgeGroup', 'true');
+// }
+//       if (filters.minPrice) queryParams.append('minPrice', filters.minPrice);
+//       if (filters.maxPrice) queryParams.append('maxPrice', filters.maxPrice);
       
-      if (filters.isFeatured === 'featured') {
-        queryParams.append('isFeatured', 'true');
-      }
+//       if (filters.isFeatured === 'featured') {
+//         queryParams.append('isFeatured', 'true');
+//       }
       
-      queryParams.append('includeInactive', 'true');
+//       queryParams.append('includeInactive', 'true');
       
-      if (filters.status === 'active') {
-        queryParams.append('isActive', 'true');
-      } else if (filters.status === 'inactive') {
-        queryParams.append('isActive', 'false');
-      }
+//       if (filters.status === 'active') {
+//         queryParams.append('isActive', 'true');
+//       } else if (filters.status === 'inactive') {
+//         queryParams.append('isActive', 'false');
+//       }
       
-      let sortParam = '-createdAt';
-      switch (filters.sortBy) {
-        case 'price_low': sortParam = 'price_asc'; break;
-        case 'price_high': sortParam = 'price_desc'; break;
-        case 'name_asc': sortParam = 'name_asc'; break;
-        case 'rating_desc': sortParam = 'rating_desc'; break;
-        default: sortParam = 'newest';
-      }
-      queryParams.append('sort', sortParam);
+//       let sortParam = '-createdAt';
+//       switch (filters.sortBy) {
+//         case 'price_low': sortParam = 'price_asc'; break;
+//         case 'price_high': sortParam = 'price_desc'; break;
+//         case 'name_asc': sortParam = 'name_asc'; break;
+//         case 'rating_desc': sortParam = 'rating_desc'; break;
+//         default: sortParam = 'newest';
+//       }
+//       queryParams.append('sort', sortParam);
 
-      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await response.json();
+//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`, {
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       const data = await response.json();
       
-      if (data.success) {
-        setProducts(data.data || []);
-        setTotalPages(data.pagination?.pages || 1);
-        setTotalProducts(data.pagination?.total || 0);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Failed to fetch products');
-    } finally {
-      setLoading(false);
+//       if (data.success) {
+//         setProducts(data.data || []);
+//         setTotalPages(data.pagination?.pages || 1);
+//         setTotalProducts(data.pagination?.total || 0);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching products:', error);
+//       toast.error('Failed to fetch products');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+const fetchProducts = async () => {
+  setLoading(true);
+  try {
+    const token = localStorage.getItem('token');
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', currentPage);
+    queryParams.append('limit', 10);
+    
+    if (filters.search) queryParams.append('search', filters.search);
+    if (filters.category) queryParams.append('category', filters.category);
+    if (filters.subcategory) queryParams.append('subcategory', filters.subcategory);
+    if (filters.childSubcategory) queryParams.append('childSubcategory', filters.childSubcategory);
+    
+    // Handle age group filter
+    if (filters.ageGroup === 'all') {
+      // Do nothing - show all products
+    } else if (filters.ageGroup === 'no-age') {
+      // Show only products with NO age group
+      queryParams.append('noAgeGroup', 'true');
+    } else if (filters.ageGroup) {
+      // Show products with specific age group
+      queryParams.append('ageGroup', filters.ageGroup);
     }
-  };
+    
+    if (filters.minPrice) queryParams.append('minPrice', filters.minPrice);
+    if (filters.maxPrice) queryParams.append('maxPrice', filters.maxPrice);
+    
+    if (filters.isFeatured === 'featured') {
+      queryParams.append('isFeatured', 'true');
+    }
+    
+    queryParams.append('includeInactive', 'true');
+    
+    if (filters.status === 'active') {
+      queryParams.append('isActive', 'true');
+    } else if (filters.status === 'inactive') {
+      queryParams.append('isActive', 'false');
+    }
+    
+    let sortParam = '-createdAt';
+    switch (filters.sortBy) {
+      case 'price_low': sortParam = 'price_asc'; break;
+      case 'price_high': sortParam = 'price_desc'; break;
+      case 'name_asc': sortParam = 'name_asc'; break;
+      case 'rating_desc': sortParam = 'rating_desc'; break;
+      default: sortParam = 'newest';
+    }
+    queryParams.append('sort', sortParam);
+
+    const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      setProducts(data.data || []);
+      setTotalPages(data.pagination?.pages || 1);
+      setTotalProducts(data.pagination?.total || 0);
+    }
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    toast.error('Failed to fetch products');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleFilterChange = (name, value) => {
     setFilters(prev => ({ ...prev, [name]: value }));

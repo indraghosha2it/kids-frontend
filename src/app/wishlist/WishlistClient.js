@@ -60,6 +60,7 @@ const getAgeGroupBadge = (ageGroup) => {
     '3-5': 'bg-blue-100 text-blue-600',
     '6-10': 'bg-green-100 text-green-600',
     '11-14': 'bg-purple-100 text-purple-600',
+     '': 'bg-teal-100 text-teal-600'
   };
   return styles[ageGroup] || 'bg-gray-100 text-gray-600';
 };
@@ -334,15 +335,19 @@ const WishlistGridCard = ({ item, router, onRemove, isInCart, onAddToCart, onVie
         </h3>
         
         {/* Age Group and Rating Row - Smaller on mobile */}
-        <div className="flex items-center justify-between mb-1">
-          {item.ageGroup ? (
-            <div className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[6px] sm:text-[8px] font-semibold ${getAgeGroupBadge(item.ageGroup)}`}>
-              <Users className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
-              Ages {item.ageGroup}
-            </div>
-          ) : (
-            <div className="text-[6px] sm:text-[8px] text-gray-400">✨ Wishlist</div>
-          )}
+       {/* Age Group and Rating Row - Smaller on mobile */}
+<div className="flex items-center justify-between mb-1">
+  {item.ageGroup ? (
+    <div className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[6px] sm:text-[8px] font-semibold ${getAgeGroupBadge(item.ageGroup)}`}>
+      <Users className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
+      Ages {item.ageGroup}
+    </div>
+  ) : (
+    <div className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[6px] sm:text-[8px] font-semibold ${getAgeGroupBadge('')}`}>
+      <Users className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
+      All Kids
+    </div>
+  )}
           
           <div className="flex items-center gap-0.5">
             <div className="flex items-center">
@@ -446,68 +451,7 @@ export default function WishlistClient() {
   const [productsInCart, setProductsInCart] = useState({});
   const fetchInProgress = useRef(false);
 
-  // Fetch wishlist function
-//   const fetchWishlist = useCallback(async (silent = false) => {
-//     if (fetchInProgress.current) {
-//       console.log('Fetch already in progress, skipping');
-//       return;
-//     }
-    
-//     fetchInProgress.current = true;
-//     if (!silent) setLoading(true);
-    
-//     try {
-//       const token = localStorage.getItem('token');
-//       const sessionId = localStorage.getItem('wishlistSessionId');
-//       const headers = {};
-      
-//       if (token) {
-//         headers['Authorization'] = `Bearer ${token}`;
-//       } else if (sessionId) {
-//         headers['x-session-id'] = sessionId;
-//       }
-      
-//       // Also fetch product details for each wishlist item to get images and tags
-//       const response = await fetch('http://localhost:5000/api/wishlist', { headers });
-//       const data = await response.json();
-      
-//       if (data.success && data.data.items.length > 0) {
-//         // Fetch product details for each wishlist item to get full product data
-//         const enrichedItems = await Promise.all(
-//           data.data.items.map(async (item) => {
-//             try {
-//               const productResponse = await fetch(`http://localhost:5000/api/products/${item.productId}`);
-//               const productData = await productResponse.json();
-//               if (productData.success) {
-//                 return {
-//                   ...item,
-//                   ...productData.data,
-//                   images: productData.data.images || [{ url: item.image }],
-//                   tags: productData.data.tags || [],
-//                   ageGroup: productData.data.ageGroup,
-//                   category: productData.data.category
-//                 };
-//               }
-//               return item;
-//             } catch (error) {
-//               console.error('Error fetching product details:', error);
-//               return item;
-//             }
-//           })
-//         );
-        
-//         setWishlist({ ...data.data, items: enrichedItems });
-//       } else {
-//         setWishlist({ items: [], totalItems: 0 });
-//       }
-//     } catch (error) {
-//       console.error('Fetch wishlist error:', error);
-//       if (!silent) toast.error('Failed to load wishlist');
-//     } finally {
-//       fetchInProgress.current = false;
-//       if (!silent) setLoading(false);
-//     }
-//   }, []);
+
 
 // Fetch wishlist function - simplified (no need for separate product fetching)
 const fetchWishlist = useCallback(async (silent = false) => {

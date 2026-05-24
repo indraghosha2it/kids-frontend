@@ -43,13 +43,13 @@ import BlogMetadataUpdater from './MetadataUpdater';
 
 // ToyMart Brand Colors
 const COLORS = {
-  primary: '#4A8A90',      // Teal
-  secondary: '#FFB6C1',    // Soft Pink
-  accent: '#FFD93D',       // Yellow
+  primary: '#4A8A90',
+  secondary: '#FFB6C1',
+  accent: '#FFD93D',
   neutral: '#FFFFFF',
-  lightGray: '#FFF9F0',    // Warm Cream
+  lightGray: '#FFF9F0',
   border: '#E5E7EB',
-  text: '#2D3A5C',         // Dark Blue
+  text: '#2D3A5C',
   textLight: '#6B7280',
   dark: '#1A1512',
   gold: '#FFD93D'
@@ -79,6 +79,15 @@ const floatingElements = [
   { icon: '🚀', left: '10%', top: '50%', delay: 1.5, duration: 7 },
   { icon: '⭐', left: '88%', top: '45%', delay: 2.5, duration: 12 },
 ];
+
+// Helper function to strip HTML tags
+const stripHtmlTags = (html) => {
+  if (!html) return '';
+  // Create a temporary div to decode HTML entities and strip tags
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  return tempDiv.textContent || tempDiv.innerText || '';
+};
 
 export default function BlogDetailsClient() {
   const searchParams = useSearchParams();
@@ -118,12 +127,61 @@ export default function BlogDetailsClient() {
         const data = await response.json();
         
         if (data.success) {
-          setBlog(data.data);
+          // Process content to fix HTML formatting
+          let processedContent = data.data.content;
+          
+          // Fix lists - ensure proper HTML list formatting
+          processedContent = processedContent.replace(/•\s+/g, '<li>');
+          processedContent = processedContent.replace(/(<li>.*?)(\n|$)/g, '$1</li>\n');
+          processedContent = processedContent.replace(/(<li>.*?<\/li>\n?)+/g, '<ul>$&</ul>');
+          
+          // Fix numbered lists
+          processedContent = processedContent.replace(/(\d+)\.\s+/g, '<li value="$1">');
+          processedContent = processedContent.replace(/(<li value="\d+">.*?)(\n|$)/g, '$1</li>\n');
+          
+          // Fix bold and strong tags
+          processedContent = processedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+          
+          // Fix line breaks
+          processedContent = processedContent.replace(/\n\n/g, '</p><p>');
+          processedContent = processedContent.replace(/\n/g, '<br/>');
+          
+          // Wrap in paragraphs if not already
+          if (!processedContent.startsWith('<')) {
+            processedContent = `<p>${processedContent}</p>`;
+          }
+          
+          setBlog({ ...data.data, content: processedContent });
           
           // Extract headings from content for table of contents
-          const headingRegex = /<h2>(.*?)<\/h2>/g;
-          const matches = [...data.data.content.matchAll(headingRegex)];
-          setHeadings(matches.map(match => ({ text: match[1], id: match[1].toLowerCase().replace(/\s/g, '-') })));
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = processedContent;
+          
+          // Get all heading elements (h2, h3, h4)
+          const headingElements = tempDiv.querySelectorAll('h2, h3, h4');
+          const extractedHeadings = [];
+          
+          headingElements.forEach((el, index) => {
+            // Get clean text without HTML tags
+            let headingText = el.textContent || el.innerText;
+            headingText = stripHtmlTags(headingText).trim();
+            
+            if (headingText && headingText.length > 0) {
+              // Create a clean ID
+              const id = `heading-${index}-${headingText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')}`;
+              el.id = id;
+              extractedHeadings.push({
+                text: headingText,
+                id: id,
+                level: el.tagName.toLowerCase()
+              });
+            }
+          });
+          
+          // Update content with IDs
+          const updatedContent = tempDiv.innerHTML;
+          setBlog(prev => ({ ...prev, content: updatedContent }));
+          setHeadings(extractedHeadings);
           
           // Prepare gallery images
           const images = [];
@@ -270,6 +328,12 @@ export default function BlogDetailsClient() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [headings]);
 
+  // Helper function to render rich text content safely
+  const renderRichText = (content) => {
+    if (!content) return '';
+    return { __html: content };
+  };
+
   if (loading) {
     return (
       <>
@@ -324,10 +388,10 @@ export default function BlogDetailsClient() {
 
   return (
     <>
-    {blog && <BlogMetadataUpdater blog={blog} />}
+      {blog && <BlogMetadataUpdater blog={blog} />}
       <Navbar />
       
-      <main className=" -mt-18 min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #FFF9F0 0%, #D4EDEE 100%)' }}>
+      <main className="-mt-18 min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #FFF9F0 0%, #D4EDEE 100%)' }}>
         
         {/* Floating Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
@@ -385,7 +449,6 @@ export default function BlogDetailsClient() {
                 >
                   {category.icon} {category.label}
                 </span>
-              
               </div>
               
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 leading-tight max-w-4xl" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
@@ -400,6 +463,7 @@ export default function BlogDetailsClient() {
                   <span>{blog.author}</span>
                 </div>
               
+             
               </div>
             </div>
           </div>
@@ -407,27 +471,48 @@ export default function BlogDetailsClient() {
 
         {/* ========== MAIN CONTENT AREA ========== */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-           <div className="flex flex-col lg:flex-row lg:items-start gap-8">
+          <div className="flex flex-col lg:flex-row lg:items-start gap-8">
             
             {/* ========== LEFT COLUMN - MAIN CONTENT ========== */}
             <div className="flex-1 lg:w-2/3">
-              {/* Blog Content */}
+              
+              {/* EXCERPT SECTION */}
+              {blog.excerpt && (
+                <div className="mb-6 bg-gradient-to-r from-[#FFB6C1]/20 to-[#D4EDEE] rounded-2xl p-6 border-l-4 border-l-[#4A8A90] shadow-sm">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider mb-2 flex items-center gap-2" style={{ color: COLORS.primary }}>
+                    <Sparkles className="w-4 h-4" />
+                    Story Snapshot
+                  </h3>
+                  <p className="text-base italic leading-relaxed" style={{ color: COLORS.text }}>
+                    {blog.excerpt}
+                  </p>
+                </div>
+              )}
+              
+              {/* Blog Content - Rich Text with proper list styling */}
               <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
                 <div 
-                  className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-[#2D3A5C] prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-[#4A8A90] prose-strong:text-[#2D3A5C] prose-li:text-gray-600"
-                  dangerouslySetInnerHTML={{ __html: blog.content }}
+                  className="prose prose-lg max-w-none 
+                    prose-headings:font-bold prose-headings:text-[#2D3A5C] prose-headings:mt-8 prose-headings:mb-4
+                    prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg
+                    prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-4
+                    prose-a:text-[#4A8A90] prose-a:no-underline hover:prose-a:underline
+                    prose-strong:text-[#2D3A5C] prose-strong:font-semibold
+                    prose-ul:list-disc prose-ul:pl-6 prose-ul:my-4
+                    prose-ol:list-decimal prose-ol:pl-6 prose-ol:my-4
+                    prose-li:text-gray-600 prose-li:mb-1
+                    prose-li:marker:text-[#4A8A90]
+                    prose-img:rounded-xl prose-img:shadow-md prose-img:my-6
+                    prose-blockquote:border-l-4 prose-blockquote:border-[#4A8A90] prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-500
+                    prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                    prose-table:border-collapse prose-table:w-full
+                    prose-th:border prose-th:border-gray-300 prose-th:px-4 prose-th:py-2 prose-th:bg-gray-100
+                    prose-td:border prose-td:border-gray-300 prose-td:px-4 prose-td:py-2
+                    [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-4
+                    [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-4
+                    [&_li]:text-gray-600 [&_li]:mb-1"
+                  dangerouslySetInnerHTML={renderRichText(blog.content)}
                 />
-              </div>
-              
-              {/* Excerpt Section */}
-              <div className="mt-6 bg-gradient-to-r from-[#FFB6C1]/20 to-[#D4EDEE] rounded-2xl p-6 border-l-4 border-l-[#4A8A90]">
-                <h3 className="text-sm font-semibold uppercase tracking-wider mb-2 flex items-center gap-2" style={{ color: COLORS.primary }}>
-                  <Sparkles className="w-4 h-4" />
-                  Story Snapshot
-                </h3>
-                <p className="text-base italic leading-relaxed" style={{ color: COLORS.text }}>
-                  {blog.excerpt}
-                </p>
               </div>
               
               {/* Additional Sections (Paragraphs) */}
@@ -530,150 +615,148 @@ export default function BlogDetailsClient() {
             </div>
 
             {/* ========== RIGHT SIDEBAR ========== */}
-        {/* ========== RIGHT SIDEBAR - FIXED STICKY ========== */}
-<aside className="lg:w-1/3 lg:pl-6">
-  <div className="lg:sticky lg:top-28 space-y-6">
-    {/* Table of Contents */}
-    {headings.length > 0 && (
-      <div className="bg-white rounded-2xl border border-[#FFB6C1]/30 p-5 shadow-lg">
-        <h3 className="font-semibold text-sm mb-4 flex items-center gap-2 pb-3 border-b border-[#FFB6C1]/30" style={{ color: COLORS.text }}>
-          <List className="w-4 h-4 text-[#4A8A90]" />
-          Story Guide
-        </h3>
-        <nav className="space-y-2 max-h-64 overflow-y-auto">
-          {headings.map((heading, idx) => (
-            <button
-              key={idx}
-              onClick={() => scrollToHeading(heading.id, heading.text)}
-              className={`text-xs block w-full text-left px-3 py-2 rounded-lg transition-all ${
-                activeHeading === heading.text
-                  ? 'bg-[#D4EDEE] text-[#4A8A90] font-medium'
-                  : 'text-gray-500 hover:bg-[#FFF9F0] hover:text-[#4A8A90]'
-              }`}
-            >
-              📖 {heading.text}
-            </button>
-          ))}
-        </nav>
-      </div>
-    )}
-
-    {/* Fun Facts Card */}
-    <div className="bg-gradient-to-br from-[#4A8A90] to-[#FFB6C1] rounded-2xl p-5 text-white shadow-lg">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
-          🧸
-        </div>
-        <div>
-          <h4 className="font-semibold text-sm">Meet the Storyteller</h4>
-          <p className="text-sm font-medium">{blog.author}</p>
-        </div>
-      </div>
-      <p className="text-xs text-white/80 leading-relaxed">
-        Passionate about creating magical stories and sharing fun toy adventures for kids and parents!
-      </p>
-      <div className="mt-4 pt-4 border-t border-white/20">
-        <div className="flex justify-between text-center">
-          <div>
-            <div className="text-lg font-bold">🎨</div>
-            <div className="text-xs text-white/60">Creative</div>
-          </div>
-          <div>
-            <div className="text-lg font-bold">✨</div>
-            <div className="text-xs text-white/60">Magical</div>
-          </div>
-          <div>
-            <div className="text-lg font-bold">🎈</div>
-            <div className="text-xs text-white/60">Fun</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {/* Related Posts */}
-    {relatedPosts.length > 0 && (
-      <div className="bg-white rounded-2xl border border-[#FFB6C1]/30 overflow-hidden shadow-lg">
-        <div className="px-5 py-4 border-b border-[#FFB6C1]/30 bg-[#FFF9F0]">
-          <h3 className="font-semibold text-sm flex items-center gap-2" style={{ color: COLORS.text }}>
-            <Star className="w-4 h-4 text-[#FFD93D] fill-[#FFD93D]" />
-            You Might Also Like
-          </h3>
-        </div>
-        <div className="p-4 space-y-4">
-          {relatedPosts.map((post, idx) => (
-            <Link key={post._id} href={`/blog/blogDetailsPage?id=${post._id}`}>
-              <div className="group cursor-pointer">
-                <div className="flex gap-3">
-                  <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-[#D4EDEE] shadow-sm">
-                    {post.featuredImage ? (
-                      <img
-                        src={post.featuredImage}
-                        alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#4A8A90]/20 to-[#FFB6C1]/20 flex items-center justify-center">
-                        <Gift className="w-6 h-6 text-[#4A8A90]" />
-                      </div>
-                    )}
+            <aside className="lg:w-1/3 lg:pl-6">
+              <div className="lg:sticky lg:top-28 space-y-6">
+                {/* Table of Contents - Clean headings without HTML tags */}
+                {headings.length > 0 && (
+                  <div className="bg-white rounded-2xl border border-[#FFB6C1]/30 p-5 shadow-lg">
+                    <h3 className="font-semibold text-sm mb-4 flex items-center gap-2 pb-3 border-b border-[#FFB6C1]/30" style={{ color: COLORS.text }}>
+                      <List className="w-4 h-4 text-[#4A8A90]" />
+                      Story Guide
+                    </h3>
+                    <nav className="space-y-2 max-h-64 overflow-y-auto">
+                      {headings.map((heading, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => scrollToHeading(heading.id, heading.text)}
+                          className={`text-xs block w-full text-left px-3 py-2 rounded-lg transition-all ${
+                            activeHeading === heading.text
+                              ? 'bg-[#D4EDEE] text-[#4A8A90] font-medium'
+                              : 'text-gray-500 hover:bg-[#FFF9F0] hover:text-[#4A8A90]'
+                          }`}
+                        >
+                          {heading.level === 'h2' ? '📖' : heading.level === 'h3' ? '•' : '◦'} {heading.text}
+                        </button>
+                      ))}
+                    </nav>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm line-clamp-2 group-hover:text-[#4A8A90] transition-colors" style={{ color: COLORS.text }}>
-                      {post.title}
-                    </h4>
-                    <div className="flex items-center gap-2 text-xs mt-1 text-gray-400">
-                      <span>{post.author}</span>
-                   
+                )}
+
+                {/* Fun Facts Card */}
+                <div className="bg-gradient-to-br from-[#4A8A90] to-[#FFB6C1] rounded-2xl p-5 text-white shadow-lg">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
+                      🧸
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm">Meet the Storyteller</h4>
+                      <p className="text-sm font-medium">{blog.author}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-white/80 leading-relaxed">
+                    Passionate about creating magical stories and sharing fun toy adventures for kids and parents!
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-white/20">
+                    <div className="flex justify-between text-center">
+                      <div>
+                        <div className="text-lg font-bold">🎨</div>
+                        <div className="text-xs text-white/60">Creative</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold">✨</div>
+                        <div className="text-xs text-white/60">Magical</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold">🎈</div>
+                        <div className="text-xs text-white/60">Fun</div>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Related Posts */}
+                {relatedPosts.length > 0 && (
+                  <div className="bg-white rounded-2xl border border-[#FFB6C1]/30 overflow-hidden shadow-lg">
+                    <div className="px-5 py-4 border-b border-[#FFB6C1]/30 bg-[#FFF9F0]">
+                      <h3 className="font-semibold text-sm flex items-center gap-2" style={{ color: COLORS.text }}>
+                        <Star className="w-4 h-4 text-[#FFD93D] fill-[#FFD93D]" />
+                        You Might Also Like
+                      </h3>
+                    </div>
+                    <div className="p-4 space-y-4">
+                      {relatedPosts.map((post, idx) => (
+                        <Link key={post._id} href={`/blog/blogDetailsPage?id=${post._id}`}>
+                          <div className="group cursor-pointer">
+                            <div className="flex gap-3">
+                              <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-[#D4EDEE] shadow-sm">
+                                {post.featuredImage ? (
+                                  <img
+                                    src={post.featuredImage}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-gradient-to-br from-[#4A8A90]/20 to-[#FFB6C1]/20 flex items-center justify-center">
+                                    <Gift className="w-6 h-6 text-[#4A8A90]" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-sm line-clamp-2 group-hover:text-[#4A8A90] transition-colors" style={{ color: COLORS.text }}>
+                                  {post.title}
+                                </h4>
+                                <div className="flex items-center gap-2 text-xs mt-1 text-gray-400">
+                                  <span>{post.author}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Share Section */}
+                <div className="bg-white rounded-2xl border border-[#FFB6C1]/30 p-5 shadow-lg">
+                  <h3 className="font-semibold text-sm mb-3 flex items-center gap-2" style={{ color: COLORS.text }}>
+                    <Share2 className="w-4 h-4 text-[#4A8A90]" />
+                    Share the Magic
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => shareBlog('facebook')}
+                      className="flex-1 p-2 bg-[#1877F2] text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center gap-2 text-sm"
+                    >
+                      <Facebook className="w-4 h-4" />
+                      Share
+                    </button>
+                    <button
+                      onClick={() => shareBlog('twitter')}
+                      className="flex-1 p-2 bg-[#1DA1F2] text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center gap-2 text-sm"
+                    >
+                      <Twitter className="w-4 h-4" />
+                      Tweet
+                    </button>
+                    <button
+                      onClick={() => shareBlog('copy')}
+                      className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      {isCopied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quote Card */}
+                <div className="bg-gradient-to-r from-[#FFD93D]/20 to-[#FFB6C1]/20 rounded-2xl p-5 text-center border border-[#FFD93D]/30">
+                  <Quote className="w-8 h-8 mx-auto mb-3 opacity-50 text-[#4A8A90]" />
+                  <p className="text-sm italic" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive", color: COLORS.text }}>
+                    "Play is the highest form of research — and we make it fun!"
+                  </p>
+                  <p className="text-xs mt-2 text-[#4A8A90]">- ToyMart Team</p>
+                </div>
               </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    )}
-
-    {/* Share Section */}
-    <div className="bg-white rounded-2xl border border-[#FFB6C1]/30 p-5 shadow-lg">
-      <h3 className="font-semibold text-sm mb-3 flex items-center gap-2" style={{ color: COLORS.text }}>
-        <Share2 className="w-4 h-4 text-[#4A8A90]" />
-        Share the Magic
-      </h3>
-      <div className="flex gap-2">
-        <button
-          onClick={() => shareBlog('facebook')}
-          className="flex-1 p-2 bg-[#1877F2] text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center gap-2 text-sm"
-        >
-          <Facebook className="w-4 h-4" />
-          Share
-        </button>
-        <button
-          onClick={() => shareBlog('twitter')}
-          className="flex-1 p-2 bg-[#1DA1F2] text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center gap-2 text-sm"
-        >
-          <Twitter className="w-4 h-4" />
-          Tweet
-        </button>
-        <button
-          onClick={() => shareBlog('copy')}
-          className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-        >
-          {isCopied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-        </button>
-      </div>
-    </div>
-
-    {/* Quote Card */}
-    <div className="bg-gradient-to-r from-[#FFD93D]/20 to-[#FFB6C1]/20 rounded-2xl p-5 text-center border border-[#FFD93D]/30">
-      <Quote className="w-8 h-8 mx-auto mb-3 opacity-50 text-[#4A8A90]" />
-      <p className="text-sm italic" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive", color: COLORS.text }}>
-        "Play is the highest form of research — and we make it fun!"
-      </p>
-      <p className="text-xs mt-2 text-[#4A8A90]">- ToyMart Team</p>
-    </div>
-  </div>
-</aside>
+            </aside>
           </div>
         </div>
 

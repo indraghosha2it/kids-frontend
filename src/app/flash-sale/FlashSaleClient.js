@@ -818,6 +818,7 @@ const getAgeGroupBadge = (ageGroup) => {
     '3-5': 'bg-blue-100 text-blue-600',
     '6-10': 'bg-green-100 text-green-600',
     '11-14': 'bg-purple-100 text-purple-600',
+     '': 'bg-teal-100 text-teal-600'
   };
   return styles[ageGroup] || 'bg-gray-100 text-gray-600';
 };
@@ -1135,16 +1136,20 @@ const FlashSaleProductCard = ({ product, router, isInCart: propIsInCart, isInWis
         </h3>
         
         {/* Age Group and Rating Row */}
-        <div className="flex items-center justify-between mb-1">
-          {/* Age Group Badge - Shows actual age group from backend */}
-          {product.ageGroup ? (
-            <div className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[6px] sm:text-[8px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
-              <Users className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
-              Ages {product.ageGroup}
-            </div>
-          ) : (
-            <div className="text-[6px] sm:text-[8px] text-gray-400">✨ Toy</div>
-          )}
+       {/* Age Group and Rating Row */}
+<div className="flex items-center justify-between mb-1">
+  {/* Age Group Badge - Shows actual age group from backend */}
+  {product.ageGroup ? (
+    <div className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[6px] sm:text-[8px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
+      <Users className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
+      Ages {product.ageGroup}
+    </div>
+  ) : (
+    <div className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[6px] sm:text-[8px] font-semibold ${getAgeGroupBadge('')}`}>
+      <Users className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
+      All Kids
+    </div>
+  )}
           
           {/* Rating Stars */}
           <div className="flex items-center gap-0.5">

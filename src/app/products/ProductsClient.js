@@ -2022,7 +2022,7 @@ const getTagStyles = (tag) => {
     'Pretend Play': 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30',
     'Trending': 'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-lg shadow-rose-500/30',
   };
-  return styles[tag] || 'bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white';
+  return styles[tag] || 'bg-gradient-to-r from-[#4A8A90] to-[#6BA3A9] text-white ';
 };
 
 const getAgeGroupBadge = (ageGroup) => {
@@ -2031,6 +2031,7 @@ const getAgeGroupBadge = (ageGroup) => {
     '3-5': 'bg-blue-100 text-blue-600',
     '6-10': 'bg-green-100 text-green-600',
     '11-14': 'bg-purple-100 text-purple-600',
+    '': 'bg-teal-100 text-teal-600'
   };
   return styles[ageGroup] || 'bg-gray-100 text-gray-600';
 };
@@ -2362,7 +2363,11 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
               Ages {product.ageGroup}
             </div>
           ) : (
-            <div className="text-[6px] sm:text-[8px] text-gray-400">✨ Toy</div>
+             <div className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded-full text-[6px] sm:text-[8px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
+              <Users className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
+            All kids
+            </div>
+           
           )}
           
           {product.rating > 0 && (
@@ -2773,12 +2778,17 @@ const ProductListCard = ({ product, router, isInCart: propIsInCart, isInWishlist
         <div className="flex-1 p-4 md:p-5">
           {/* Age Group and Rating Row */}
           <div className="flex items-center justify-between mb-2">
-            {product.ageGroup && (
-              <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
-                <Users className="w-2.5 h-2.5" />
-                Ages {product.ageGroup} years
-              </div>
-            )}
+            {product.ageGroup ? (
+  <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${getAgeGroupBadge(product.ageGroup)}`}>
+    <Users className="w-2.5 h-2.5" />
+    Ages {product.ageGroup} years
+  </div>
+) : (
+  <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${getAgeGroupBadge('')}`}>
+    <Users className="w-2.5 h-2.5" />
+    All Kids
+  </div>
+)}
             
             {/* Rating Stars */}
             {product.rating > 0 && (

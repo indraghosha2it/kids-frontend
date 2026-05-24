@@ -2783,7 +2783,7 @@ setTimeout(() => {
     if (!formData.fullDescription || formData.fullDescription === '<p></p>') newErrors.fullDescription = 'Full description is required';
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
-    if (!formData.ageGroup) newErrors.ageGroup = 'Age group is required';
+    // if (!formData.ageGroup) newErrors.ageGroup = 'Age group is required';
     if (formData.stockQuantity < 0) newErrors.stockQuantity = 'Stock quantity cannot be negative';
     if (formData.regularPrice <= 0) newErrors.regularPrice = 'Regular price must be greater than 0';
     if (formData.discountPrice > formData.regularPrice) newErrors.discountPrice = 'Discount price cannot exceed regular price';
@@ -3210,7 +3210,7 @@ setTimeout(() => {
                         />
                         {errors.brand && <p className="text-xs text-red-600 mt-1">{errors.brand}</p>}
                       </div>
-
+{/* 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Age Group <span className="text-red-500">*</span>
@@ -3233,7 +3233,55 @@ setTimeout(() => {
                           ))}
                         </div>
                         {errors.ageGroup && <p className="text-xs text-red-600 mt-1">{errors.ageGroup}</p>}
-                      </div>
+                      </div> */}
+
+     <div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Age Group <span className="text-gray-400 text-xs">(Optional)</span>
+  </label>
+  <div className="grid grid-cols-4 gap-2">
+    {/* Add "Not Specified" option */}
+    {/* <button
+      type="button"
+      onClick={() => setFormData(prev => ({ ...prev, ageGroup: '' }))}
+      className={`p-2 rounded-lg border-2 transition-all text-center ${
+        !formData.ageGroup
+          ? 'border-[#4A8A90] bg-[#D4EDEE]'
+          : 'border-gray-200 hover:border-[#FFB6C1]'
+      }`}
+    >
+      <span className="text-lg">📦</span>
+      <p className="text-[10px] font-medium mt-1">Not Specified</p>
+    </button> */}
+    <button
+  type="button"
+  onClick={() => setFormData(prev => ({ ...prev, ageGroup: '' }))}
+  className={`p-2 rounded-lg border-2 transition-all text-center ${
+    !formData.ageGroup
+      ? 'border-[#4A8A90] bg-[#D4EDEE]'
+      : 'border-gray-200 hover:border-[#FFB6C1]'
+  }`}
+>
+  <span className="text-lg">🎈</span>
+  <p className="text-[10px] font-medium mt-1">All Kids</p>
+</button>
+    {AGE_GROUPS.map(age => (
+      <button
+        key={age.value}
+        type="button"
+        onClick={() => setFormData(prev => ({ ...prev, ageGroup: age.value }))}
+        className={`p-2 rounded-lg border-2 transition-all text-center ${
+          formData.ageGroup === age.value
+            ? 'border-[#4A8A90] bg-[#D4EDEE]'
+            : 'border-gray-200 hover:border-[#FFB6C1]'
+        }`}
+      >
+        <span className="text-lg">{age.icon}</span>
+        <p className="text-[10px] font-medium mt-1">{age.label}</p>
+      </button>
+    ))}
+  </div>
+</div>
                     </div>
                   </div>
                 </div>

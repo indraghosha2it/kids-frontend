@@ -561,7 +561,7 @@ export default function RootLayout({ children }) {
         {children}
         
         {/* Toast Notifications */}
-        <Toaster 
+        {/* <Toaster 
           position="top-right"
           richColors
           closeButton
@@ -570,13 +570,33 @@ export default function RootLayout({ children }) {
           theme="light"
           toastOptions={{
             style: {
+          
               background: '#FFFFFF',
               color: '#333333',
               border: '1px solid #FF6B35',
               borderRadius: '12px',
             },
           }}
-        />
+        /> */}
+
+        {/* Toast Notifications */}
+<Toaster 
+  position="top-right"
+  richColors
+  closeButton
+  expand={true}
+  duration={4000}
+  theme="light"
+  toastOptions={{
+    style: {
+      background: '#FFFFFF',
+      color: '#333333',
+      border: '1px solid #FF6B35',
+      borderRadius: '12px',
+      marginTop: '40px',  // This pushes the toast down from the top
+    },
+  }}
+/>
         
         {/* UI Components */}
         <ScrollToTop />

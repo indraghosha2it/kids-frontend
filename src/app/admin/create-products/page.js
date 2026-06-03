@@ -3,6 +3,7 @@
 
 // import { useState, useEffect, useRef } from 'react';
 // import { useRouter } from 'next/navigation';
+// import NextLink from 'next/link';
 // import { 
 //   Plus, 
 //   X, 
@@ -15,77 +16,240 @@
 //   Upload,
 //   Package,
 //   DollarSign,
-//   Palette,
-//   Ruler,
-//   MinusCircle,
-//   PlusCircle,
-//   ChevronDown,
-//   Users,
+//   Tag,
 //   Info,
+//   Star,
+//   Video,
 //   Hash,
 //   Type,
-//   Star,
-//   Search,
-//   Tag,
-//   FolderTree,
+//   Layers,
+//   Gift,
+//   Sparkles,
+//   ChevronDown,
+//   Clock,
+//   Edit3,
+//   Eye,
 //   GripVertical,
-//   Scale,
-//   Wrench
+//   Youtube,
+//   Link as LinkIcon
 // } from 'lucide-react';
-// import NextLink from 'next/link';
 // import { toast } from 'sonner';
-// import { SketchPicker } from 'react-color';
 // import { MantineProvider } from '@mantine/core';
 // import { RichTextEditor } from '@mantine/tiptap';
 // import { useEditor } from '@tiptap/react';
 // import StarterKit from '@tiptap/starter-kit';
 // import TextAlign from '@tiptap/extension-text-align';
-// import Link from '@tiptap/extension-link';
+// import TiptapLink from '@tiptap/extension-link';
 
 // import '@mantine/tiptap/styles.css';
 // import '@mantine/core/styles.css';
 
-// // Predefined colors for quick selection
-// const PREDEFINED_COLORS = [
-//   '#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF',
-//   '#000000', '#FFFFFF', '#808080', '#800000', '#808000', '#008000',
-//   '#800080', '#008080', '#000080', '#FFA500', '#FFC0CB', '#A52A2A',
-//   '#6B4F3A', '#4A90E2', '#50C878', '#9B59B6', '#E74C3C', '#F39C12', '#1ABC9C'
+// // Age group options
+// const AGE_GROUPS = [
+//    { value: '', label: 'Not Specified', icon: '📦' }, 
+//   { value: '0-2', label: '0-2 years', icon: '👶' },
+//   { value: '3-5', label: '3-5 years', icon: '🧒' },
+//   { value: '6-10', label: '6-10 years', icon: '👧' },
+//   { value: '11-14', label: '11-14 years', icon: '🧑' }
 // ];
 
-// // Targeted customer options
-// const TARGETED_CUSTOMERS = [
-//   { value: 'ladies', label: 'Ladies', icon: '👩' },
-//   { value: 'gents', label: 'Gents', icon: '👨' },
-//   { value: 'kids', label: 'Kids', icon: '🧒' },
-//   { value: 'unisex', label: 'Unisex', icon: '👤' }
-// ];
-
-// // Available tags
+// // Kids toy specific tags
 // const AVAILABLE_TAGS = [
 //   'Best Seller',
 //   'New Arrival',
-//   'Top Deal',
+//   'Limited Edition',
 //   'Eco-Friendly',
-//   'Hot Export Item',
-//   'Customizable',
-//   'Premium Quality',
-//   'Trending'
+//   'Educational',
+//   'STEM Toy',
+//   'Montessori',
+//   'Creative Play',
+//   'Outdoor Fun',
+//   'Battery Included',
+//   'Non-Toxic',
+//   'Award Winner',
+//   'Musical Toy',
+//   'Interactive',
+//   'Light Up',
+//   'Remote Control',
+//   'Building Set',
+//   'Puzzle Game',
+//   'Art & Craft',
+//   'Pretend Play'
 // ];
 
-// // Order unit options
-// const ORDER_UNITS = [
-//   { value: 'piece', label: 'Pieces / Units', icon: '📦', description: 'Sell by individual pieces/units', unitLabel: 'pieces' },
-//   { value: 'kg', label: 'Kilogram (KG)', icon: '⚖️', description: 'Sell by weight in kilograms', unitLabel: 'kg' },
-//   { value: 'ton', label: 'Metric Ton (MT)', icon: '🏗️', description: 'Sell by metric ton (1000 kg)', unitLabel: 'metric tons' }
+// // Promotion options
+// const PROMOTION_OPTIONS = [
+//   { value: 'flash-sale', label: 'Flash Sale', icon: '⚡', color: '#FF6B6B' },
+//   { value: 'new-arrival', label: 'New Arrival', icon: '⭐', color: '#FFD93D' },
+//   { value: 'trending', label: 'Trending Now', icon: '🔥', color: '#FF8C42' },
+//   { value: 'clearance', label: 'Clearance Sale', icon: '💨', color: '#4ECDC4' },
+//   { value: 'holiday-special', label: 'Holiday Special', icon: '🎄', color: '#2ECC71' },
+//   { value: 'bundle-deal', label: 'Bundle Deal', icon: '🎁', color: '#9B59B6' },
+//   { value: 'limited-stock', label: 'Limited Stock', icon: '⚠️', color: '#E74C3C' }
 // ];
 
-// // Cloudinary upload function
+
+// const compressImageSmart = async (file) => {
+//   return new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.readAsDataURL(file);
+    
+//     reader.onload = (event) => {
+//       const img = new Image();
+//       img.src = event.target.result;
+      
+//       img.onload = () => {
+//         const canvas = document.createElement('canvas');
+//         canvas.width = img.width;
+//         canvas.height = img.height;
+        
+//         const ctx = canvas.getContext('2d');
+//         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+//         // MORE AGGRESSIVE compression - target under 300KB
+//         let quality = 0.4; // Default 40% quality
+        
+//         if (file.size > 5 * 1024 * 1024) {
+//           quality = 0.25; // 25% quality for 5MB+ files
+//         } else if (file.size > 2 * 1024 * 1024) {
+//           quality = 0.3; // 30% quality for 2-5MB files
+//         } else if (file.size > 1 * 1024 * 1024) {
+//           quality = 0.35; // 35% quality for 1-2MB files
+//         } else if (file.size > 500 * 1024) {
+//           quality = 0.45; // 45% quality for 500KB-1MB files
+//         } else {
+//           quality = 0.55; // 55% quality for smaller files
+//         }
+        
+//         canvas.toBlob(
+//           (blob) => {
+//             const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), {
+//               type: 'image/jpeg',
+//               lastModified: Date.now(),
+//             });
+//             const reduction = ((file.size - blob.size) / file.size * 100).toFixed(1);
+//             console.log(`📸 Compressed: ${(file.size / 1024).toFixed(0)}KB → ${(blob.size / 1024).toFixed(0)}KB (${reduction}% reduction)`);
+//             resolve(compressedFile);
+//           },
+//           'image/jpeg',
+//           quality
+//         );
+//       };
+      
+//       img.onerror = () => reject(new Error('Failed to load image'));
+//     };
+    
+//     reader.onerror = () => reject(new Error('Failed to read file'));
+//   });
+// };
+
+// // Add this function for video compression
+// const compressVideo = async (file) => {
+//   return new Promise((resolve, reject) => {
+//     // Create video element
+//     const video = document.createElement('video');
+//     const canvas = document.createElement('canvas');
+//     const ctx = canvas.getContext('2d');
+    
+//     video.preload = 'metadata';
+//     video.src = URL.createObjectURL(file);
+    
+//     video.onloadedmetadata = () => {
+//       // Set canvas dimensions (can reduce resolution if needed)
+//       let width = video.videoWidth;
+//       let height = video.videoHeight;
+      
+//       // Optional: reduce resolution for smaller size
+//       const MAX_WIDTH = 1280;
+//       const MAX_HEIGHT = 720;
+      
+//       if (width > MAX_WIDTH) {
+//         height = (height * MAX_WIDTH) / width;
+//         width = MAX_WIDTH;
+//       }
+//       if (height > MAX_HEIGHT) {
+//         width = (width * MAX_HEIGHT) / height;
+//         height = MAX_HEIGHT;
+//       }
+      
+//       canvas.width = width;
+//       canvas.height = height;
+      
+//       video.currentTime = 0;
+//     };
+    
+//     video.onseeked = () => {
+//       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+//       // Get the first frame as preview
+//       canvas.toBlob(
+//         (blob) => {
+//           console.log(`🎥 Video frame captured: ${(blob.size / 1024).toFixed(0)}KB`);
+          
+//           // For actual video compression, we need to use a different approach
+//           // Since browser video compression is complex, we'll just log that
+//           // and return the original file with a note
+//           console.log(`⚠️ Browser video compression limited. Original: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+          
+//           // Return original but log recommendation
+//           toast.info(`Video size: ${(file.size / 1024 / 1024).toFixed(2)}MB. Consider compressing before upload for faster loading.`);
+//           resolve(file);
+//         },
+//         'image/jpeg',
+//         0.7
+//       );
+//     };
+    
+//     video.onerror = () => reject(new Error('Failed to load video'));
+//   });
+// };
+
+// // Update your uploadVideoToCloudinary function
+
+
+// // Use in upload function
+
+
+// // Cloudinary upload function for images
+// // const uploadToCloudinary = async (file) => {
+// //    const compressedFile = await compressImageSmart(file);
+// //   const formData = new FormData();
+// //   formData.append('file', file);
+// //   formData.append('upload_preset', 'toys-products');
+  
+// //   try {
+// //     const response = await fetch(
+// //       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+// //       {
+// //         method: 'POST',
+// //         body: formData,
+// //       }
+// //     );
+    
+// //     const data = await response.json();
+// //     if (data.secure_url) {
+// //       return {
+// //         url: data.secure_url,
+// //         publicId: data.public_id,
+// //       };
+// //     } else {
+// //       throw new Error(data.error?.message || 'Upload failed');
+// //     }
+// //   } catch (error) {
+// //     console.error('Cloudinary upload error:', error);
+// //     throw error;
+// //   }
+// // };
+
 // const uploadToCloudinary = async (file) => {
+//   // Client-side compression only
+//   const compressedFile = await compressImageSmart(file);
+  
 //   const formData = new FormData();
-//   formData.append('file', file);
-//   formData.append('upload_preset', 'jute-products');
-//   formData.append('folder', 'jute-products');
+//   formData.append('file', compressedFile);
+//   formData.append('upload_preset', 'toys-products');
+  
+//   // Remove the transformation line completely
   
 //   try {
 //     const response = await fetch(
@@ -98,12 +262,13 @@
     
 //     const data = await response.json();
 //     if (data.secure_url) {
+//       console.log(`✅ Image uploaded successfully`);
 //       return {
 //         url: data.secure_url,
 //         publicId: data.public_id,
 //       };
 //     } else {
-//       throw new Error('Upload failed');
+//       throw new Error(data.error?.message || 'Upload failed');
 //     }
 //   } catch (error) {
 //     console.error('Cloudinary upload error:', error);
@@ -111,53 +276,190 @@
 //   }
 // };
 
-// export default function AdminCreateProduct() {
+// // Upload video to Cloudinary
+// // const uploadVideoToCloudinary = async (file) => {
+// //   const formData = new FormData();
+// //   formData.append('file', file);
+// //   formData.append('upload_preset', 'toys-products');
+// //   formData.append('resource_type', 'video');
+  
+// //   try {
+// //     const response = await fetch(
+// //       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
+// //       {
+// //         method: 'POST',
+// //         body: formData,
+// //       }
+// //     );
+    
+// //     const data = await response.json();
+// //     if (data.secure_url) {
+// //       return {
+// //         url: data.secure_url,
+// //         publicId: data.public_id,
+// //       };
+// //     } else {
+// //       throw new Error(data.error?.message || 'Upload failed');
+// //     }
+// //   } catch (error) {
+// //     console.error('Cloudinary video upload error:', error);
+// //     throw error;
+// //   }
+// // };
+
+
+
+// const uploadVideoToCloudinary = async (file) => {
+//   const formData = new FormData();
+//   formData.append('file', file);
+//   formData.append('upload_preset', 'toys-products');
+//   // Do NOT include resource_type: 'video'
+  
+//   try {
+//     const response = await fetch(
+//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`,
+//       {
+//         method: 'POST',
+//         body: formData,
+//       }
+//     );
+    
+//     const data = await response.json();
+//     if (data.secure_url) {
+//       toast.success('Video uploaded and compressed successfully!');
+//       return {
+//         url: data.secure_url,
+//         publicId: data.public_id,
+//       };
+//     } else {
+//       throw new Error(data.error?.message || 'Upload failed');
+//     }
+//   } catch (error) {
+//     console.error('Cloudinary video upload error:', error);
+//     toast.error('Failed to upload video');
+//     throw error;
+//   }
+// };
+// // Extract YouTube video ID from URL
+// const getYouTubeVideoId = (url) => {
+//   const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+//   const match = url.match(regex);
+//   return match ? match[1] : null;
+// };
+
+// // Restore Draft Modal Component
+// const RestoreDraftModal = ({ isOpen, onConfirm, onCancel, draftData }) => {
+//   if (!isOpen) return null;
+  
+//   return (
+//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+//       <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+//         <div className="flex items-center gap-3 text-amber-600 mb-4">
+//           <AlertCircle className="w-6 h-6" />
+//           <h3 className="text-lg font-semibold">Unsaved Draft Found</h3>
+//         </div>
+        
+//         <p className="text-sm text-gray-600 mb-2">
+//           You have unsaved draft data from your last session.
+//         </p>
+//         <p className="text-xs text-gray-500 mb-4">
+//           Would you like to restore it? If you choose not to restore, the draft will be discarded.
+//         </p>
+        
+//         {draftData && (
+//           <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs">
+//             <p className="font-medium text-gray-700 mb-1">Draft preview:</p>
+//             {draftData.productName && (
+//               <p className="text-gray-600">Product: {draftData.productName}</p>
+//             )}
+//             {draftData.brand && (
+//               <p className="text-gray-600">Brand: {draftData.brand}</p>
+//             )}
+//             {draftData.ageGroup && (
+//               <p className="text-gray-600">Age: {draftData.ageGroup} years</p>
+//             )}
+//             <p className="text-gray-500 mt-1">
+//               Last saved: {new Date().toLocaleString()}
+//             </p>
+//           </div>
+//         )}
+        
+//         <div className="flex items-center justify-end gap-3 mt-4">
+//           <button
+//             onClick={onCancel}
+//             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+//           >
+//             Discard Draft
+//           </button>
+//           <button
+//             onClick={onConfirm}
+//             className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+//             style={{ backgroundColor: '#4A8A90' }}
+//           >
+//             Restore Draft
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // Save to localStorage key
+// const DRAFT_KEY = 'toy_product_draft';
+
+// export default function AdminCreateToyProduct() {
 //   const router = useRouter();
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const [isSavingDraft, setIsSavingDraft] = useState(false);
 //   const [categories, setCategories] = useState([]);
 //   const [subcategories, setSubcategories] = useState([]);
 //   const [childSubcategories, setChildSubcategories] = useState([]);
-//   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
-//   const [showColorPicker, setShowColorPicker] = useState(false);
-//   const [currentColorIndex, setCurrentColorIndex] = useState(null);
 //   const [isMounted, setIsMounted] = useState(false);
-//   const [keywordInput, setKeywordInput] = useState('');
-//   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
-//   const [showTags, setShowTags] = useState(false);
+//   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
 //   const [showMeta, setShowMeta] = useState(false);
-//   const [orderUnit, setOrderUnit] = useState('piece');
-
+//   const [generatedSku, setGeneratedSku] = useState('');
+//   const [lastSaved, setLastSaved] = useState(null);
+  
+//   // Restore modal state
+//   const [showRestoreModal, setShowRestoreModal] = useState(false);
+//   const [pendingDraft, setPendingDraft] = useState(null);
+  
+//   // Video upload type: 'upload' or 'youtube'
+//   const [videoType, setVideoType] = useState('upload');
+//   const [youtubeUrl, setYoutubeUrl] = useState('');
+  
+//   // Drag and drop state
 //   const [draggedIndex, setDraggedIndex] = useState(null);
 //   const [dragOverIndex, setDragOverIndex] = useState(null);
-//   const colorPickerRef = useRef(null);
-  
+
+//   const fileInputRefs = useRef([]);
+//   const videoInputRef = useRef(null);
+//   const autoSaveTimerRef = useRef(null);
+
 //   const [formData, setFormData] = useState({
 //     productName: '',
-//     description: '',
-//     instruction: '', 
+//     shortDescription: '',
+//     fullDescription: '',
 //     category: '',
 //     subcategory: '',
 //     childSubcategory: '',
-//     targetedCustomer: 'unisex',
-//     fabric: '',
-//     weightPerUnit: '',
-//     orderUnit: 'piece',
-//     moq: 100,
-//     pricePerUnit: 0,
-//     quantityBasedPricing: [
-//       { range: '100-299', price: 0 }
-//     ],
-//     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-//     colors: [
-//       { code: '#6B4F3A' },
-//       { code: '#F5E6D3' },
-//       { code: '#3A7D44' }
-//     ],
-//     additionalInfo: [],
-//     customizationOptions: [],
-//     isFeatured: false,
+//     brand: '',
+//     ageGroup: '',
+//     stockQuantity: '',
+
+//     regularPrice: 0,
+//     discountPrice: 0,
+//     deliveryInfo: '',
+//     codAvailable: false,
 //     tags: [],
+//     promotion: '',
+//     isFeatured: false,
+//     rating: 0,
+//     additionalInfo: [],
+//     videoUrl: '',
+//     videoPublicId: '',
+//     videoType: 'upload',
 //     metaSettings: {
 //       metaTitle: '',
 //       metaDescription: '',
@@ -165,7 +467,7 @@
 //     }
 //   });
 
-//   // Image state - 6 slots with upload tracking
+//   // Product Images State (up to 6 images)
 //   const [productImages, setProductImages] = useState([
 //     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
 //     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
@@ -175,111 +477,384 @@
 //     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null }
 //   ]);
 
-//   const fileInputRefs = useRef([]);
+//   // Video upload state
+//   const [videoUpload, setVideoUpload] = useState({
+//     file: null,
+//     preview: null,
+//     uploading: false,
+//     error: '',
+//     url: null,
+//     publicId: null
+//   });
+
+//   const [keywordInput, setKeywordInput] = useState('');
+//   // Add these state variables near your other useState declarations
+// const [isEditorReady, setIsEditorReady] = useState(false);
+// const [isInstructionEditorReady, setIsInstructionEditorReady] = useState(false);
+// const [isDeliveryEditorReady, setIsDeliveryEditorReady] = useState(false);
+
+//   const [additionalInfoInput, setAdditionalInfoInput] = useState({ fieldName: '', fieldValue: '' });
+//   const [ratingHover, setRatingHover] = useState(0);
+
 //   const [errors, setErrors] = useState({});
 
-//   const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-//   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+//   const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+//   const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
 //   const maxFileSize = 5 * 1024 * 1024;
+//   const maxVideoSize = 100 * 1024 * 1024; // 100MB
+
+//   // Editor setup
+// // Editor setup with onReady callback
+// const shortDescEditor = useEditor({
+//   extensions: [
+//     StarterKit,
+//     TiptapLink.configure({ openOnClick: false }),
+//     TextAlign.configure({ types: ['heading', 'paragraph'] }),
+//   ],
+//   content: formData.shortDescription,
+//   onUpdate: ({ editor }) => {
+//     setFormData(prev => ({ ...prev, shortDescription: editor.getHTML() }));
+//   },
+//   onReady: () => {
+//     setIsEditorReady(true);
+//   },
+//   immediatelyRender: false,
+// });
+
+// const fullDescEditor = useEditor({
+//   extensions: [
+//     StarterKit,
+//     TiptapLink.configure({ openOnClick: false }),
+//     TextAlign.configure({ types: ['heading', 'paragraph'] }),
+//   ],
+//   content: formData.fullDescription,
+//   onUpdate: ({ editor }) => {
+//     setFormData(prev => ({ ...prev, fullDescription: editor.getHTML() }));
+//   },
+//   onReady: () => {
+//     setIsInstructionEditorReady(true);
+//   },
+//   immediatelyRender: false,
+// });
+// const deliveryInfoEditor = useEditor({
+//   extensions: [
+//     StarterKit,
+//     TiptapLink.configure({ openOnClick: false }),
+//     TextAlign.configure({ types: ['heading', 'paragraph'] }),
+//   ],
+//   content: formData.deliveryInfo,
+//   onUpdate: ({ editor }) => {
+//     setFormData(prev => ({ ...prev, deliveryInfo: editor.getHTML() }));
+//   },
+//   onReady: () => {
+//     setIsDeliveryEditorReady(true);
+//   },
+//   immediatelyRender: false,
+// });
+
+
+//   // Load draft from localStorage on mount
+// // Load draft from localStorage on mount
+// useEffect(() => {
+//   const loadDraft = () => {
+//     try {
+//       const savedDraft = localStorage.getItem(DRAFT_KEY);
+//       if (savedDraft) {
+//         const draft = JSON.parse(savedDraft);
+        
+//         // Check if draft has any meaningful data - MORE LENIENT
+//         const hasData = (draft.formData?.productName && draft.formData.productName.trim() !== '') || 
+//                        (draft.formData?.shortDescription && draft.formData.shortDescription !== '<p></p>') ||
+//                        (draft.formData?.fullDescription && draft.formData.fullDescription !== '<p></p>') ||
+//                        (draft.productImages && draft.productImages.some(img => img.url)) ||
+//                        (draft.videoUpload?.url);
+        
+//         if (!hasData) {
+//           console.log('No meaningful data in draft');
+//           localStorage.removeItem(DRAFT_KEY);
+//           sessionStorage.removeItem('draft_discarded');
+//           return;
+//         }
+        
+//         // Check if draft was discarded in this session
+//         const draftDiscarded = sessionStorage.getItem('draft_discarded');
+//         if (draftDiscarded === 'true') {
+//           console.log('Draft was discarded in this session, not showing modal');
+//           sessionStorage.removeItem('draft_discarded');
+//           return;
+//         }
+        
+//         console.log('Found draft with data, showing restore modal');
+        
+//         if (draft.formData) {
+//           setFormData(draft.formData);
+//           setVideoType(draft.formData.videoType || 'upload');
+//           setYoutubeUrl(draft.formData.videoUrl || '');
+//         }
+//         if (draft.productImages) {
+//           const restoredImages = productImages.map((img, idx) => {
+//             const savedImg = draft.productImages[idx];
+//             if (savedImg && savedImg.url) {
+//               return {
+//                 ...img,
+//                 url: savedImg.url,
+//                 publicId: savedImg.publicId,
+//                 preview: savedImg.url,
+//                 uploading: false,
+//                 uploadAborted: false
+//               };
+//             }
+//             return img;
+//           });
+//           setProductImages(restoredImages);
+//         }
+//         if (draft.videoUpload) {
+//           setVideoUpload(draft.videoUpload);
+//         }
+//         if (draft.lastSaved) {
+//           setLastSaved(new Date(draft.lastSaved));
+//         }
+        
+//         setPendingDraft(draft);
+//         setShowRestoreModal(true);
+//       } else {
+//         console.log('No draft found in localStorage');
+//         sessionStorage.removeItem('draft_discarded');
+//       }
+//     } catch (error) {
+//       console.error('Error loading draft:', error);
+//     }
+//   };
+//   loadDraft();
+// }, []);
+
+//   // Handle restore draft confirmation
+// const handleRestoreDraft = () => {
+//   if (pendingDraft) {
+//     try {
+//       // Restore form data
+//       if (pendingDraft.formData) {
+//         const restoredData = {
+//           ...pendingDraft.formData,
+//           // Ensure arrays are properly restored
+//           quantityBasedPricing: pendingDraft.formData.quantityBasedPricing && pendingDraft.formData.quantityBasedPricing.length > 0 
+//             ? pendingDraft.formData.quantityBasedPricing 
+//             : [{ range: '100-299', price: '' }],
+//           sizes: pendingDraft.formData.sizes && pendingDraft.formData.sizes.length > 0 
+//             ? pendingDraft.formData.sizes 
+//             : ['S', 'M', 'L', 'XL', 'XXL'],
+//           colors: pendingDraft.formData.colors && pendingDraft.formData.colors.length > 0 
+//             ? pendingDraft.formData.colors 
+//             : [{ code: '#FF0000' }, { code: '#0000FF' }, { code: '#000000' }],
+//           tags: Array.isArray(pendingDraft.formData.tags) ? pendingDraft.formData.tags : [],
+//           additionalInfo: Array.isArray(pendingDraft.formData.additionalInfo) ? pendingDraft.formData.additionalInfo : [],
+//           codAvailable: pendingDraft.formData.codAvailable || false,
+//           metaSettings: pendingDraft.formData.metaSettings || {
+//             metaTitle: '',
+//             metaDescription: '',
+//             metaKeywords: []
+//           }
+//         };
+        
+//         setFormData(restoredData);
+        
+//         // Restore editor content after a short delay to ensure editors are ready
+//         setTimeout(() => {
+//           if (shortDescEditor && pendingDraft.formData.shortDescription) {
+//             shortDescEditor.commands.setContent(pendingDraft.formData.shortDescription);
+//           }
+//           if (fullDescEditor && pendingDraft.formData.fullDescription) {
+//             fullDescEditor.commands.setContent(pendingDraft.formData.fullDescription);
+//           }
+//           if (deliveryInfoEditor && pendingDraft.formData.deliveryInfo) {
+//     deliveryInfoEditor.commands.setContent(pendingDraft.formData.deliveryInfo);
+//   }
+//         }, 200);
+        
+//         // Restore video type and URL
+//         setVideoType(pendingDraft.formData.videoType || 'upload');
+//         setYoutubeUrl(pendingDraft.formData.videoUrl || '');
+//       }
+      
+//       // Restore product images
+//       if (pendingDraft.productImages && pendingDraft.productImages.length > 0) {
+//         const restoredImages = productImages.map((img, idx) => {
+//           const savedImg = pendingDraft.productImages[idx];
+//           if (savedImg && savedImg.url) {
+//             return {
+//               ...img,
+//               url: savedImg.url,
+//               publicId: savedImg.publicId,
+//               preview: savedImg.url,
+//               uploading: false,
+//               uploadAborted: false
+//             };
+//           }
+//           return img;
+//         });
+//         setProductImages(restoredImages);
+//       }
+      
+//       // Restore video upload
+//       if (pendingDraft.videoUpload) {
+//         setVideoUpload(pendingDraft.videoUpload);
+//       }
+      
+//       toast.success('Draft restored successfully');
+      
+//       // Force a re-save after restoration
+//       setTimeout(() => {
+//         saveToLocalStorage();
+//       }, 500);
+      
+//     } catch (error) {
+//       console.error('Error restoring draft:', error);
+//       toast.error('Failed to restore draft');
+//     }
+//   }
+//   setShowRestoreModal(false);
+//   setPendingDraft(null);
+// };
+
+// const handleDiscardDraft = () => {
+//   // Remove draft from localStorage
+//   localStorage.removeItem(DRAFT_KEY);
+  
+//   // Set session flag to prevent showing modal again for this session
+//   sessionStorage.setItem('draft_discarded', 'true');
+  
+//   // Clear the pending draft data
+//   setPendingDraft(null);
+  
+//   // Close the modal
+//   setShowRestoreModal(false);
+  
+//   // Reset form data
+//   setFormData({
+//     productName: '',
+//     shortDescription: '',
+//     fullDescription: '',
+//     category: '',
+//     subcategory: '',
+//     childSubcategory: '',
+//     brand: '',
+//     ageGroup: '',
+//    stockQuantity: '',
+//     skuCode: generatedSku,
+//     regularPrice: 0,
+//     discountPrice: 0,
+//     deliveryInfo: '',
+//     codAvailable: false,
+//     tags: [],
+//     promotion: '',
+//     isFeatured: false,
+//     rating: 0,
+//     additionalInfo: [],
+//     videoUrl: '',
+//     videoPublicId: '',
+//     videoType: 'upload',
+//     metaSettings: {
+//       metaTitle: '',
+//       metaDescription: '',
+//       metaKeywords: []
+//     }
+//   });
+  
+//   // Clear product images
+//   setProductImages([
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null }
+//   ]);
+  
+//   // Clear video upload
+//   setVideoUpload({ file: null, preview: null, uploading: false, error: '', url: null, publicId: null });
+//   setYoutubeUrl('');
+//   setLastSaved(null);
+  
+//   // Show success message
+//   toast.success('Draft discarded');
+// };
+
+//  const saveToLocalStorage = () => {
+//   try {
+//     // Get current content directly from editors
+//     let currentShortDesc = formData.shortDescription;
+//     let currentFullDesc = formData.fullDescription;
+    
+//     if (shortDescEditor && !shortDescEditor.isDestroyed) {
+//       const editorContent = shortDescEditor.getHTML();
+//       if (editorContent && editorContent !== '<p></p>') {
+//         currentShortDesc = editorContent;
+//       }
+//     }
+//     if (fullDescEditor && !fullDescEditor.isDestroyed) {
+//       const editorContent = fullDescEditor.getHTML();
+//       if (editorContent && editorContent !== '<p></p>') {
+//         currentFullDesc = editorContent;
+//       }
+//     }
+    
+//     const draft = {
+//       formData: {
+//         ...formData,
+//         shortDescription: currentShortDesc,
+//         fullDescription: currentFullDesc,
+//         videoType,
+//         videoUrl: youtubeUrl
+//       },
+//       productImages: productImages.map(img => ({
+//         ...img,
+//         preview: img.url || null,
+//         file: null,
+//         uploading: false
+//       })),
+//       videoUpload: {
+//         ...videoUpload,
+//         preview: videoUpload.url || null,
+//         file: null,
+//         uploading: false
+//       },
+//       lastSaved: new Date().toISOString()
+//     };
+//     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+//     setLastSaved(new Date());
+//   } catch (error) {
+//     console.error('Error saving draft:', error);
+//   }
+// };
+
+//   // Auto-save on form changes
+//   useEffect(() => {
+//     if (autoSaveTimerRef.current) {
+//       clearTimeout(autoSaveTimerRef.current);
+//     }
+//     autoSaveTimerRef.current = setTimeout(() => {
+//       if (formData.productName || formData.shortDescription || productImages.some(img => img.url)) {
+//         saveToLocalStorage();
+//       }
+//     }, 3000);
+//     return () => {
+//       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+//     };
+//   }, [formData, productImages, videoUpload, youtubeUrl, videoType]);
 
 //   useEffect(() => {
 //     setIsMounted(true);
-//   }, []);
 
-//   useEffect(() => {
-//     const handleClickOutside = (event) => {
-//       if (colorPickerRef.current && !colorPickerRef.current.contains(event.target)) {
-//         setShowColorPicker(false);
-//         setCurrentColorIndex(null);
-//       }
-//     };
-
-//     document.addEventListener('mousedown', handleClickOutside);
-//     return () => {
-//       document.removeEventListener('mousedown', handleClickOutside);
-//     };
-//   }, []);
-
-//   // Update pricing range labels when order unit changes
-//   useEffect(() => {
-//     if (orderUnit === 'kg') {
-//       setFormData(prev => ({
-//         ...prev,
-//         quantityBasedPricing: [
-//           { range: '100-499', price: 0 }
-//         ]
-//       }));
-//     } else if (orderUnit === 'ton') {
-//       setFormData(prev => ({
-//         ...prev,
-//         quantityBasedPricing: [
-//           { range: '1-4', price: 0 }
-//         ]
-//       }));
-//     } else {
-//       setFormData(prev => ({
-//         ...prev,
-//         quantityBasedPricing: [
-//           { range: '100-299', price: 0 }
-//         ]
-//       }));
-//     }
-//   }, [orderUnit]);
-
-//   const editor = useEditor({
-//     extensions: [
-//       StarterKit.configure({
-//         bulletList: { keepMarks: true, keepAttributes: false },
-//         orderedList: { keepMarks: true, keepAttributes: false },
-//       }),
-//       Link.configure({
-//         openOnClick: false,
-//         HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' },
-//       }),
-//       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-//     ],
-//     content: formData.description,
-//     onUpdate: ({ editor }) => {
-//       setFormData(prev => ({ ...prev, description: editor.getHTML() }));
-//     },
-//     immediatelyRender: false,
-//     editable: true,
-//   });
-
-//   const instructionEditor = useEditor({
-//     extensions: [
-//       StarterKit.configure({
-//         bulletList: { keepMarks: true, keepAttributes: false },
-//         orderedList: { keepMarks: true, keepAttributes: false },
-//       }),
-//       Link.configure({
-//         openOnClick: false,
-//         HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' },
-//       }),
-//       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-//     ],
-//     content: formData.instruction,
-//     onUpdate: ({ editor }) => {
-//       setFormData(prev => ({ ...prev, instruction: editor.getHTML() }));
-//     },
-//     immediatelyRender: false,
-//     editable: true,
-//   });
-
-//   useEffect(() => {
 //     fetchCategories();
 //   }, []);
 
 //   useEffect(() => {
 //     if (formData.category) {
 //       fetchSubcategories(formData.category);
-//       fetchCategoryDetails(formData.category);
 //     } else {
 //       setSubcategories([]);
-//       setSelectedCategoryDetails(null);
-//       setChildSubcategories([]);
-//       setShowChildSubcategory(false);
 //       setFormData(prev => ({ ...prev, subcategory: '', childSubcategory: '' }));
+//       setChildSubcategories([]);
 //     }
 //   }, [formData.category]);
 
@@ -288,26 +863,45 @@
 //       fetchChildSubcategories(formData.category, formData.subcategory);
 //     } else {
 //       setChildSubcategories([]);
-//       setShowChildSubcategory(false);
 //       setFormData(prev => ({ ...prev, childSubcategory: '' }));
 //     }
 //   }, [formData.subcategory]);
 
-//   useEffect(() => {
-//     const user = JSON.parse(localStorage.getItem('user') || '{}');
-//     if (user.role !== 'admin' && user.role !== 'moderator') {
-//       router.push('/login');
+//   // Sync short description editor content when formData changes
+// useEffect(() => {
+//   if (shortDescEditor && isEditorReady && formData.shortDescription) {
+//     const currentContent = shortDescEditor.getHTML();
+//     if (currentContent !== formData.shortDescription && formData.shortDescription !== '<p></p>') {
+//       shortDescEditor.commands.setContent(formData.shortDescription);
 //     }
-//   }, [router]);
+//   }
+// }, [shortDescEditor, isEditorReady, formData.shortDescription]);
+
+// // Sync full description editor content when formData changes
+// useEffect(() => {
+//   if (fullDescEditor && isInstructionEditorReady && formData.fullDescription) {
+//     const currentContent = fullDescEditor.getHTML();
+//     if (currentContent !== formData.fullDescription && formData.fullDescription !== '<p></p>') {
+//       fullDescEditor.commands.setContent(formData.fullDescription);
+//     }
+//   }
+// }, [fullDescEditor, isInstructionEditorReady, formData.fullDescription]);
+
+//   const generateSKU = () => {
+//     const prefix = 'TOY';
+//     const timestamp = Date.now().toString().slice(-8);
+//     const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+//     const sku = `${prefix}-${timestamp}-${random}`;
+//     setGeneratedSku(sku);
+//     setFormData(prev => ({ ...prev, skuCode: sku }));
+//   };
 
 //   const fetchCategories = async () => {
-//     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
 //       const response = await fetch('http://localhost:5000/api/categories', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
-      
 //       const data = await response.json();
 //       if (data.success) {
 //         setCategories(data.data);
@@ -315,8 +909,6 @@
 //     } catch (error) {
 //       console.error('Error fetching categories:', error);
 //       toast.error('Failed to fetch categories');
-//     } finally {
-//       setIsLoading(false);
 //     }
 //   };
 
@@ -327,7 +919,6 @@
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
-      
 //       if (data.success) {
 //         setSubcategories(data.data.subcategories);
 //       } else {
@@ -346,63 +937,33 @@
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
-      
 //       if (data.success) {
 //         setChildSubcategories(data.data.children);
-//         setShowChildSubcategory(data.data.children.length > 0);
 //       } else {
 //         setChildSubcategories([]);
-//         setShowChildSubcategory(false);
 //       }
 //     } catch (error) {
 //       console.error('Error fetching child subcategories:', error);
 //       setChildSubcategories([]);
-//       setShowChildSubcategory(false);
-//     }
-//   };
-
-//   const fetchCategoryDetails = async (categoryId) => {
-//     try {
-//       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       });
-      
-//       const data = await response.json();
-//       if (data.success) {
-//         setSelectedCategoryDetails(data.data);
-//       }
-//     } catch (error) {
-//       console.error('Error fetching category details:', error);
 //     }
 //   };
 
 //   const validateImageFile = (file) => {
-//     if (!allowedFileTypes.includes(file.type)) {
-//       const fileExtension = file.name.split('.').pop().toLowerCase();
-//       return {
-//         valid: false,
-//         message: `Invalid format: .${fileExtension}. Allowed: ${allowedExtensions.join(', ')}`
-//       };
+//     if (!allowedImageTypes.includes(file.type)) {
+//       return { valid: false, message: `Invalid format. Allowed: JPG, PNG, WebP, GIF` };
 //     }
-
 //     if (file.size > maxFileSize) {
-//       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-//       return {
-//         valid: false,
-//         message: `File too large: ${fileSizeMB}MB. Max: 5MB`
-//       };
+//       return { valid: false, message: `File too large. Max: 5MB` };
 //     }
-
 //     return { valid: true };
 //   };
 
+//   // Single image upload
 //   const handleImageChange = async (e, index) => {
 //     const file = e.target.files[0];
 //     if (!file) return;
 
-//     // Clear any existing image in this slot first
-//     if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
+//     if (productImages[index].preview?.startsWith('blob:')) {
 //       URL.revokeObjectURL(productImages[index].preview);
 //     }
 
@@ -411,10 +972,12 @@
 //       const updatedImages = [...productImages];
 //       updatedImages[index] = { ...updatedImages[index], error: validation.message };
 //       setProductImages(updatedImages);
+//       toast.error(`Image ${index + 1}: ${validation.message}`);
 //       return;
 //     }
 
 //     const previewUrl = URL.createObjectURL(file);
+//     const batchId = Date.now();
     
 //     const updatedImages = [...productImages];
 //     updatedImages[index] = {
@@ -425,38 +988,36 @@
 //       url: null,
 //       publicId: null,
 //       uploadAborted: false,
-//       uploadBatchId: null
+//       uploadBatchId: batchId
 //     };
 //     setProductImages(updatedImages);
+//     saveToLocalStorage();
 
 //     try {
 //       const { url, publicId } = await uploadToCloudinary(file);
       
 //       setProductImages(prevImages => {
 //         const updated = [...prevImages];
-//         if (updated[index] && updated[index].uploading === true && !updated[index].uploadAborted) {
+//         if (updated[index] && updated[index].uploadBatchId === batchId && !updated[index].uploadAborted) {
 //           updated[index] = {
 //             ...updated[index],
 //             url: url,
 //             publicId: publicId,
-//             uploading: false,
-//             uploadAborted: false
+//             uploading: false
 //           };
 //         }
 //         return updated;
 //       });
-      
 //       toast.success(`Image ${index + 1} uploaded successfully`);
+//       saveToLocalStorage();
 //     } catch (error) {
-//       console.error('Upload error:', error);
 //       setProductImages(prevImages => {
 //         const updated = [...prevImages];
-//         if (updated[index] && updated[index].uploading === true && !updated[index].uploadAborted) {
+//         if (updated[index] && updated[index].uploadBatchId === batchId) {
 //           updated[index] = {
 //             ...updated[index],
-//             error: 'Failed to upload image to Cloudinary',
+//             error: 'Failed to upload image',
 //             uploading: false,
-//             uploadAborted: false,
 //             preview: null,
 //             file: null
 //           };
@@ -467,13 +1028,12 @@
 //     }
 //   };
 
+//   // Multiple image upload
 //   const handleMultipleImageSelect = async (e) => {
 //     const files = Array.from(e.target.files);
-    
 //     if (files.length === 0) return;
     
-//     const currentImages = [...productImages];
-//     const currentImagesCount = currentImages.filter(img => img.url !== null || img.uploading).length;
+//     const currentImagesCount = productImages.filter(img => img.url !== null || img.uploading).length;
 //     const availableSlots = 6 - currentImagesCount;
     
 //     if (files.length > availableSlots) {
@@ -484,36 +1044,14 @@
 //       return;
 //     }
     
-//     const validFiles = [];
-//     const invalidFiles = [];
-    
-//     for (let i = 0; i < files.length; i++) {
-//       const file = files[i];
-//       const validation = validateImageFile(file);
-//       if (validation.valid) {
-//         validFiles.push({ file, originalIndex: i });
-//       } else {
-//         invalidFiles.push({ index: i + 1, message: validation.message });
-//         toast.error(`Image ${i + 1}: ${validation.message}`);
-//       }
-//     }
-    
-//     if (validFiles.length === 0) {
-//       toast.error('No valid images to upload');
-//       if (fileInputRefs.current['multiple']) {
-//         fileInputRefs.current['multiple'].value = '';
-//       }
-//       return;
-//     }
-    
 //     const emptySlots = [];
-//     for (let i = 0; i < currentImages.length; i++) {
-//       if (!currentImages[i].url && !currentImages[i].uploading && !currentImages[i].preview) {
+//     for (let i = 0; i < productImages.length; i++) {
+//       if (!productImages[i].url && !productImages[i].uploading && !productImages[i].preview) {
 //         emptySlots.push(i);
 //       }
 //     }
     
-//     if (validFiles.length > emptySlots.length) {
+//     if (files.length > emptySlots.length) {
 //       toast.error(`Only ${emptySlots.length} slots available. Please remove some images first.`);
 //       if (fileInputRefs.current['multiple']) {
 //         fileInputRefs.current['multiple'].value = '';
@@ -522,136 +1060,103 @@
 //     }
     
 //     const batchId = Date.now();
-//     const updatedImages = [...currentImages];
 //     const uploadPromises = [];
     
-//     for (let i = 0; i < validFiles.length; i++) {
-//       const { file } = validFiles[i];
+//     for (let i = 0; i < files.length && i < emptySlots.length; i++) {
+//       const file = files[i];
 //       const slotIndex = emptySlots[i];
+      
+//       const validation = validateImageFile(file);
+//       if (!validation.valid) {
+//         toast.error(`Image ${i + 1}: ${validation.message}`);
+//         continue;
+//       }
+      
 //       const previewUrl = URL.createObjectURL(file);
       
-//       updatedImages[slotIndex] = {
-//         file: file,
-//         preview: previewUrl,
-//         error: '',
-//         uploading: true,
-//         url: null,
-//         publicId: null,
-//         uploadAborted: false,
-//         uploadBatchId: batchId
-//       };
+//       setProductImages(prevImages => {
+//         const updated = [...prevImages];
+//         updated[slotIndex] = {
+//           file: file,
+//           preview: previewUrl,
+//           error: '',
+//           uploading: true,
+//           url: null,
+//           publicId: null,
+//           uploadAborted: false,
+//           uploadBatchId: batchId
+//         };
+//         return updated;
+//       });
+//       saveToLocalStorage();
       
 //       const uploadPromise = (async () => {
 //         try {
 //           const { url, publicId } = await uploadToCloudinary(file);
-          
 //           setProductImages(prevImages => {
-//             const newImages = [...prevImages];
-//             if (newImages[slotIndex] && 
-//                 newImages[slotIndex].uploading === true && 
-//                 !newImages[slotIndex].uploadAborted &&
-//                 newImages[slotIndex].uploadBatchId === batchId) {
-//               newImages[slotIndex] = {
-//                 ...newImages[slotIndex],
+//             const updated = [...prevImages];
+//             if (updated[slotIndex] && updated[slotIndex].uploadBatchId === batchId && !updated[slotIndex].uploadAborted) {
+//               updated[slotIndex] = {
+//                 ...updated[slotIndex],
 //                 url: url,
 //                 publicId: publicId,
-//                 uploading: false,
-//                 uploadAborted: false
+//                 uploading: false
 //               };
-//             } else if (newImages[slotIndex] && newImages[slotIndex].uploadAborted) {
-//               if (newImages[slotIndex].preview && newImages[slotIndex].preview.startsWith('blob:')) {
-//                 URL.revokeObjectURL(newImages[slotIndex].preview);
-//               }
 //             }
-//             return newImages;
+//             return updated;
 //           });
-          
 //           return { success: true, slotIndex };
 //         } catch (error) {
-//           console.error('Upload error:', error);
 //           setProductImages(prevImages => {
-//             const newImages = [...prevImages];
-//             if (newImages[slotIndex] && 
-//                 newImages[slotIndex].uploading === true && 
-//                 !newImages[slotIndex].uploadAborted &&
-//                 newImages[slotIndex].uploadBatchId === batchId) {
-//               newImages[slotIndex] = {
-//                 ...newImages[slotIndex],
+//             const updated = [...prevImages];
+//             if (updated[slotIndex] && updated[slotIndex].uploadBatchId === batchId) {
+//               updated[slotIndex] = {
+//                 ...updated[slotIndex],
 //                 error: 'Failed to upload image',
 //                 uploading: false,
-//                 uploadAborted: false,
 //                 preview: null,
 //                 file: null
 //               };
 //             }
-//             return newImages;
+//             return updated;
 //           });
-//           return { success: false, slotIndex, error };
+//           return { success: false, slotIndex };
 //         }
 //       })();
       
 //       uploadPromises.push(uploadPromise);
 //     }
     
-//     setProductImages(updatedImages);
-    
 //     const results = await Promise.all(uploadPromises);
-//     const successfulUploads = results.filter(r => r.success).length;
-//     const failedUploads = results.filter(r => !r.success).length;
+//     const successfulUploads = results.filter(r => r && r.success).length;
+//     const failedUploads = results.filter(r => r && !r.success).length;
     
 //     if (successfulUploads > 0) {
 //       toast.success(`${successfulUploads} image(s) uploaded successfully`);
+//       saveToLocalStorage();
 //     }
 //     if (failedUploads > 0) {
 //       toast.error(`${failedUploads} image(s) failed to upload`);
 //     }
     
-//     // Clear the file input
 //     if (fileInputRefs.current['multiple']) {
 //       fileInputRefs.current['multiple'].value = '';
 //     }
 //   };
 
-//   const removeImage = (index) => {
-//     const imageToRemove = productImages[index];
-    
-//     // Revoke object URL if it exists (to prevent memory leaks)
-//     if (imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
-//       URL.revokeObjectURL(imageToRemove.preview);
-//     }
-    
-//     // Reset the image slot completely
-//     const updatedImages = [...productImages];
-//     updatedImages[index] = { 
-//       file: null, 
-//       preview: null, 
-//       error: '', 
-//       url: null, 
-//       publicId: null, 
-//       uploading: false,
-//       uploadAborted: true,
-//       uploadBatchId: null
-//     };
-    
-//     setProductImages(updatedImages);
-    
-//     // Clear the file input value for this slot if it exists
-//     if (fileInputRefs.current[index]) {
-//       fileInputRefs.current[index].value = '';
-//     }
-    
-//     toast.success(`Image removed from slot ${index + 1}`);
-//   };
-
+//   // Drag and drop functions for image reordering
 //   const moveImage = (fromIndex, toIndex) => {
 //     const updatedImages = [...productImages];
 //     const [movedImage] = updatedImages.splice(fromIndex, 1);
 //     updatedImages.splice(toIndex, 0, movedImage);
 //     setProductImages(updatedImages);
+//     saveToLocalStorage();
 //   };
 
 //   const handleDragStart = (index) => {
-//     setDraggedIndex(index);
+//     if (productImages[index].preview && !productImages[index].uploading) {
+//       setDraggedIndex(index);
+//     }
 //   };
 
 //   const handleDragOverWithFeedback = (event, index) => {
@@ -671,7 +1176,11 @@
 //       setDraggedIndex(null);
 //       return;
 //     }
-//     moveImage(draggedIndex, dropIndex);
+//     if (!productImages[draggedIndex]?.uploading && !productImages[dropIndex]?.uploading) {
+//       moveImage(draggedIndex, dropIndex);
+//     } else {
+//       toast.error('Cannot reorder images while uploading');
+//     }
 //     setDraggedIndex(null);
 //     setDragOverIndex(null);
 //   };
@@ -681,178 +1190,257 @@
 //     setDragOverIndex(null);
 //   };
 
+//   const addImageSlot = () => {
+//     if (productImages.length < 6) {
+//       setProductImages([...productImages, { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null }]);
+//       saveToLocalStorage();
+//     }
+//   };
+
+//   const removeImage = (index) => {
+//     const imageToRemove = productImages[index];
+    
+//     setProductImages(prevImages => {
+//       const updated = [...prevImages];
+//       if (updated[index]) {
+//         updated[index].uploadAborted = true;
+//       }
+//       return updated;
+//     });
+    
+//     if (imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+//       URL.revokeObjectURL(imageToRemove.preview);
+//     }
+    
+//     const updatedImages = [...productImages];
+//     updatedImages[index] = { 
+//       file: null, 
+//       preview: null, 
+//       error: '', 
+//       url: null, 
+//       publicId: null, 
+//       uploading: false,
+//       uploadAborted: false,
+//       uploadBatchId: null
+//     };
+//     setProductImages(updatedImages);
+    
+//     if (fileInputRefs.current[index]) {
+//       fileInputRefs.current[index].value = '';
+//     }
+    
+//     toast.success(`Image removed from slot ${index + 1}`);
+//     saveToLocalStorage();
+//   };
+
+//   // Video upload handlers
+//   const handleVideoFileChange = async (e) => {
+//     const file = e.target.files[0];
+//     if (!file) return;
+
+//     if (videoUpload.preview?.startsWith('blob:')) {
+//       URL.revokeObjectURL(videoUpload.preview);
+//     }
+
+//     if (!allowedVideoTypes.includes(file.type)) {
+//       setVideoUpload({ ...videoUpload, error: 'Invalid format. Allowed: MP4, WebM, OGG, MOV' });
+//       toast.error('Invalid video format');
+//       return;
+//     }
+
+//     if (file.size > maxVideoSize) {
+//       setVideoUpload({ ...videoUpload, error: `File too large. Max: 100MB` });
+//       toast.error('Video too large. Max 100MB');
+//       return;
+//     }
+
+//     const previewUrl = URL.createObjectURL(file);
+//     setVideoUpload({
+//       file: file,
+//       preview: previewUrl,
+//       uploading: true,
+//       error: '',
+//       url: null,
+//       publicId: null
+//     });
+//     saveToLocalStorage();
+
+//     try {
+//       const { url, publicId } = await uploadVideoToCloudinary(file);
+//       setVideoUpload({
+//         file: file,
+//         preview: previewUrl,
+//         uploading: false,
+//         error: '',
+//         url: url,
+//         publicId: publicId
+//       });
+//       setFormData(prev => ({ ...prev, videoUrl: url, videoPublicId: publicId, videoType: 'upload' }));
+//       toast.success('Video uploaded successfully');
+//       saveToLocalStorage();
+//     } catch (error) {
+//       setVideoUpload({
+//         ...videoUpload,
+//         error: 'Failed to upload video',
+//         uploading: false,
+//         preview: null,
+//         file: null
+//       });
+//       toast.error('Failed to upload video');
+//     }
+//   };
+
+//   const handleYoutubeUrlChange = (url) => {
+//     setYoutubeUrl(url);
+//     const videoId = getYouTubeVideoId(url);
+//     if (videoId) {
+//       const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+//       setFormData(prev => ({ ...prev, videoUrl: embedUrl, videoType: 'youtube' }));
+//       setVideoUpload({ file: null, preview: null, uploading: false, error: '', url: null, publicId: null });
+//       toast.success('YouTube link added successfully');
+//     } else if (url === '') {
+//       setFormData(prev => ({ ...prev, videoUrl: '', videoType: 'upload' }));
+//     }
+//     saveToLocalStorage();
+//   };
+
+//   const removeVideo = () => {
+//     if (videoUpload.preview?.startsWith('blob:')) {
+//       URL.revokeObjectURL(videoUpload.preview);
+//     }
+//     setVideoUpload({ file: null, preview: null, uploading: false, error: '', url: null, publicId: null });
+//     setYoutubeUrl('');
+//     setFormData(prev => ({ ...prev, videoUrl: '', videoPublicId: '', videoType: 'upload' }));
+//     if (videoInputRef.current) videoInputRef.current.value = '';
+//     toast.success('Video removed');
+//     saveToLocalStorage();
+//   };
+
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
 //     setFormData(prev => ({ ...prev, [name]: value }));
-//     if (errors[name]) {
-//       setErrors(prev => ({ ...prev, [name]: null }));
-//     }
+//     if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
 //   };
 
-//   const handleOrderUnitChange = (unit) => {
-//     setOrderUnit(unit);
-//     const updatedSizes = unit !== 'piece' ? [] : formData.sizes;
-    
-//     setFormData(prev => ({ 
-//       ...prev, 
-//       orderUnit: unit,
-//       moq: unit === 'ton' ? 1 : 100,
-//       pricePerUnit: 0,
-//       sizes: updatedSizes
-//     }));
-//   };
+//   // const handleNumberChange = (e) => {
+//   //   const { name, value } = e.target;
+//   //   const numValue = value === '' ? 0 : parseFloat(value);
+//   //   setFormData(prev => ({ ...prev, [name]: numValue }));
+//   //   if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+//   // };
 
-//   const handlePricingChange = (index, field, value) => {
-//     const updatedPricing = [...formData.quantityBasedPricing];
-    
-//     if (field === 'price') {
-//       if (value === '') {
-//         updatedPricing[index] = { ...updatedPricing[index], [field]: '' };
-//       } else {
-//         const numValue = parseFloat(value);
-//         if (!isNaN(numValue)) {
-//           updatedPricing[index] = { ...updatedPricing[index], [field]: numValue };
-//         }
-//       }
-//     } else {
-//       updatedPricing[index] = { ...updatedPricing[index], [field]: value };
-//     }
-    
-//     setFormData(prev => ({ ...prev, quantityBasedPricing: updatedPricing }));
-//   };
-
-//   const addPricingRow = () => {
-//     let newRange = '5000+';
-//     if (orderUnit === 'ton') {
-//       newRange = '50+';
-//     } else if (orderUnit === 'kg') {
-//       newRange = '5000+';
-//     } else {
-//       newRange = '5000+';
-//     }
+//   const handleNumberChange = (e) => {
+//   const { name, value } = e.target;
+//   // Allow empty string for stockQuantity
+//   if (name === 'stockQuantity' && value === '') {
+//     setFormData(prev => ({ ...prev, [name]: '' }));
+//   } else {
+//     const numValue = value === '' ? 0 : parseFloat(value);
+//     setFormData(prev => ({ ...prev, [name]: numValue }));
+//   }
+//   if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+// };
+//   const handleTagToggle = (tag) => {
 //     setFormData(prev => ({
 //       ...prev,
-//       quantityBasedPricing: [
-//         ...prev.quantityBasedPricing,
-//         { range: newRange, price: 0 }
-//       ]
+//       tags: prev.tags.includes(tag) 
+//         ? prev.tags.filter(t => t !== tag)
+//         : [...prev.tags, tag]
 //     }));
+//     saveToLocalStorage();
 //   };
 
-//   const removePricingRow = (index) => {
-//     if (formData.quantityBasedPricing.length > 1) {
-//       const updatedPricing = formData.quantityBasedPricing.filter((_, i) => i !== index);
-//       setFormData(prev => ({ ...prev, quantityBasedPricing: updatedPricing }));
-//     }
+//   const handlePromotionSelect = (value) => {
+//     setFormData(prev => ({ ...prev, promotion: prev.promotion === value ? '' : value }));
+//     saveToLocalStorage();
 //   };
 
-//   const handleSizeChange = (index, value) => {
-//     const updatedSizes = [...formData.sizes];
-//     updatedSizes[index] = value;
-//     setFormData(prev => ({ ...prev, sizes: updatedSizes }));
+//   const handleRatingChange = (rating) => {
+//     setFormData(prev => ({ ...prev, rating }));
+//     saveToLocalStorage();
 //   };
 
-//   const addSize = () => {
-//     setFormData(prev => ({
-//       ...prev,
-//       sizes: [...prev.sizes, '']
-//     }));
-//   };
-
-//   const removeSize = (index) => {
-//     if (formData.sizes.length > 1) {
-//       const updatedSizes = formData.sizes.filter((_, i) => i !== index);
-//       setFormData(prev => ({ ...prev, sizes: updatedSizes }));
-//     }
-//   };
-
-//   const handleColorChange = (index, field, value) => {
-//     const updatedColors = [...formData.colors];
-//     updatedColors[index] = { ...updatedColors[index], [field]: value };
-//     setFormData(prev => ({ ...prev, colors: updatedColors }));
-//   };
-
-//   const openColorPicker = (index, event) => {
-//     event.stopPropagation();
-//     setCurrentColorIndex(index);
-//     setShowColorPicker(true);
-//   };
-
-//   const addColor = () => {
-//     setFormData(prev => ({
-//       ...prev,
-//       colors: [...prev.colors, { code: '#6B4F3A' }]
-//     }));
-//   };
-
-//   const removeColor = (index) => {
-//     if (formData.colors.length > 1) {
-//       const updatedColors = formData.colors.filter((_, i) => i !== index);
-//       setFormData(prev => ({ ...prev, colors: updatedColors }));
-//     }
-//   };
-
-//   const handleAdditionalInfoChange = (index, field, value) => {
-//     const updatedInfo = [...formData.additionalInfo];
-//     updatedInfo[index] = { ...updatedInfo[index], [field]: value };
-//     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
+// const addAdditionalInfo = () => {
+//   console.log('=== ADDING ADDITIONAL INFO ===');
+//   console.log('Current additionalInfoInput:', additionalInfoInput);
+  
+//   if (additionalInfoInput.fieldName.trim() && additionalInfoInput.fieldValue.trim()) {
+//     const newInfo = { 
+//       fieldName: additionalInfoInput.fieldName.trim(), 
+//       fieldValue: additionalInfoInput.fieldValue.trim() 
+//     };
     
-//     if (errors[`additionalInfo_${index}_${field}`]) {
-//       setErrors(prev => ({ ...prev, [`additionalInfo_${index}_${field}`]: null }));
-//     }
-//   };
-
-//   const addAdditionalInfo = () => {
-//     setFormData(prev => ({
-//       ...prev,
-//       additionalInfo: [
-//         ...prev.additionalInfo,
-//         { fieldName: '', fieldValue: '' }
-//       ]
-//     }));
-//   };
+//     console.log('New info to add:', newInfo);
+//     console.log('Current additionalInfo array:', formData.additionalInfo);
+    
+//     setFormData(prev => {
+//       const updated = {
+//         ...prev,
+//         additionalInfo: [...prev.additionalInfo, newInfo]
+//       };
+//       console.log('Updated formData:', updated.additionalInfo);
+//       return updated;
+//     });
+    
+//     setAdditionalInfoInput({ fieldName: '', fieldValue: '' });
+//     saveToLocalStorage();
+//     toast.success('Additional info added');
+//   } else {
+//     toast.error('Please fill both field name and value');
+//   }
+// };
 
 //   const removeAdditionalInfo = (index) => {
 //     const updatedInfo = formData.additionalInfo.filter((_, i) => i !== index);
 //     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
+//     saveToLocalStorage();
 //   };
 
-//   const handleCustomizationChange = (index, field, value) => {
-//     const updatedOptions = [...formData.customizationOptions];
-//     updatedOptions[index] = { ...updatedOptions[index], [field]: value };
-//     setFormData(prev => ({ ...prev, customizationOptions: updatedOptions }));
-//   };
-
-//   const addCustomizationOption = () => {
-//     setFormData(prev => ({
-//       ...prev,
-//       customizationOptions: [
-//         ...prev.customizationOptions,
-//         { title: '', value: '' }
-//       ]
-//     }));
-//   };
-
-//   const removeCustomizationOption = (index) => {
-//     const updatedOptions = formData.customizationOptions.filter((_, i) => i !== index);
-//     setFormData(prev => ({ ...prev, customizationOptions: updatedOptions }));
-//   };
-
-//   const handleTagToggle = (tag) => {
-//     setFormData(prev => ({
-//       ...prev,
-//       tags: prev.tags.includes(tag) ? [] : [tag]
-//     }));
-//   };
-
-//   const handleMetaChange = (field, value) => {
-//     setFormData(prev => ({
-//       ...prev,
-//       metaSettings: {
-//         ...prev.metaSettings,
-//         [field]: value
-//       }
-//     }));
+//   const clearDraft = () => {
+//     if (confirm('Are you sure you want to clear the draft? All unsaved data will be lost.')) {
+//       localStorage.removeItem(DRAFT_KEY);
+//       setFormData({
+//         productName: '',
+//         shortDescription: '',
+//         fullDescription: '',
+//         category: '',
+//         subcategory: '',
+//         childSubcategory: '',
+//         brand: '',
+//         ageGroup: '',
+//         stockQuantity: '',
+       
+//         regularPrice: 0,
+//         discountPrice: 0,
+//         deliveryInfo: '',
+//         codAvailable: false,
+//         tags: [],
+//         promotion: '',
+//         isFeatured: false,
+//         rating: 0,
+//         additionalInfo: [],
+//         videoUrl: '',
+//         videoPublicId: '',
+//         videoType: 'upload',
+//        metaSettings: {
+//   metaTitle: '',
+//   metaDescription: '',
+//   metaKeywords: []
+// }
+//       });
+//       setProductImages([
+//         { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//         { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//         { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//         { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//         { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+//         { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null }
+//       ]);
+//       setVideoUpload({ file: null, preview: null, uploading: false, error: '', url: null, publicId: null });
+//       setYoutubeUrl('');
+//       setLastSaved(null);
+//       toast.success('Draft cleared');
+//     }
 //   };
 
 //   const addKeyword = () => {
@@ -871,19 +1459,7 @@
 //       }
 //     }));
 //     setKeywordInput('');
-//   };
-
-//   const handleKeywordKeyDown = (e) => {
-//     if (e.key === 'Enter' || e.key === ',') {
-//       e.preventDefault();
-//       addKeyword();
-//     }
-//   };
-
-//   const handleKeywordBlur = () => {
-//     if (keywordInput.trim()) {
-//       addKeyword();
-//     }
+//     saveToLocalStorage();
 //   };
 
 //   const removeKeyword = (indexToRemove) => {
@@ -894,209 +1470,241 @@
 //         metaKeywords: prev.metaSettings.metaKeywords.filter((_, index) => index !== indexToRemove)
 //       }
 //     }));
+//     saveToLocalStorage();
 //   };
 
-//   const validateAdditionalInfo = () => {
-//     let isValid = true;
-//     const newErrors = {};
-
-//     formData.additionalInfo.forEach((info, index) => {
-//       if (!info.fieldName.trim()) {
-//         newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required';
-//         isValid = false;
-//       }
-//       if (!info.fieldValue.trim()) {
-//         newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required';
-//         isValid = false;
-//       }
-//     });
-
-//     setErrors(prev => ({ ...prev, ...newErrors }));
-//     return isValid;
+//   const handleMetaChange = (field, value) => {
+//     setFormData(prev => ({
+//       ...prev,
+//       metaSettings: { ...prev.metaSettings, [field]: value }
+//     }));
+//     saveToLocalStorage();
 //   };
 
 //   const validateForm = () => {
 //     const newErrors = {};
 
-//     if (!formData.productName.trim()) {
-//       newErrors.productName = 'Product name is required';
-//     }
+//     if (!formData.productName.trim()) newErrors.productName = 'Product name is required';
+//     if (!formData.shortDescription || formData.shortDescription === '<p></p>') newErrors.shortDescription = 'Short description is required';
+//     if (!formData.fullDescription || formData.fullDescription === '<p></p>') newErrors.fullDescription = 'Full description is required';
+//     if (!formData.category) newErrors.category = 'Category is required';
+//     if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
+//     // if (!formData.ageGroup) newErrors.ageGroup = 'Age group is required';
+//     // if (formData.stockQuantity < 0) newErrors.stockQuantity = 'Stock quantity cannot be negative';
+//     // Only validate if stockQuantity has a value (not empty)
+// if (formData.stockQuantity !== '' && formData.stockQuantity < 0) {
+//   newErrors.stockQuantity = 'Stock quantity cannot be negative';
+// }
+// // Optional: Add validation for required field
+// if (formData.stockQuantity === '') {
+//   newErrors.stockQuantity = 'Stock quantity is required';
+// }
+//     if (formData.regularPrice <= 0) newErrors.regularPrice = 'Regular price must be greater than 0';
+//     if (formData.discountPrice > formData.regularPrice) newErrors.discountPrice = 'Discount price cannot exceed regular price';
+//     if (!formData.deliveryInfo.trim()) newErrors.deliveryInfo = 'Delivery information is required';
 
-//     if (!formData.category) {
-//       newErrors.category = 'Category is required';
-//     }
-
-//     if (!formData.targetedCustomer) {
-//       newErrors.targetedCustomer = 'Targeted customer is required';
-//     }
-
-//     if (!formData.fabric.trim()) {
-//       newErrors.fabric = 'Fabric details are required';
-//     }
-
-//     if (formData.moq < 1) {
-//       newErrors.moq = 'MOQ must be at least 1';
-//     }
-
-//     if (formData.pricePerUnit < 0) {
-//       newErrors.pricePerUnit = 'Price must be 0 or greater';
-//     }
-
-//     const hasImages = productImages.some(img => img.url !== null && !img.uploadAborted);
-//     if (!hasImages) {
-//       newErrors.images = 'At least one product image is required';
-//     }
-
-//     if (formData.colors.length === 0) {
-//       newErrors.colors = 'At least one color is required';
-//     }
-
-//     if (formData.metaSettings.metaTitle && formData.metaSettings.metaTitle.length > 70) {
-//       newErrors.metaTitle = 'Meta title should not exceed 70 characters';
-//     }
-
-//     if (formData.metaSettings.metaDescription && formData.metaSettings.metaDescription.length > 160) {
-//       newErrors.metaDescription = 'Meta description should not exceed 160 characters';
-//     }
+//     const hasImages = productImages.some(img => img.url !== null);
+//     if (!hasImages) newErrors.images = 'At least one product image is required';
 
 //     setErrors(newErrors);
-//     const isAdditionalInfoValid = validateAdditionalInfo();
+//     return Object.keys(newErrors).length === 0;
+//   };
+
+//   const handleSaveDraft = () => {
+//     setIsSavingDraft(true);
+//     saveToLocalStorage();
+//     setTimeout(() => {
+//       setIsSavingDraft(false);
+//       toast.success('Draft saved successfully!');
+//     }, 500);
+//   };
+
+// const handleSubmit = async (e) => {
+//   e.preventDefault();
+
+//   const uploading = productImages.some(img => img.uploading) || videoUpload.uploading;
+//   if (uploading) {
+//     toast.error('Please wait for all uploads to complete');
+//     return;
+//   }
+
+//   if (!validateForm()) {
+//     toast.error('Please fix the errors in the form');
+//     return;
+//   }
+
+//   setIsSubmitting(true);
+
+//   try {
+//     const token = localStorage.getItem('token');
+//     const imageUrls = productImages.filter(img => img.url).map(img => img.url);
     
-//     return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
-//   };
+//     const finalVideoUrl = videoUpload.url || (youtubeUrl ? `https://www.youtube.com/embed/${getYouTubeVideoId(youtubeUrl)}` : '');
+    
+//     const payload = {
+//       productName: formData.productName,
+//       shortDescription: formData.shortDescription,
+//       fullDescription: formData.fullDescription,
+//       category: formData.category,
+//       subcategory: formData.subcategory,
+//       childSubcategory: formData.childSubcategory,
+//       brand: formData.brand,
+//       ageGroup: formData.ageGroup,
+// stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity),      regularPrice: Number(formData.regularPrice),
+//       discountPrice: Number(formData.discountPrice),
+//       deliveryInfo: formData.deliveryInfo,
+//       codAvailable: formData.codAvailable,
+//       tags: formData.tags,
+//       promotion: formData.promotion,
+//       isFeatured: formData.isFeatured,
+//       rating: Number(formData.rating),
+//       additionalInfo: formData.additionalInfo,
+//       videoUrl: finalVideoUrl,
+//       videoPublicId: videoUpload.publicId || '',
+//       videoType: formData.videoType,
+//       metaSettings: {
+//         metaTitle: formData.metaSettings.metaTitle,
+//         metaDescription: formData.metaSettings.metaDescription,
+//         metaKeywords: formData.metaSettings.metaKeywords || []
+//       },
+//       images: imageUrls
+//     };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
+//     const response = await fetch('http://localhost:5000/api/products', {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${token}`,
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify(payload)
+//     });
 
-//     const uploading = productImages.some(img => img.uploading === true);
-//     if (uploading) {
-//       toast.error('Please wait for all images to finish uploading');
-//       return;
-//     }
+//     const data = await response.json();
 
-//     const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
-//     if (hasEmptyPrice) {
-//       toast.error('Please fill in all price fields in Quantity Based Pricing');
-//       return;
-//     }
-
-//     if (!validateForm()) {
-//       toast.error('Please fix the errors in the form');
-//       return;
-//     }
-
-//     setIsSubmitting(true);
-
-//     try {
-//       const token = localStorage.getItem('token');
+//     if (data.success) {
+//       const generatedSku = data.data.skuCode;
+//       toast.success(`✅ Product created successfully! SKU: ${generatedSku}`);
+//       localStorage.removeItem(DRAFT_KEY);
+//       router.push('/admin/all-products');
+//     } else {
+//       // Display the error message from backend
+//       const errorMessage = data.error || 'Failed to create product';
+//       toast.error(errorMessage);
       
-//       // Only include images that have a URL and are not aborted and not uploading
-//       const imageUrls = productImages
-//         .filter(img => img.url !== null && !img.uploadAborted && !img.uploading)
-//         .map(img => img.url);
-      
-//       const processedPricing = formData.quantityBasedPricing.map(tier => ({
-//         ...tier,
-//         price: tier.price === '' ? 0 : parseFloat(tier.price)
-//       }));
-
-//       const processedAdditionalInfo = formData.additionalInfo.filter(
-//         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
-//       );
-
-//       const processedCustomizationOptions = formData.customizationOptions.filter(
-//         option => option.title.trim() !== '' && option.value.trim() !== ''
-//       );
-
-//       const filteredSizes = orderUnit === 'piece' 
-//         ? formData.sizes.filter(s => s.trim() !== '')
-//         : [];
-
-//       const payload = {
-//         productName: formData.productName,
-//         description: formData.description,
-//         instruction: formData.instruction || '',
-//         category: formData.category,
-//         subcategory: formData.subcategory || '',
-//         childSubcategory: formData.childSubcategory || '',
-//         targetedCustomer: formData.targetedCustomer,
-//         fabric: formData.fabric,
-//         weightPerUnit: formData.weightPerUnit || '',
-//         orderUnit: orderUnit,
-//         moq: formData.moq,
-//         pricePerUnit: formData.pricePerUnit === 0 ? '' : formData.pricePerUnit,
-//         quantityBasedPricing: processedPricing,
-//         sizes: filteredSizes,
-//         colors: formData.colors,
-//         additionalInfo: processedAdditionalInfo,
-//         customizationOptions: processedCustomizationOptions,
-//         images: imageUrls,
-//         isFeatured: formData.isFeatured,
-//         tags: formData.tags,
-//         metaSettings: formData.metaSettings
-//       };
-
-//       const response = await fetch('http://localhost:5000/api/products', {
-//         method: 'POST',
-//         headers: {
-//           'Authorization': `Bearer ${token}`,
-//           'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify(payload)
-//       });
-
-//       const data = await response.json();
-
-//       if (data.success) {
-//         toast.success('Product created successfully!');
-//         router.push('/admin/all-products');
-//       } else {
-//         toast.error(data.error || 'Failed to create product');
+//       // If it's a duplicate product name error, focus on the product name field
+//       if (errorMessage.includes('already exists')) {
+//         setErrors(prev => ({ ...prev, productName: errorMessage }));
+//         // Scroll to product name field
+//         document.querySelector('input[name="productName"]')?.scrollIntoView({ 
+//           behavior: 'smooth', 
+//           block: 'center' 
+//         });
 //       }
-//     } catch (error) {
-//       console.error('Error creating product:', error);
-//       toast.error('Network error. Please try again.');
-//     } finally {
-//       setIsSubmitting(false);
 //     }
-//   };
+//   } catch (error) {
+//     console.error('Error creating product:', error);
+//     toast.error('Network error. Please try again.');
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
 
-//   const getSelectedCustomerIcon = () => {
-//     const customer = TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer);
-//     return customer ? customer.icon : '👤';
-//   };
+//   const discountPercentage = formData.regularPrice && formData.discountPrice 
+//     ? Math.round(((formData.regularPrice - formData.discountPrice) / formData.regularPrice) * 100)
+//     : 0;
 
-//   const getCurrentUnitLabel = () => {
-//     const unit = ORDER_UNITS.find(u => u.value === orderUnit);
-//     return unit?.unitLabel || 'pieces';
-//   };
-
-//   const getPricePerLabel = () => {
-//     if (orderUnit === 'piece') return 'Per Piece';
-//     if (orderUnit === 'kg') return 'Per KG';
-//     return 'Per Metric Ton';
+//   const getVideoPreview = () => {
+//     if (videoUpload.url) {
+//       return (
+//         <div className="relative">
+//           <video src={videoUpload.url} className="w-full rounded-lg" controls />
+//           <button
+//             type="button"
+//             onClick={removeVideo}
+//             className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+//           >
+//             <X className="w-4 h-4" />
+//           </button>
+//         </div>
+//       );
+//     } else if (youtubeUrl && getYouTubeVideoId(youtubeUrl)) {
+//       const videoId = getYouTubeVideoId(youtubeUrl);
+//       return (
+//         <div className="relative">
+//           <iframe
+//             src={`https://www.youtube.com/embed/${videoId}`}
+//             className="w-full rounded-lg aspect-video"
+//             allowFullScreen
+//           />
+//           <button
+//             type="button"
+//             onClick={removeVideo}
+//             className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+//           >
+//             <X className="w-4 h-4" />
+//           </button>
+//         </div>
+//       );
+//     }
+//     return null;
 //   };
 
 //   return (
 //     <MantineProvider>
-//       <div className="min-h-screen" style={{ backgroundColor: '#FAF7F2' }}>
+//       <div className="min-h-screen" style={{ backgroundColor: '#FFF9F0' }}>
+//         {/* Restore Draft Modal */}
+//         <RestoreDraftModal 
+//           isOpen={showRestoreModal}
+//           onConfirm={handleRestoreDraft}
+//           onCancel={handleDiscardDraft}
+//           draftData={pendingDraft?.formData}
+//         />
+        
 //         {/* Header */}
-//         <div className="bg-white border-b shadow-sm sticky top-0 z-10" style={{ borderBottomColor: '#6B4F3A' }}>
-//           <div className="px-6 py-4">
+//         <div className="bg-white border-b shadow-sm sticky top-0 z-10" style={{ borderBottomColor: '#FFB6C1' }}>
+//           <div className="px-2 py-2">
 //             <div className="flex items-center justify-between">
 //               <div className="flex items-center gap-4">
-//                 <NextLink href="/admin/all-products" className="p-2 hover:bg-[#F5E6D3] rounded-lg transition-colors">
-//                   <ArrowLeft className="w-5 h-5" style={{ color: '#6B4F3A' }} />
+//                 <NextLink href="/admin/all-products" className="p-2 hover:bg-pink-50 rounded-lg transition-colors">
+//                   <ArrowLeft className="w-5 h-5" style={{ color: '#4A8A90' }} />
 //                 </NextLink>
 //                 <div>
 //                   <div className="flex items-center gap-2">
-//                     <h1 className="text-2xl font-bold" style={{ color: '#2A2A2A', fontFamily: 'Playfair Display, serif' }}>Create New Product</h1>
-//                     <span className="px-2 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: '#F5E6D3', color: '#6B4F3A' }}>
-//                       Admin
+//                     <Gift className="w-6 h-6" style={{ color: '#4A8A90' }} />
+//                     <h1 className="text-xl font-bold" style={{ color: '#2D3A5C', fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       Create New Toy Product
+//                     </h1>
+//                     <span className="px-2 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}>
+//                       Kids Toys
 //                     </span>
 //                   </div>
-//                   <p className="text-sm text-gray-500 mt-1">Add a new jute product to your catalog</p>
+//                   <p className="text-sm text-gray-500 mt-1">Add a magical new toy to your collection</p>
 //                 </div>
+//               </div>
+//               <div className="flex items-center gap-3">
+//                 {lastSaved && (
+//                   <span className="text-xs text-gray-400 flex items-center gap-1">
+//                     <Clock className="w-3 h-3" />
+//                     Last saved: {lastSaved.toLocaleTimeString()}
+//                   </span>
+//                 )}
+//                 <button
+//                   type="button"
+//                   onClick={clearDraft}
+//                   className="px-4 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+//                 >
+//                   Clear Draft
+//                 </button>
+//                 <button
+//                   type="button"
+//                   onClick={handleSaveDraft}
+//                   disabled={isSavingDraft}
+//                   className="px-4 py-2 text-sm rounded-lg transition-colors flex items-center gap-2"
+//                   style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}
+//                 >
+//                   {isSavingDraft ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+//                   Save Draft
+//                 </button>
 //               </div>
 //             </div>
 //           </div>
@@ -1105,20 +1713,18 @@
 //         {/* Main Content */}
 //         <div className="p-6">
 //           <form onSubmit={handleSubmit}>
-//             {/* Row 1: Basic Details and Product Images */}
-//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-//               {/* Basic Details Card */}
-//               <div className="lg:col-span-2">
+//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+//               {/* Left Column - Main Info */}
+//               <div className="lg:col-span-2 space-y-6">
+//                 {/* Basic Information Card - Same as before */}
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                   <div className="p-5 border-b border-gray-200">
-//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                       <Package className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                       Basic Details
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       <Package className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//                       Basic Information
 //                     </h2>
 //                   </div>
-                  
 //                   <div className="p-5 space-y-4">
-//                     {/* Product Name */}
 //                     <div>
 //                       <label className="block text-sm font-medium text-gray-700 mb-1">
 //                         Product Name <span className="text-red-500">*</span>
@@ -1128,27 +1734,48 @@
 //                         name="productName"
 //                         value={formData.productName}
 //                         onChange={handleChange}
-//                         className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition ${
+//                         className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
 //                           errors.productName ? 'border-red-500' : 'border-gray-300'
 //                         }`}
-//                         placeholder="e.g., Premium Jute Fiber, Jute Shopping Bag"
+//                         placeholder="e.g., Magical Unicorn Plush Toy, STEM Robot Kit"
 //                       />
-//                       {errors.productName && (
-//                         <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-//                           <AlertCircle className="w-3 h-3" />
-//                           {errors.productName}
-//                         </p>
-//                       )}
+//                       {errors.productName && <p className="text-xs text-red-600 mt-1">{errors.productName}</p>}
 //                     </div>
 
-//                     {/* Description */}
+//                     {/* Short Description */}
 //                     <div>
 //                       <label className="block text-sm font-medium text-gray-700 mb-1">
-//                         Description
+//                         Short Description <span className="text-red-500">*</span>
 //                       </label>
-//                       {isMounted && editor && (
-//                         <div className="border border-gray-300 rounded-lg overflow-hidden">
-//                           <RichTextEditor editor={editor}>
+//                       {isMounted && shortDescEditor && (
+//                         <div className={`border rounded-lg overflow-hidden ${errors.shortDescription ? 'border-red-500' : 'border-gray-300'}`}>
+//                           <RichTextEditor editor={shortDescEditor}>
+//                             <RichTextEditor.Toolbar>
+//                               <RichTextEditor.ControlsGroup>
+//                                 <RichTextEditor.Bold />
+//                                 <RichTextEditor.Italic />
+//                               </RichTextEditor.ControlsGroup>
+//                               <RichTextEditor.ControlsGroup>
+//                                 <RichTextEditor.AlignLeft />
+//                                 <RichTextEditor.AlignCenter />
+//                                 <RichTextEditor.AlignRight />
+//                               </RichTextEditor.ControlsGroup>
+//                             </RichTextEditor.Toolbar>
+//                             <RichTextEditor.Content />
+//                           </RichTextEditor>
+//                         </div>
+//                       )}
+//                       <p className="text-xs text-gray-500 mt-1">Brief description shown in product listings</p>
+//                     </div>
+
+//                     {/* Full Description */}
+//                     <div>
+//                       <label className="block text-sm font-medium text-gray-700 mb-1">
+//                         Full Description <span className="text-red-500">*</span>
+//                       </label>
+//                       {isMounted && fullDescEditor && (
+//                         <div className={`border rounded-lg overflow-hidden ${errors.fullDescription ? 'border-red-500' : 'border-gray-300'}`}>
+//                           <RichTextEditor editor={fullDescEditor}>
 //                             <RichTextEditor.Toolbar>
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.Bold />
@@ -1160,7 +1787,6 @@
 //                                 <RichTextEditor.H1 />
 //                                 <RichTextEditor.H2 />
 //                                 <RichTextEditor.H3 />
-//                                 <RichTextEditor.H4 />
 //                               </RichTextEditor.ControlsGroup>
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.BulletList />
@@ -1171,64 +1797,25 @@
 //                                 <RichTextEditor.AlignCenter />
 //                                 <RichTextEditor.AlignRight />
 //                               </RichTextEditor.ControlsGroup>
-//                               <RichTextEditor.ControlsGroup>
-//                                 <RichTextEditor.Link />
-//                                 <RichTextEditor.Unlink />
-//                               </RichTextEditor.ControlsGroup>
 //                             </RichTextEditor.Toolbar>
 //                             <RichTextEditor.Content />
 //                           </RichTextEditor>
 //                         </div>
 //                       )}
 //                     </div>
+//                   </div>
+//                 </div>
 
-//                     {/* Instruction Field */}
-//                     <div>
-//                       <label className="block text-sm font-medium text-gray-700 mb-1">
-//                         Packaging / Care Instructions
-//                       </label>
-//                       {isMounted && instructionEditor && (
-//                         <div className="border border-gray-300 rounded-lg overflow-hidden">
-//                           <RichTextEditor editor={instructionEditor}>
-//                             <RichTextEditor.Toolbar>
-//                               <RichTextEditor.ControlsGroup>
-//                                 <RichTextEditor.Bold />
-//                                 <RichTextEditor.Italic />
-//                                 <RichTextEditor.Underline />
-//                                 <RichTextEditor.Strikethrough />
-//                               </RichTextEditor.ControlsGroup>
-//                               <RichTextEditor.ControlsGroup>
-//                                 <RichTextEditor.H1 />
-//                                 <RichTextEditor.H2 />
-//                                 <RichTextEditor.H3 />
-//                                 <RichTextEditor.H4 />
-//                               </RichTextEditor.ControlsGroup>
-//                               <RichTextEditor.ControlsGroup>
-//                                 <RichTextEditor.BulletList />
-//                                 <RichTextEditor.OrderedList />
-//                               </RichTextEditor.ControlsGroup>
-//                               <RichTextEditor.ControlsGroup>
-//                                 <RichTextEditor.AlignLeft />
-//                                 <RichTextEditor.AlignCenter />
-//                                 <RichTextEditor.AlignRight />
-//                               </RichTextEditor.ControlsGroup>
-//                               <RichTextEditor.ControlsGroup>
-//                                 <RichTextEditor.Link />
-//                                 <RichTextEditor.Unlink />
-//                               </RichTextEditor.ControlsGroup>
-//                             </RichTextEditor.Toolbar>
-//                             <RichTextEditor.Content />
-//                           </RichTextEditor>
-//                         </div>
-//                       )}
-//                       <p className="text-xs text-gray-500 mt-1">
-//                         Add care instructions, washing guidelines, or any special notes for customers
-//                       </p>
-//                     </div>
-
-//                     {/* Category, Subcategory, etc. */}
+//                 {/* Categories Card - Same as before */}
+//                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                   <div className="p-5 border-b border-gray-200">
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       <Layers className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//                       Categories & Classification
+//                     </h2>
+//                   </div>
+//                   <div className="p-5">
 //                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       {/* Category */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Category <span className="text-red-500">*</span>
@@ -1237,61 +1824,48 @@
 //                           name="category"
 //                           value={formData.category}
 //                           onChange={handleChange}
-//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition ${
+//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
 //                             errors.category ? 'border-red-500' : 'border-gray-300'
 //                           }`}
 //                         >
-//                           <option value="">Choose Category</option>
+//                           <option value="">Select Category</option>
 //                           {categories.map(cat => (
 //                             <option key={cat._id} value={cat._id}>{cat.name}</option>
 //                           ))}
 //                         </select>
-//                         {errors.category && (
-//                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
-//                         )}
+//                         {errors.category && <p className="text-xs text-red-600 mt-1">{errors.category}</p>}
 //                       </div>
 
-//                       {/* Subcategory */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           <div className="flex items-center gap-1">
-//                             <FolderTree className="w-4 h-4" />
-//                             Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
-//                           </div>
+//                           Subcategory <span className="text-gray-400 text-xs">(Optional)</span>
 //                         </label>
 //                         <select
 //                           name="subcategory"
 //                           value={formData.subcategory}
-//                           onChange={(e) => {
-//                             handleChange(e);
-//                             setFormData(prev => ({ ...prev, childSubcategory: '' }));
-//                           }}
+//                           onChange={handleChange}
 //                           disabled={!formData.category || subcategories.length === 0}
-//                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
+//                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
 //                         >
-//                           <option value="">-- Select Subcategory (Optional) --</option>
+//                           <option value="">Select Subcategory</option>
 //                           {subcategories.map(sub => (
 //                             <option key={sub._id} value={sub._id}>{sub.name}</option>
 //                           ))}
 //                         </select>
 //                       </div>
 
-//                       {/* Child Subcategory */}
-//                       {showChildSubcategory && (
+//                       {childSubcategories.length > 0 && (
 //                         <div>
 //                           <label className="block text-sm font-medium text-gray-700 mb-1">
-//                             <div className="flex items-center gap-1">
-//                               <FolderTree className="w-4 h-4" />
-//                               Child Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
-//                             </div>
+//                             Child Subcategory <span className="text-gray-400 text-xs">(Optional)</span>
 //                           </label>
 //                           <select
 //                             name="childSubcategory"
 //                             value={formData.childSubcategory}
 //                             onChange={handleChange}
-//                             className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition border-gray-300"
+//                             className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition border-gray-300"
 //                           >
-//                             <option value="">-- Select Child Subcategory (Optional) --</option>
+//                             <option value="">Select Child Subcategory</option>
 //                             {childSubcategories.map(child => (
 //                               <option key={child._id} value={child._id}>{child.name}</option>
 //                             ))}
@@ -1299,113 +1873,434 @@
 //                         </div>
 //                       )}
 
-//                       {/* Targeted Customer */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           <div className="flex items-center gap-1">
-//                             <Users className="w-4 h-4" />
-//                             Target Customer <span className="text-red-500">*</span>
-//                           </div>
-//                         </label>
-//                         <div className="relative">
-//                           <select
-//                             name="targetedCustomer"
-//                             value={formData.targetedCustomer}
-//                             onChange={handleChange}
-//                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition appearance-none ${
-//                               errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
-//                             }`}
-//                           >
-//                             {TARGETED_CUSTOMERS.map(customer => (
-//                               <option key={customer.value} value={customer.value}>
-//                                 {customer.icon} {customer.label}
-//                               </option>
-//                             ))}
-//                           </select>
-//                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-//                             <span className="text-lg">{getSelectedCustomerIcon()}</span>
-//                           </div>
-//                         </div>
-//                       </div>
-
-//                       {/* Fabric */}
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Fabric (Material) <span className="text-red-500">*</span>
+//                           Brand <span className="text-red-500">*</span>
 //                         </label>
 //                         <input
 //                           type="text"
-//                           name="fabric"
-//                           value={formData.fabric}
+//                           name="brand"
+//                           value={formData.brand}
 //                           onChange={handleChange}
-//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition ${
-//                             errors.fabric ? 'border-red-500' : 'border-gray-300'
+//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
+//                             errors.brand ? 'border-red-500' : 'border-gray-300'
 //                           }`}
-//                           placeholder="e.g., 100% Natural Jute"
+//                           placeholder="e.g., LEGO, Mattel, Hasbro"
+//                         />
+//                         {errors.brand && <p className="text-xs text-red-600 mt-1">{errors.brand}</p>}
+//                       </div>
+
+//                       {/* <div>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">
+//                           Age Group <span className="text-red-500">*</span>
+//                         </label>
+//                         <div className="grid grid-cols-4 gap-2">
+//                           {AGE_GROUPS.map(age => (
+//                             <button
+//                               key={age.value}
+//                               type="button"
+//                               onClick={() => setFormData(prev => ({ ...prev, ageGroup: age.value }))}
+//                               className={`p-2 rounded-lg border-2 transition-all text-center ${
+//                                 formData.ageGroup === age.value
+//                                   ? 'border-[#4A8A90] bg-[#D4EDEE]'
+//                                   : 'border-gray-200 hover:border-[#FFB6C1]'
+//                               }`}
+//                             >
+//                               <span className="text-lg">{age.icon}</span>
+//                               <p className="text-[10px] font-medium mt-1">{age.label}</p>
+//                             </button>
+//                           ))}
+//                         </div>
+//                         {errors.ageGroup && <p className="text-xs text-red-600 mt-1">{errors.ageGroup}</p>}
+//                       </div> */}
+//                       {/* Age Group Section - Remove the red asterisk */}
+// <div>
+//   <label className="block text-sm font-medium text-gray-700 mb-1">
+//     Age Group <span className="text-gray-400 text-xs">(Optional)</span>
+//   </label>
+//   <div className="grid grid-cols-5 gap-2">
+//     {AGE_GROUPS.map(age => (
+//       <button
+//         key={age.value}
+//         type="button"
+//         onClick={() => setFormData(prev => ({ ...prev, ageGroup: age.value }))}
+//         className={`p-2 rounded-lg border-2 transition-all text-center ${
+//           formData.ageGroup === age.value
+//             ? 'border-[#4A8A90] bg-[#D4EDEE]'
+//             : 'border-gray-200 hover:border-[#FFB6C1]'
+//         }`}
+//       >
+//         <span className="text-lg">{age.icon}</span>
+//         <p className="text-[10px] font-medium mt-1">{age.label}</p>
+//       </button>
+//     ))}
+//   </div>
+//   {/* Remove the error display for ageGroup */}
+//   {/* {errors.ageGroup && <p className="text-xs text-red-600 mt-1">{errors.ageGroup}</p>} */}
+// </div>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* Pricing Card - Same as before */}
+//                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                   <div className="p-5 border-b border-gray-200">
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       <DollarSign className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//                       Pricing & Inventory
+//                     </h2>
+//                   </div>
+//                   <div className="p-5">
+//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                     {/* SKU Code Field - Read-only, will be filled by backend after creation */}
+// {/* <div>
+//   <label className="block text-sm font-medium text-gray-700 mb-1">SKU Code</label>
+//   <div className="flex items-center gap-2">
+//     <input
+//       type="text"
+//       name="skuCode"
+//       value={formData.skuCode || 'Will be auto-generated'}
+//       disabled
+//       className="flex-1 px-3 py-2 text-sm bg-gray-100 border border-gray-200 rounded-lg font-mono text-gray-500 cursor-not-allowed"
+//     />
+//     <button
+//       type="button"
+//       onClick={() => toast.info('SKU will be automatically generated when product is created')}
+//       className="px-3 py-2 text-sm rounded-lg transition-colors cursor-help"
+//       style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}
+//     >
+//       Auto
+//     </button>
+//   </div>
+//   <p className="text-xs text-gray-500 mt-1">
+//     SKU will be automatically generated by the system in format: TOY-XXXXX-XXX
+//   </p>
+// </div> */}
+
+//                       <div>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">
+//                           Stock Quantity <span className="text-red-500">*</span>
+//                         </label>
+//                        <input
+//   type="number"
+//   name="stockQuantity"
+//   value={formData.stockQuantity}
+//   onChange={handleNumberChange}
+//   onWheel={(e) => e.target.blur()}
+//   min="0"
+//   placeholder="0"
+//   className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
+//     errors.stockQuantity ? 'border-red-500' : 'border-gray-300'
+//   }`}
+// />
+//                       </div>
+
+//                       <div>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">
+//                           Regular Price (৳) <span className="text-red-500">*</span>
+//                         </label>
+//                         <input
+//                           type="number"
+//                           name="regularPrice"
+//                           value={formData.regularPrice || ''}
+//                           onChange={handleNumberChange}
+//                           onWheel={(e) => e.target.blur()}
+//                           min="0"
+//                           step="1"
+//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
+//                             errors.regularPrice ? 'border-red-500' : 'border-gray-300'
+//                           }`}
+//                           placeholder="0"
 //                         />
 //                       </div>
 
-//                       {/* Weight Per Unit */}
 //                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           <div className="flex items-center gap-1">
-//                             <Scale className="w-4 h-4" />
-//                             Weight Per Unit <span className="text-gray-400 text-xs font-normal">(Optional)</span>
-//                           </div>
-//                         </label>
-//                         <div className="flex items-center gap-2">
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">Discount Price (৳)</label>
+//                         <div className="relative">
 //                           <input
 //                             type="number"
-//                             name="weightPerUnit"
-//                             value={formData.weightPerUnit}
-//                             onChange={handleChange}
+//                             name="discountPrice"
+//                             value={formData.discountPrice || ''}
+//                             onChange={handleNumberChange}
 //                             onWheel={(e) => e.target.blur()}
-//                             step="0.01"
 //                             min="0"
-//                             className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                             placeholder="e.g., 0.5"
+//                             step="1"
+//                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
+//                               errors.discountPrice ? 'border-red-500' : 'border-gray-300'
+//                             }`}
+//                             placeholder="0"
 //                           />
-//                           <span className="text-sm text-gray-500">kg/unit</span>
+//                           {discountPercentage > 0 && (
+//                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
+//                               <span className="text-xs font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded">
+//                                 {discountPercentage}% OFF
+//                               </span>
+//                             </div>
+//                           )}
 //                         </div>
-//                         <p className="text-xs text-gray-500 mt-1">
-//                           Specify weight per piece/unit (helps with shipping calculations)
-//                         </p>
 //                       </div>
 //                     </div>
 
-//                     {/* Category Info Display */}
-//                     {selectedCategoryDetails && (
-//                       <div className="mt-2 p-3 rounded-lg border" style={{ backgroundColor: '#F5E6D3', borderColor: '#6B4F3A' }}>
-//                         <div className="flex items-center gap-2">
-//                           <Package className="w-4 h-4" style={{ color: '#6B4F3A' }} />
-//                           <div>
-//                             <p className="text-sm font-medium text-gray-900">
-//                               Selected Category: {selectedCategoryDetails.name}
-//                             </p>
-//                             {formData.subcategory && subcategories.find(s => s._id === formData.subcategory) && (
-//                               <p className="text-xs text-gray-600 mt-1">
-//                                 <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
-//                               </p>
-//                             )}
-//                             {formData.childSubcategory && childSubcategories.find(c => c._id === formData.childSubcategory) && (
-//                               <p className="text-xs text-gray-600 mt-1">
-//                                 <span className="font-medium">Child Subcategory:</span> {childSubcategories.find(c => c._id === formData.childSubcategory)?.name}
-//                               </p>
-//                             )}
-//                           </div>
-//                         </div>
-//                       </div>
-//                     )}
+//                    {/* Delivery Details - Rich Text Editor */}
+// <div className="mt-4">
+//   <label className="block text-sm font-medium text-gray-700 mb-1">
+//     Delivery Details <span className="text-red-500">*</span>
+//   </label>
+//   {isMounted && deliveryInfoEditor && (
+//     <div className={`border rounded-lg overflow-hidden ${errors.deliveryInfo ? 'border-red-500' : 'border-gray-300'}`}>
+//       <RichTextEditor editor={deliveryInfoEditor}>
+//         <RichTextEditor.Toolbar>
+//           <RichTextEditor.ControlsGroup>
+//             <RichTextEditor.Bold />
+//             <RichTextEditor.Italic />
+//             <RichTextEditor.Underline />
+//           </RichTextEditor.ControlsGroup>
+//           <RichTextEditor.ControlsGroup>
+//             <RichTextEditor.BulletList />
+//             <RichTextEditor.OrderedList />
+//           </RichTextEditor.ControlsGroup>
+//           <RichTextEditor.ControlsGroup>
+//             <RichTextEditor.AlignLeft />
+//             <RichTextEditor.AlignCenter />
+//             <RichTextEditor.AlignRight />
+//           </RichTextEditor.ControlsGroup>
+//         </RichTextEditor.Toolbar>
+//         <RichTextEditor.Content />
+//       </RichTextEditor>
+//     </div>
+//   )}
+//   <p className="text-xs text-gray-500 mt-1">
+//     Include shipping information, delivery time, and other delivery-related details
+//   </p>
+// </div>
+
+// {/* Cash on Delivery Checkbox */}
+// <div className="mt-4">
+//   <label className="flex items-center gap-3 cursor-pointer">
+//     <input
+//       type="checkbox"
+//       checked={formData.codAvailable}
+//       onChange={(e) => setFormData(prev => ({ ...prev, codAvailable: e.target.checked }))}
+//       className="w-5 h-5 rounded border-gray-300 text-[#4A8A90] focus:ring-[#4A8A90]"
+//       style={{ accentColor: '#4A8A90' }}
+//     />
+//     <div>
+//       <span className="text-sm font-medium text-gray-700">Cash on Delivery Available</span>
+//       <p className="text-xs text-gray-500">Enable COD payment option for this product</p>
+//     </div>
+//   </label>
+// </div>
 //                   </div>
 //                 </div>
-//               </div>
 
-//               {/* Product Images Card */}
-//               <div className="lg:col-span-1">
+//                 {/* Additional Information */}
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                   <div className="p-5 border-b border-gray-200">
-//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                       <ImageIcon className="w-5 h-5" style={{ color: '#6B4F3A' }} />
+//                     <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowAdditionalInfo(!showAdditionalInfo)}>
+//                       <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                         <Info className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//                         Additional Information
+//                       </h2>
+//                       <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showAdditionalInfo ? 'rotate-180' : ''}`} />
+//                     </div>
+//                   </div>
+//                   {showAdditionalInfo && (
+//                     <div className="p-5">
+//                       <div className="space-y-4">
+//                         {formData.additionalInfo.map((info, index) => (
+//                           <div key={index} className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: '#FFF9F0', border: '1px solid #D4EDEE' }}>
+//                             <div className="flex-1 grid grid-cols-2 gap-3">
+//                               <span className="text-sm font-medium" style={{ color: '#4A8A90' }}>{info.fieldName}:</span>
+//                               <span className="text-sm text-gray-600">{info.fieldValue}</span>
+//                             </div>
+//                             <button type="button" onClick={() => removeAdditionalInfo(index)} className="text-gray-400 hover:text-red-500">
+//                               <X className="w-4 h-4" />
+//                             </button>
+//                           </div>
+//                         ))}
+//                         <div className="flex gap-3">
+//                           <input
+//                             type="text"
+//                             placeholder="e.g., Material"
+//                             value={additionalInfoInput.fieldName}
+//                             onChange={(e) => setAdditionalInfoInput({ ...additionalInfoInput, fieldName: e.target.value })}
+//                             className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none"
+//                           />
+//                           <input
+//                             type="text"
+//                             placeholder="e.g., Premium Cotton"
+//                             value={additionalInfoInput.fieldValue}
+//                             onChange={(e) => setAdditionalInfoInput({ ...additionalInfoInput, fieldValue: e.target.value })}
+//                             className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none"
+//                           />
+//                           <button
+//                             type="button"
+//                             onClick={addAdditionalInfo}
+//                             className="px-4 py-2 text-white rounded-lg transition-colors"
+//                             style={{ backgroundColor: '#4A8A90' }}
+//                           >
+//                             <Plus className="w-4 h-4" />
+//                           </button>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   )}
+//                 </div>
+
+//                 {/* Meta Settings for SEO */}
+// <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//   <div className="p-5 border-b border-gray-200">
+//     <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowMeta(!showMeta)}>
+//       <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//         <Hash className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//         SEO & Meta Settings
+//       </h2>
+//       <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
+//     </div>
+//     <p className="text-xs text-gray-500 mt-1">Optimize your product for search engines</p>
+//   </div>
+  
+//   {showMeta && (
+//     <div className="p-5">
+//       <div className="space-y-4">
+//         {/* Meta Title */}
+//         <div>
+//           <label className="block text-sm font-medium text-gray-700 mb-1">
+//             Meta Title
+//             <span className="text-xs text-gray-400 ml-2">(70 characters max)</span>
+//           </label>
+//           <input
+//             type="text"
+//             value={formData.metaSettings.metaTitle}
+//             onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
+//             maxLength="70"
+//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition"
+//             placeholder="e.g., Buy Educational STEM Toys for Kids | Toy Store Bangladesh"
+//           />
+//           <div className="flex justify-end mt-1">
+//             <span className={`text-xs ${formData.metaSettings.metaTitle?.length > 70 ? 'text-red-500' : 'text-gray-400'}`}>
+//               {formData.metaSettings.metaTitle?.length || 0}/70
+//             </span>
+//           </div>
+//         </div>
+
+//         {/* Meta Description */}
+//         <div>
+//           <label className="block text-sm font-medium text-gray-700 mb-1">
+//             Meta Description
+//             <span className="text-xs text-gray-400 ml-2">(160 characters max)</span>
+//           </label>
+//           <textarea
+//             value={formData.metaSettings.metaDescription}
+//             onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
+//             maxLength="160"
+//             rows="3"
+//             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition resize-none"
+//             placeholder="Write a compelling description that appears in search engine results..."
+//           />
+//           <div className="flex justify-end mt-1">
+//             <span className={`text-xs ${formData.metaSettings.metaDescription?.length > 160 ? 'text-red-500' : 'text-gray-400'}`}>
+//               {formData.metaSettings.metaDescription?.length || 0}/160
+//             </span>
+//           </div>
+//         </div>
+
+//         {/* Meta Keywords */}
+//         <div>
+//           <label className="block text-sm font-medium text-gray-700 mb-1">
+//             Meta Keywords
+//             <span className="text-xs text-gray-400 ml-2">(Comma separated)</span>
+//           </label>
+//           <div className="flex gap-2">
+//             <input
+//               type="text"
+//               value={keywordInput}
+//               onChange={(e) => setKeywordInput(e.target.value)}
+//               onKeyPress={(e) => {
+//                 if (e.key === 'Enter') {
+//                   e.preventDefault();
+//                   addKeyword();
+//                 }
+//               }}
+//               className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition"
+//               placeholder="e.g., educational toys, STEM kit, learning games"
+//             />
+//             <button
+//               type="button"
+//               onClick={addKeyword}
+//               className="px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2"
+//               style={{ backgroundColor: '#4A8A90' }}
+//             >
+//               <Plus className="w-4 h-4" />
+//               Add
+//             </button>
+//           </div>
+          
+//           {/* Display Keywords */}
+//           {formData.metaSettings.metaKeywords && formData.metaSettings.metaKeywords.length > 0 && (
+//             <div className="mt-3 flex flex-wrap gap-2">
+//               {formData.metaSettings.metaKeywords.map((keyword, index) => (
+//                 <div
+//                   key={index}
+//                   className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full"
+//                   style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}
+//                 >
+//                   <span>{keyword}</span>
+//                   <button
+//                     type="button"
+//                     onClick={() => removeKeyword(index)}
+//                     className="hover:text-red-500 transition-colors"
+//                   >
+//                     <X className="w-3 h-3" />
+//                   </button>
+//                 </div>
+//               ))}
+//             </div>
+//           )}
+//           <p className="text-xs text-gray-500 mt-2">
+//             Keywords help search engines understand your product. Add relevant terms separated by commas.
+//           </p>
+//         </div>
+
+//         {/* SEO Preview */}
+//         {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (
+//           <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50">
+//             <p className="text-xs font-medium text-gray-500 mb-2">Search Engine Preview:</p>
+//             <div className="space-y-1">
+//               {formData.metaSettings.metaTitle && (
+//                 <p className="text-base font-medium text-blue-700 line-clamp-1">
+//                   {formData.metaSettings.metaTitle}
+//                 </p>
+//               )}
+//               {formData.metaSettings.metaTitle && (
+//                 <p className="text-xs text-green-700">
+//                   https://yourstore.com/product/{formData.productName?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'product-slug'}
+//                 </p>
+//               )}
+//               {formData.metaSettings.metaDescription && (
+//                 <p className="text-xs text-gray-600 line-clamp-2">
+//                   {formData.metaSettings.metaDescription}
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   )}
+// </div>
+                
+
+                
+//               </div>
+
+//               {/* Right Column */}
+//               <div className="space-y-6">
+//                 {/* Product Images Card */}
+//                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                   <div className="p-5 border-b border-gray-200">
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       <ImageIcon className="w-5 h-5" style={{ color: '#4A8A90' }} />
 //                       Product Images <span className="text-red-500">*</span>
 //                     </h2>
 //                     <p className="text-xs text-gray-500 mt-1">Upload up to 6 images (JPG, PNG, WebP, max 5MB each)</p>
@@ -1419,7 +2314,6 @@
 //                       </p>
 //                     )}
                     
-//                     {/* Multiple Image Upload Button */}
 //                     <div className="mb-4">
 //                       <input
 //                         type="file"
@@ -1436,7 +2330,7 @@
 //                         type="button"
 //                         onClick={() => fileInputRefs.current['multiple']?.click()}
 //                         className="w-full flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg border-2 border-dashed transition-colors"
-//                         style={{ backgroundColor: '#F5E6D3', color: '#6B4F3A', borderColor: '#6B4F3A' }}
+//                         style={{ backgroundColor: '#D4EDEE', color: '#4A8A90', borderColor: '#4A8A90' }}
 //                       >
 //                         <Upload className="w-5 h-5" />
 //                         <span>Select Multiple Images (Up to 6)</span>
@@ -1446,27 +2340,26 @@
 //                       </p>
 //                     </div>
 
-//                     {/* Image Preview Grid with Drag and Drop */}
 //                     <div className="grid grid-cols-2 gap-4">
 //                       {productImages.map((img, index) => (
 //                         <div
 //                           key={index}
 //                           draggable={img.preview !== null && !img.uploading}
-//                           onDragStart={() => img.preview && !img.uploading && handleDragStart(index)}
-//                           onDragOver={(e) => img.preview && !img.uploading && handleDragOverWithFeedback(e, index)}
+//                           onDragStart={() => handleDragStart(index)}
+//                           onDragOver={(e) => handleDragOverWithFeedback(e, index)}
 //                           onDragLeave={handleDragLeave}
-//                           onDrop={() => img.preview && !img.uploading && handleDropWithFeedback(index)}
+//                           onDrop={() => handleDropWithFeedback(index)}
 //                           onDragEnd={handleDragEnd}
 //                           className={`transition-all duration-200 ${
 //                             draggedIndex === index ? 'opacity-50 scale-95' : ''
 //                           } ${
 //                             dragOverIndex === index && draggedIndex !== index && draggedIndex !== null 
-//                               ? 'ring-2 ring-[#6B4F3A] ring-offset-2 rounded-lg' 
+//                               ? 'ring-2 ring-[#4A8A90] ring-offset-2 rounded-lg' 
 //                               : ''
 //                           }`}
 //                         >
 //                           {img.preview ? (
-//                             <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-40 hover:border-[#6B4F3A] transition-colors cursor-grab active:cursor-grabbing">
+//                             <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-40 hover:border-[#4A8A90] transition-colors cursor-grab active:cursor-grabbing bg-gray-100">
 //                               <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
 //                                 <GripVertical className="w-3 h-3 text-white" />
 //                               </div>
@@ -1476,24 +2369,20 @@
 //                                 alt={`Product ${index + 1}`} 
 //                                 className="w-full h-full object-contain bg-gray-100"
 //                                 onError={(e) => {
-//                                   console.error('Image failed to load');
 //                                   e.target.src = 'https://via.placeholder.com/150?text=Error';
 //                                 }}
 //                               />
                               
-//                               {/* Uploading Overlay */}
 //                               {img.uploading && (
 //                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
 //                                   <Loader2 className="w-6 h-6 text-white animate-spin" />
 //                                 </div>
 //                               )}
                               
-//                               {/* Remove Button */}
 //                               <button
 //                                 type="button"
 //                                 onClick={() => removeImage(index)}
 //                                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20"
-//                                 disabled={false}
 //                                 title="Remove image"
 //                               >
 //                                 <X className="w-3 h-3" />
@@ -1505,8 +2394,8 @@
 //                             </div>
 //                           ) : (
 //                             <div 
-//                               className={`border-2 border-dashed rounded-lg p-4 text-center h-40 flex flex-col items-center justify-center cursor-pointer ${
-//                                 img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 hover:border-[#6B4F3A] hover:bg-[#F5E6D3]'
+//                               className={`border-2 border-dashed rounded-lg p-4 text-center h-40 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+//                                 img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 hover:border-[#4A8A90] hover:bg-[#D4EDEE]'
 //                               }`}
 //                               onClick={() => fileInputRefs.current[index]?.click()}
 //                             >
@@ -1531,647 +2420,244 @@
 //                       ))}
 //                     </div>
                     
-//                     {/* Upload Progress Summary */}
 //                     {productImages.some(img => img.uploading) && (
-//                       <div className="mt-4 p-2 rounded-lg" style={{ backgroundColor: '#F5E6D3' }}>
-//                         <p className="text-xs" style={{ color: '#6B4F3A' }}>
-//                           Uploading: {productImages.filter(img => img.uploading).length} image(s) remaining...
+//                       <div className="mt-4 p-2 rounded-lg" style={{ backgroundColor: '#D4EDEE' }}>
+//                         <p className="text-xs" style={{ color: '#4A8A90' }}>
+//                           Uploading: {productImages.filter(img => img.uploading && !img.uploadAborted).length} image(s) remaining...
 //                         </p>
 //                       </div>
 //                     )}
                     
-//                     {/* Image Count Info */}
 //                     <div className="mt-4 text-xs text-gray-500 text-center">
 //                       {productImages.filter(img => img.url !== null && !img.uploading && !img.uploadAborted).length} of 6 images uploaded
 //                     </div>
 //                   </div>
 //                 </div>
-//               </div>
-//             </div>
 
-//             {/* Sizes and Colors */}
-//             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-//               {/* Sizes - Only show for 'piece' unit */}
-//               {orderUnit === 'piece' ? (
+//                 {/* Video Upload Card - NEW */}
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                   <div className="p-5 border-b border-gray-200">
-//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                       <Ruler className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                       Sizes <span className="text-gray-400 text-sm font-normal">(Optional)</span>
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       <Video className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//                       Product Video <span className="text-gray-400 text-xs">(Optional)</span>
 //                     </h2>
-//                     <p className="text-xs text-gray-500 mt-1">Sizes available only for piece-based products</p>
+//                     <p className="text-xs text-gray-500 mt-1">Upload a video or add a YouTube link to showcase your toy</p>
 //                   </div>
 //                   <div className="p-5">
-//                     <div className="space-y-2">
-//                       {formData.sizes.map((size, index) => (
-//                         <div key={index} className="flex items-center gap-2">
+//                     {/* Video Type Toggle */}
+//                     <div className="flex gap-2 mb-4">
+//                       <button
+//                         type="button"
+//                         onClick={() => setVideoType('upload')}
+//                         className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+//                           videoType === 'upload'
+//                             ? 'text-white'
+//                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+//                         }`}
+//                         style={videoType === 'upload' ? { backgroundColor: '#4A8A90' } : {}}
+//                       >
+//                         <Upload className="w-4 h-4 inline mr-1" />
+//                         Upload Video
+//                       </button>
+//                       <button
+//                         type="button"
+//                         onClick={() => setVideoType('youtube')}
+//                         className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+//                           videoType === 'youtube'
+//                             ? 'text-white'
+//                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+//                         }`}
+//                         style={videoType === 'youtube' ? { backgroundColor: '#4A8A90' } : {}}
+//                       >
+//                         <Youtube className="w-4 h-4 inline mr-1" />
+//                         YouTube Link
+//                       </button>
+//                     </div>
+
+//                     {/* Video Preview */}
+//                     {getVideoPreview()}
+
+//                     {/* Upload Section */}
+//                     {videoType === 'upload' && !videoUpload.url && !videoUpload.preview && (
+//                       <div
+//                         className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-[#4A8A90] transition-colors"
+//                         onClick={() => videoInputRef.current?.click()}
+//                       >
+//                         <input
+//                           type="file"
+//                           ref={videoInputRef}
+//                           className="hidden"
+//                           accept="video/*"
+//                           onChange={handleVideoFileChange}
+//                         />
+//                         <Video className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+//                         <p className="text-sm text-gray-500">Click or drag to upload video</p>
+//                         <p className="text-xs text-gray-400 mt-1">MP4, WebM, MOV (Max 100MB)</p>
+//                       </div>
+//                     )}
+
+//                     {/* YouTube URL Input */}
+//                     {videoType === 'youtube' && !formData.videoUrl && (
+//                       <div className="space-y-3">
+//                         <div className="relative">
+//                           <Youtube className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
 //                           <input
 //                             type="text"
-//                             value={size}
-//                             onChange={(e) => handleSizeChange(index, e.target.value)}
-//                             placeholder={`Size ${index + 1}`}
-//                             className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
+//                             value={youtubeUrl}
+//                             onChange={(e) => handleYoutubeUrlChange(e.target.value)}
+//                             placeholder="https://www.youtube.com/watch?v=..."
+//                             className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none"
 //                           />
-//                           {formData.sizes.length > 1 && (
-//                             <button
-//                               type="button"
-//                               onClick={() => removeSize(index)}
-//                               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-//                             >
-//                               <Trash2 className="w-4 h-4" />
-//                             </button>
-//                           )}
 //                         </div>
+//                         <p className="text-xs text-gray-500">
+//                           Paste any YouTube video URL. The video will be embedded on your product page.
+//                         </p>
+//                       </div>
+//                     )}
+
+//                     {videoUpload.error && (
+//                       <p className="text-xs text-red-500 mt-2">{videoUpload.error}</p>
+//                     )}
+//                   </div>
+//                 </div>
+
+//                 {/* Rating */}
+//                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                   <div className="p-5 border-b border-gray-200">
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       <Star className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//                       Product Rating
+//                     </h2>
+//                   </div>
+//                   <div className="p-5">
+//                     <div className="flex items-center gap-2">
+//                       {[1, 2, 3, 4, 5].map(star => (
+//                         <button
+//                           key={star}
+//                           type="button"
+//                           onClick={() => handleRatingChange(star)}
+//                           onMouseEnter={() => setRatingHover(star)}
+//                           onMouseLeave={() => setRatingHover(0)}
+//                           className="transition-transform hover:scale-110"
+//                         >
+//                           <Star 
+//                             className={`w-8 h-8 ${
+//                               (ratingHover || formData.rating) >= star
+//                                 ? 'fill-yellow-400 text-yellow-400'
+//                                 : 'text-gray-300'
+//                             }`}
+//                           />
+//                         </button>
 //                       ))}
-//                       <button
-//                         type="button"
-//                         onClick={addSize}
-//                         className="w-full flex items-center justify-center gap-1 px-3 py-2 mt-2 text-xs font-medium border border-dashed rounded-lg transition-colors"
-//                         style={{ color: '#6B4F3A', borderColor: '#6B4F3A' }}
-//                       >
-//                         <Plus className="w-3.5 h-3.5" />
-//                         Add Size
-//                       </button>
-//                       <p className="text-xs text-gray-400 text-center mt-2">
-//                         Add custom sizes for this product
-//                       </p>
+//                       <span className="ml-2 text-sm text-gray-500">
+//                         {formData.rating > 0 ? `${formData.rating} out of 5 stars` : 'No rating yet'}
+//                       </span>
 //                     </div>
+//                     <p className="text-xs text-gray-500 mt-3">Set the initial product rating (1-5 stars)</p>
 //                   </div>
 //                 </div>
-//               ) : (
-//                 <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 text-center">
-//                   <Ruler className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-//                   <p className="text-sm text-gray-500">Sizes are not available for {orderUnit === 'kg' ? 'KG' : 'Metric Ton'} based products</p>
-//                   <p className="text-xs text-gray-400 mt-1">Please select "Pieces / Units" to add size options</p>
-//                 </div>
-//               )}
 
-//               {/* Colors - Always show */}
-//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-//                 <div className="p-5 border-b border-gray-200">
-//                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                     <Palette className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                     Colors <span className="text-red-500">*</span>
-//                   </h2>
-//                   {orderUnit !== 'piece' && (
-//                     <p className="text-xs text-gray-500 mt-1">Colors configuration for weight-based products (kg/ton)</p>
-//                   )}
-//                 </div>
-//                 <div className="p-5">
-//                   {errors.colors && (
-//                     <p className="text-xs text-red-600 mb-3 flex items-center gap-1">
-//                       <AlertCircle className="w-3 h-3" />
-//                       {errors.colors}
-//                     </p>
-//                   )}
-//                   <div className="space-y-3">
-//                     {formData.colors.map((color, index) => (
-//                       <div key={index} className="relative">
-//                         <div className="flex items-center gap-2 w-full">
-//                           <div 
-//                             className="flex-1 flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 p-1 cursor-pointer hover:border-[#6B4F3A] transition-colors"
-//                             onClick={(e) => openColorPicker(index, e)}
-//                           >
-//                             <div 
-//                               className="w-10 h-10 rounded-lg border-2 border-gray-200 flex-shrink-0"
-//                               style={{ backgroundColor: color.code }}
-//                             />
-//                             <div className="flex-1 font-mono text-sm text-gray-600">
-//                               {color.code}
-//                             </div>
-//                             <ChevronDown className="w-4 h-4 text-gray-500 flex-shrink-0" />
-//                           </div>
-//                           {formData.colors.length > 1 && (
-//                             <button
-//                               type="button"
-//                               onClick={() => removeColor(index)}
-//                               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
-//                             >
-//                               <Trash2 className="w-4 h-4" />
-//                             </button>
-//                           )}
-//                         </div>
-//                         {showColorPicker && currentColorIndex === index && (
-//                           <div ref={colorPickerRef} className="absolute right-0 mt-2 z-50">
-//                             <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-3">
-//                               <SketchPicker
-//                                 color={color.code}
-//                                 onChange={(color) => handleColorChange(index, 'code', color.hex)}
-//                                 presetColors={PREDEFINED_COLORS}
-//                               />
-//                             </div>
-//                           </div>
-//                         )}
-//                       </div>
-//                     ))}
-//                     <button
-//                       type="button"
-//                       onClick={addColor}
-//                       className="w-full flex items-center justify-center gap-1 px-3 py-2 mt-2 text-xs font-medium border border-dashed rounded-lg transition-colors"
-//                       style={{ color: '#6B4F3A', borderColor: '#6B4F3A' }}
-//                     >
-//                       <Plus className="w-3.5 h-3.5" />
-//                       Add Color
-//                     </button>
+//                 {/* Tags */}
+//                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                   <div className="p-5 border-b border-gray-200">
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       <Tag className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//                       Product Tags
+//                     </h2>
 //                   </div>
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Order Unit Selection */}
-//             <div className="mb-6">
-//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-//                 <div className="p-5 border-b border-gray-200">
-//                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                     <Package className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                     Selling Unit
-//                   </h2>
-//                   <p className="text-xs text-gray-500 mt-1">Select how this product is measured and sold</p>
-//                 </div>
-//                 <div className="p-5">
-//                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                     {ORDER_UNITS.map(unit => (
-//                       <button
-//                         key={unit.value}
-//                         type="button"
-//                         onClick={() => handleOrderUnitChange(unit.value)}
-//                         className={`p-4 rounded-lg border-2 transition-all text-left ${
-//                           orderUnit === unit.value 
-//                             ? 'border-[#6B4F3A] bg-[#F5E6D3]' 
-//                             : 'border-gray-200 hover:border-[#6B4F3A]'
-//                         }`}
-//                       >
-//                         <div className="flex items-center gap-3">
-//                           <span className="text-2xl">{unit.icon}</span>
-//                           <div>
-//                             <p className="font-medium text-gray-900">{unit.label}</p>
-//                             <p className="text-xs text-gray-500">{unit.description}</p>
-//                           </div>
-//                         </div>
-//                       </button>
-//                     ))}
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Pricing Section */}
-//             <div className="mb-6">
-//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-//                 <div className="p-5 border-b border-gray-200">
-//                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                     <DollarSign className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                     Pricing & MOQ
-//                   </h2>
-//                 </div>
-//                 <div className="p-5 space-y-4">
-//                   <div className="grid grid-cols-2 gap-4">
-//                     <div>
-//                       <label className="block text-sm font-medium text-gray-700 mb-1">
-//                         Minimum Order Quantity (MOQ) <span className="text-red-500">*</span>
-//                       </label>
-//                       <div className="flex items-center gap-2">
-//                         <input
-//                           type="number"
-//                           name="moq"
-//                           value={formData.moq}
-//                           onChange={handleChange}
-//                           onWheel={(e) => e.target.blur()}
-//                           min="1"
-//                           className="flex-1 px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                         />
-//                         <span className="text-sm text-gray-500">
-//                           {getCurrentUnitLabel()}
-//                         </span>
-//                       </div>
-//                       {errors.moq && <p className="text-xs text-red-600 mt-1">{errors.moq}</p>}
+//                   <div className="p-5">
+//                     <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+//                       {AVAILABLE_TAGS.map(tag => (
+//                         <button
+//                           key={tag}
+//                           type="button"
+//                           onClick={() => handleTagToggle(tag)}
+//                           className={`px-3 py-1.5 text-xs rounded-full transition-all ${
+//                             formData.tags.includes(tag)
+//                               ? 'text-white'
+//                               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+//                           }`}
+//                           style={formData.tags.includes(tag) ? { backgroundColor: '#4A8A90' } : {}}
+//                         >
+//                           {tag}
+//                         </button>
+//                       ))}
 //                     </div>
-//                     <div>
-//                       <label className="block text-sm font-medium text-gray-700 mb-1">
-//                         {getPricePerLabel()} ($) <span className="text-red-500">*</span>
-//                       </label>
-//                       <div className="flex items-center gap-2">
-//                         <input
-//                           type="number"
-//                           name="pricePerUnit"
-//                           value={formData.pricePerUnit === 0 ? '' : formData.pricePerUnit}
-//                           onChange={handleChange}
-//                           onWheel={(e) => e.target.blur()}
-//                           min="0"
-//                           step="0.01"
-//                           placeholder="0.00"
-//                           className="flex-1 px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                         />
-//                         <span className="text-sm text-gray-500">$</span>
-//                       </div>
-//                       {errors.pricePerUnit && <p className="text-xs text-red-600 mt-1">{errors.pricePerUnit}</p>}
-//                     </div>
-//                   </div>
-
-//                   <div>
-//                     <div className="flex items-center justify-between mb-4">
-//                       <label className="block text-sm font-medium text-gray-700">
-//                         Bulk Pricing (Quantity in {getCurrentUnitLabel()}):
-//                       </label>
-//                       <button
-//                         type="button"
-//                         onClick={addPricingRow}
-//                         className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors border"
-//                         style={{ color: '#6B4F3A', borderColor: '#6B4F3A' }}
-//                       >
-//                         <PlusCircle className="w-3.5 h-3.5" />
-//                         Add Tier
-//                       </button>
-//                     </div>
-//                     <div className="space-y-4">
-//                       {formData.quantityBasedPricing.map((tier, index) => (
-//                         <div key={index} className="flex items-start gap-3">
-//                           <div className="w-1/2">
-//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               Quantity Range ({getCurrentUnitLabel()})
-//                             </label>
-//                             <input
-//                               type="text"
-//                               value={tier.range}
-//                               onChange={(e) => handlePricingChange(index, 'range', e.target.value)}
-//                               placeholder={
-//                                 orderUnit === 'ton' ? "e.g., 1-4 MT" : 
-//                                 orderUnit === 'kg' ? "e.g., 100-499 kg" : 
-//                                 "e.g., 100-299 pcs"
-//                               }
-//                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                             />
-//                           </div>
-//                           <div className="w-1/2">
-//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               Price Per {orderUnit === 'ton' ? 'MT ($)' : orderUnit === 'kg' ? 'KG ($)' : 'Unit ($)'}
-//                             </label>
-//                             <input
-//                               type="number"
-//                               value={tier.price === 0 ? '' : tier.price}
-//                               onChange={(e) => handlePricingChange(index, 'price', e.target.value)}
-//                               onWheel={(e) => e.target.blur()}
-//                               placeholder="0.00"
-//                               min="0"
-//                               step="0.01"
-//                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                             />
-//                           </div>
-//                           {formData.quantityBasedPricing.length > 1 && (
-//                             <div className="flex items-end h-[62px]">
-//                               <button
-//                                 type="button"
-//                                 onClick={() => removePricingRow(index)}
-//                                 className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-//                               >
-//                                 <MinusCircle className="w-5 h-5" />
+//                     {formData.tags.length > 0 && (
+//                       <div className="mt-3 p-3 rounded-lg" style={{ backgroundColor: '#D4EDEE' }}>
+//                         <p className="text-xs font-medium mb-2" style={{ color: '#4A8A90' }}>Selected Tags:</p>
+//                         <div className="flex flex-wrap gap-2">
+//                           {formData.tags.map(tag => (
+//                             <span key={tag} className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full" style={{ backgroundColor: '#4A8A90', color: 'white' }}>
+//                               {tag}
+//                               <button type="button" onClick={() => handleTagToggle(tag)} className="hover:opacity-70">
+//                                 <X className="w-2.5 h-2.5" />
 //                               </button>
-//                             </div>
-//                           )}
-//                         </div>
-//                       ))}
-//                     </div>
-//                     <p className="text-xs text-gray-500 mt-2">
-//                       {orderUnit === 'ton' 
-//                         ? 'Set pricing tiers based on order quantity in Metric Tons (1 MT = 1000 kg)' 
-//                         : orderUnit === 'kg'
-//                         ? 'Set pricing tiers based on order weight in kilograms'
-//                         : 'Set pricing tiers based on order quantity in pieces'}
-//                     </p>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Customization Options */}
-//             <div className="mb-6">
-//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-//                 <div className="p-5 border-b border-gray-200">
-//                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                     <Wrench className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                     Customization Options
-//                   </h2>
-//                   <p className="text-xs text-gray-500 mt-1">
-//                     Add customization options available for this product (e.g., Logo Printing, Handle Type, Color Options, etc.)
-//                   </p>
-//                 </div>
-//                 <div className="p-5">
-//                   <div className="space-y-4">
-//                     {formData.customizationOptions.map((option, index) => (
-//                       <div key={index} className="flex items-start gap-3 p-4 rounded-lg border" style={{ backgroundColor: '#FAF7F2', borderColor: '#F5E6D3' }}>
-//                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
-//                           <div>
-//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               <Type className="w-3 h-3 inline mr-1" />
-//                               Customization Title
-//                             </label>
-//                             <input
-//                               type="text"
-//                               value={option.title}
-//                               onChange={(e) => handleCustomizationChange(index, 'title', e.target.value)}
-//                               placeholder="e.g., Logo Printing, Handle Type, Material Finish"
-//                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                             />
-//                           </div>
-//                           <div>
-//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               <Hash className="w-3 h-3 inline mr-1" />
-//                               Options / Details
-//                             </label>
-//                             <input
-//                               type="text"
-//                               value={option.value}
-//                               onChange={(e) => handleCustomizationChange(index, 'value', e.target.value)}
-//                               placeholder="e.g., Custom logo available, Cotton handle, Matte finish"
-//                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                             />
-//                           </div>
-//                         </div>
-//                         <button
-//                           type="button"
-//                           onClick={() => removeCustomizationOption(index)}
-//                           className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-//                         >
-//                           <Trash2 className="w-4 h-4" />
-//                         </button>
-//                       </div>
-//                     ))}
-//                     <button
-//                       type="button"
-//                       onClick={addCustomizationOption}
-//                       className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-2 border-dashed rounded-lg transition-colors"
-//                       style={{ color: '#6B4F3A', borderColor: '#6B4F3A' }}
-//                     >
-//                       <PlusCircle className="w-4 h-4" />
-//                       Add Customization Option
-//                     </button>
-//                     <p className="text-xs text-gray-400 text-center mt-2">
-//                       Add as many customization options as needed. Leave empty if not applicable.
-//                     </p>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Additional Information */}
-//             <div className="mb-6">
-//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-//                 <div className="p-5 border-b border-gray-200">
-//                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                     <Info className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                     Additional Information
-//                   </h2>
-//                   <p className="text-xs text-gray-500 mt-1">
-//                     Add custom fields for extra product details (e.g., GSM, tensile strength, etc.)
-//                   </p>
-//                 </div>
-//                 <div className="p-5">
-//                   <div className="space-y-4">
-//                     {formData.additionalInfo.map((info, index) => (
-//                       <div key={index} className="flex items-start gap-3 p-4 rounded-lg border" style={{ backgroundColor: '#FAF7F2', borderColor: '#F5E6D3' }}>
-//                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
-//                           <div>
-//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               <Type className="w-3 h-3 inline mr-1" />
-//                               Field Name
-//                             </label>
-//                             <input
-//                               type="text"
-//                               value={info.fieldName}
-//                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
-//                               placeholder="e.g., GSM, Tensile Strength"
-//                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                             />
-//                           </div>
-//                           <div>
-//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               <Hash className="w-3 h-3 inline mr-1" />
-//                               Field Value
-//                             </label>
-//                             <input
-//                               type="text"
-//                               value={info.fieldValue}
-//                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldValue', e.target.value)}
-//                               placeholder="e.g., 200 GSM, 50 kg"
-//                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                             />
-//                           </div>
-//                         </div>
-//                         <button
-//                           type="button"
-//                           onClick={() => removeAdditionalInfo(index)}
-//                           className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-//                         >
-//                           <Trash2 className="w-4 h-4" />
-//                         </button>
-//                       </div>
-//                     ))}
-//                     <button
-//                       type="button"
-//                       onClick={addAdditionalInfo}
-//                       className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-2 border-dashed rounded-lg transition-colors"
-//                       style={{ color: '#6B4F3A', borderColor: '#6B4F3A' }}
-//                     >
-//                       <PlusCircle className="w-4 h-4" />
-//                       Add Additional Information
-//                     </button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Product Promotion */}
-//             <div className="mb-6">
-//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-//                 <div className="p-5 border-b border-gray-200">
-//                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                     <Star className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                     Product Promotion
-//                   </h2>
-//                 </div>
-//                 <div className="p-5">
-//                   <div className="mb-4">
-//                     <label className="flex items-center gap-3 cursor-pointer">
-//                       <input
-//                         type="checkbox"
-//                         checked={formData.isFeatured}
-//                         onChange={(e) => {
-//                           setFormData({ ...formData, isFeatured: e.target.checked });
-//                           setShowTags(e.target.checked);
-//                         }}
-//                         className="w-5 h-5 rounded"
-//                         style={{ accentColor: '#6B4F3A' }}
-//                       />
-//                       <div>
-//                         <span className="text-sm font-medium text-gray-700">Mark as Featured Product</span>
-//                         <p className="text-xs text-gray-500">Featured products will appear in special sections</p>
-//                       </div>
-//                     </label>
-//                   </div>
-
-//                   <div className="mt-4">
-//                     <div 
-//                       className="flex items-center justify-between cursor-pointer py-2"
-//                       onClick={() => setShowTags(!showTags)}
-//                     >
-//                       <div className="flex items-center gap-2">
-//                         <Tag className="w-4 h-4" style={{ color: '#6B4F3A' }} />
-//                         <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
-//                       </div>
-//                       <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
-//                     </div>
-//                     {showTags && (
-//                       <div className="mt-3">
-//                         <p className="text-xs text-gray-500 mb-2">Select one tag (optional)</p>
-//                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-//                           {AVAILABLE_TAGS.map(tag => (
-//                             <label key={tag} className="flex items-center gap-2 cursor-pointer">
-//                               <input
-//                                 type="radio"
-//                                 name="productTag"
-//                                 checked={formData.tags.includes(tag)}
-//                                 onChange={() => handleTagToggle(tag)}
-//                                 className="w-4 h-4"
-//                                 style={{ accentColor: '#6B4F3A' }}
-//                               />
-//                               <span className="text-sm text-gray-600">{tag}</span>
-//                             </label>
+//                             </span>
 //                           ))}
 //                         </div>
-//                         {formData.tags.length > 0 && (
-//                           <div className="mt-4 flex flex-wrap gap-2">
-//                             {formData.tags.map(tag => (
-//                               <span key={tag} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: '#F5E6D3', color: '#6B4F3A' }}>
-//                                 {tag}
-//                                 <button
-//                                   type="button"
-//                                   onClick={() => handleTagToggle(tag)}
-//                                   className="ml-1.5 hover:opacity-70"
-//                                 >
-//                                   <X className="w-3 h-3" />
-//                                 </button>
-//                               </span>
-//                             ))}
-//                           </div>
-//                         )}
 //                       </div>
 //                     )}
 //                   </div>
 //                 </div>
-//               </div>
-//             </div>
 
-//             {/* Meta Settings */}
-//             <div className="mb-6">
-//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-//                 <div className="p-5 border-b border-gray-200">
-//                   <div 
-//                     className="flex items-center justify-between cursor-pointer"
-//                     onClick={() => setShowMeta(!showMeta)}
-//                   >
-//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-//                       <Search className="w-5 h-5" style={{ color: '#6B4F3A' }} />
-//                       Meta Settings (SEO)
+//                 {/* Promotion */}
+//                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                   <div className="p-5 border-b border-gray-200">
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+//                       <Sparkles className="w-5 h-5" style={{ color: '#4A8A90' }} />
+//                       Promotions
 //                     </h2>
-//                     <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
+//                   </div>
+//                   <div className="p-5">
+//                     <div className="grid grid-cols-2 gap-2">
+//                       {PROMOTION_OPTIONS.map(promo => (
+//                         <button
+//                           key={promo.value}
+//                           type="button"
+//                           onClick={() => handlePromotionSelect(promo.value)}
+//                           className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all text-sm ${
+//                             formData.promotion === promo.value
+//                               ? 'border-[#FFB6C1] bg-pink-50'
+//                               : 'border-gray-200 hover:border-[#D4EDEE]'
+//                           }`}
+//                         >
+//                           <span className="text-base">{promo.icon}</span>
+//                           <span className="text-xs font-medium">{promo.label}</span>
+//                         </button>
+//                       ))}
+//                     </div>
+//                     <label className="flex items-center gap-3 mt-4 cursor-pointer">
+//                       <input
+//                         type="checkbox"
+//                         checked={formData.isFeatured}
+//                         onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+//                         className="w-4 h-4"
+//                         style={{ accentColor: '#4A8A90' }}
+//                       />
+//                       <span className="text-sm text-gray-700">Feature this product on homepage</span>
+//                     </label>
 //                   </div>
 //                 </div>
-//                 {showMeta && (
-//                   <div className="p-5">
-//                     <div className="space-y-4">
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
-//                         <input
-//                           type="text"
-//                           value={formData.metaSettings.metaTitle}
-//                           onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
-//                           maxLength="70"
-//                           placeholder="Enter meta title (max 70 characters)"
-//                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition"
-//                         />
-//                         <div className="flex justify-between mt-1">
-//                           <p className="text-xs text-gray-500">Appears in search engine results</p>
-//                           <span className="text-xs text-gray-500">{formData.metaSettings.metaTitle?.length || 0}/70</span>
-//                         </div>
-//                       </div>
-
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
-//                         <textarea
-//                           value={formData.metaSettings.metaDescription}
-//                           onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
-//                           maxLength="160"
-//                           placeholder="Enter meta description (max 160 characters)"
-//                           rows="3"
-//                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition resize-none"
-//                         />
-//                         <div className="flex justify-between mt-1">
-//                           <p className="text-xs text-gray-500">Brief description for search results</p>
-//                           <span className="text-xs text-gray-500">{formData.metaSettings.metaDescription?.length || 0}/160</span>
-//                         </div>
-//                       </div>
-
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
-//                         {formData.metaSettings.metaKeywords?.length > 0 && (
-//                           <div className="flex flex-wrap gap-2 mb-3 p-3 rounded-lg border" style={{ backgroundColor: '#FAF7F2', borderColor: '#F5E6D3' }}>
-//                             {formData.metaSettings.metaKeywords.map((keyword, index) => (
-//                               <span key={index} className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium" style={{ backgroundColor: '#F5E6D3', color: '#6B4F3A' }}>
-//                                 {keyword}
-//                                 <button type="button" onClick={() => removeKeyword(index)} className="ml-1.5 hover:opacity-70">
-//                                   <X className="w-3 h-3" />
-//                                 </button>
-//                               </span>
-//                             ))}
-//                           </div>
-//                         )}
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={keywordInput}
-//                             onChange={(e) => setKeywordInput(e.target.value)}
-//                             onKeyDown={handleKeywordKeyDown}
-//                             onBlur={handleKeywordBlur}
-//                             placeholder="Type a keyword and press Enter or comma to add"
-//                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6B4F3A] focus:border-transparent outline-none transition pr-20"
-//                           />
-//                           {keywordInput.trim() && (
-//                             <button
-//                               type="button"
-//                               onClick={addKeyword}
-//                               className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-white text-xs font-medium rounded transition-colors"
-//                               style={{ backgroundColor: '#6B4F3A' }}
-//                             >
-//                               Add
-//                             </button>
-//                           )}
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 )}
 //               </div>
 //             </div>
 
-//             {/* Submit Button */}
-//             <div className="mt-6 flex justify-end">
+//             {/* Submit Buttons */}
+//             <div className="mt-8 flex justify-end gap-3">
+//               <NextLink href="/admin/all-products">
+//                 <button type="button" className="px-6 py-2.5 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+//                   Cancel
+//                 </button>
+//               </NextLink>
+             
 //               <button
 //                 type="submit"
 //                 disabled={isSubmitting}
-//                 className="flex items-center gap-2 px-6 py-3 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-//                 style={{ backgroundColor: '#6B4F3A' }}
+//                 className="flex items-center gap-2 px-6 py-2.5 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+//                 style={{ backgroundColor: '#4A8A90' }}
 //               >
-//                 {isSubmitting ? (
-//                   <>
-//                     <Loader2 className="w-4 h-4 animate-spin" />
-//                     <span>Creating Product...</span>
-//                   </>
-//                 ) : (
-//                   <>
-//                     <Save className="w-4 h-4" />
-//                     <span>Create Product</span>
-//                   </>
-//                 )}
+//                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+//                 {isSubmitting ? 'Creating...' : 'Create Product'}
 //               </button>
 //             </div>
 //           </form>
@@ -2214,7 +2700,11 @@ import {
   Eye,
   GripVertical,
   Youtube,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Barcode,
+  Scan,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { MantineProvider } from '@mantine/core';
@@ -2229,7 +2719,7 @@ import '@mantine/core/styles.css';
 
 // Age group options
 const AGE_GROUPS = [
-   { value: '', label: 'Not Specified', icon: '📦' }, 
+  { value: '', label: 'Not Specified', icon: '📦' }, 
   { value: '0-2', label: '0-2 years', icon: '👶' },
   { value: '3-5', label: '3-5 years', icon: '🧒' },
   { value: '6-10', label: '6-10 years', icon: '👧' },
@@ -2271,6 +2761,229 @@ const PROMOTION_OPTIONS = [
   { value: 'limited-stock', label: 'Limited Stock', icon: '⚠️', color: '#E74C3C' }
 ];
 
+// Barcode Input Component (inline)
+const BarcodeInput = ({ value, onChange, onValidate, disabled = false, error = '' }) => {
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState(null);
+  const [isScannerMode, setIsScannerMode] = useState(false);
+  const [scannedValue, setScannedValue] = useState('');
+  const inputRef = useRef(null);
+  const scanTimeoutRef = useRef(null);
+
+  const validateBarcode = async (barcodeValue) => {
+    if (!barcodeValue || barcodeValue.length < 8) {
+      setValidationResult(null);
+      return;
+    }
+
+    setIsValidating(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/barcodes/validate/${barcodeValue}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setValidationResult(data.data);
+        if (onValidate) onValidate(data.data);
+      }
+    } catch (error) {
+      console.error('Validation error:', error);
+      setValidationResult({ isValid: false, message: 'Network error' });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (value) {
+        validateBarcode(value);
+      } else {
+        setValidationResult(null);
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [value]);
+
+  // useEffect(() => {
+  //   const handleKeyPress = (e) => {
+  //     if (!isScannerMode) return;
+      
+  //     if (e.key === 'Enter') {
+  //       if (scannedValue) {
+  //         onChange({ target: { name: 'barcode', value: scannedValue } });
+  //         setScannedValue('');
+  //         setIsScannerMode(false);
+  //         if (inputRef.current) {
+  //           inputRef.current.focus();
+  //         }
+  //       }
+  //     } else {
+  //       setScannedValue(prev => prev + e.key);
+  //     }
+  //   };
+
+  //   window.addEventListener('keydown', handleKeyPress);
+  //   return () => window.removeEventListener('keydown', handleKeyPress);
+  // }, [isScannerMode, scannedValue, onChange]);
+
+  useEffect(() => {
+  const handleKeyPress = (e) => {
+    if (!isScannerMode) return;
+    
+    if (e.key === 'Enter') {
+      if (scannedValue) {
+        // Clean the scanned value - remove any non-digit characters
+        let cleanBarcode = scannedValue.replace(/[^0-9]/g, '');
+        
+        // Limit to 13 digits
+        if (cleanBarcode.length > 13) {
+          cleanBarcode = cleanBarcode.slice(0, 13);
+        }
+        
+        console.log('Scanned barcode:', scannedValue);
+        console.log('Cleaned barcode:', cleanBarcode);
+        
+        onChange({ target: { name: 'barcode', value: cleanBarcode } });
+        setScannedValue('');
+        setIsScannerMode(false);
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }
+    } else {
+      // Only add digits, ignore other keys
+      if (/[0-9]/.test(e.key)) {
+        setScannedValue(prev => prev + e.key);
+      }
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyPress);
+  return () => window.removeEventListener('keydown', handleKeyPress);
+}, [isScannerMode, scannedValue, onChange]);
+
+  const startScannerMode = () => {
+    setIsScannerMode(true);
+    setScannedValue('');
+    toast.info('Scan barcode now...');
+    
+    scanTimeoutRef.current = setTimeout(() => {
+      if (isScannerMode) {
+        setIsScannerMode(false);
+        toast.info('Scanner mode timeout');
+      }
+    }, 10000);
+  };
+
+  const cancelScannerMode = () => {
+    setIsScannerMode(false);
+    setScannedValue('');
+    if (scanTimeoutRef.current) {
+      clearTimeout(scanTimeoutRef.current);
+    }
+  };
+
+  const getValidationIcon = () => {
+    if (isValidating) return <Loader2 className="w-4 h-4 animate-spin text-gray-400" />;
+    if (!validationResult) return <Barcode className="w-4 h-4 text-gray-400" />;
+    if (validationResult.isValid && (validationResult.status === 'available' || validationResult.status === 'new')) {
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
+    }
+    return <XCircle className="w-4 h-4 text-red-500" />;
+  };
+
+  const getValidationMessage = () => {
+    if (!validationResult) return null;
+    if (validationResult.isValid) {
+      if (validationResult.status === 'new') {
+        return <span className="text-green-600 text-xs">✓ New barcode - will be auto-generated</span>;
+      }
+      if (validationResult.status === 'available') {
+        return <span className="text-green-600 text-xs">✓ Barcode available for assignment</span>;
+      }
+    }
+    return <span className="text-red-600 text-xs">{validationResult.message}</span>;
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        Barcode <span className="text-gray-400 text-xs">(Optional - 8-13 digits)</span>
+      </label>
+      
+      <div className="relative">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2">
+          {getValidationIcon()}
+        </div>
+        
+        <input
+          ref={inputRef}
+          type="text"
+          name="barcode"
+          value={value || ''}
+          onChange={onChange}
+          disabled={disabled || isScannerMode}
+          placeholder="Enter barcode number or scan with scanner"
+          className={`w-full pl-10 pr-28 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
+            error ? 'border-red-500' : validationResult?.isValid === false ? 'border-red-500' : 'border-gray-300'
+          }`}
+          maxLength="13"
+        />
+        
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+          {isScannerMode ? (
+            <button
+              type="button"
+              onClick={cancelScannerMode}
+              className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition"
+            >
+              Cancel Scan
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={startScannerMode}
+              className="flex items-center gap-1 px-2 py-1 text-xs bg-[#4A8A90] text-white rounded hover:bg-[#3A7A80] transition"
+            >
+              <Scan className="w-3 h-3" />
+              <span className="hidden sm:inline">Scan</span>
+            </button>
+          )}
+        </div>
+      </div>
+      
+      {isScannerMode && (
+        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center gap-2">
+            <Scan className="w-4 h-4 text-blue-500 animate-pulse" />
+            <span className="text-sm text-blue-700">Scanner mode active - Scan barcode now</span>
+          </div>
+          <p className="text-xs text-blue-600 mt-1">
+            Scanning: {scannedValue || 'waiting for barcode...'}
+          </p>
+        </div>
+      )}
+      
+      {getValidationMessage()}
+      
+      {error && !validationResult?.isValid === false && (
+        <p className="text-xs text-red-600 flex items-center gap-1">
+          <AlertCircle className="w-3 h-3" />
+          {error}
+        </p>
+      )}
+      
+      <p className="text-xs text-gray-500">
+        You can either:
+        <br />• Enter a barcode from pre-generated list
+        <br />• Scan a barcode using a barcode scanner
+        <br />• Leave empty - no barcode will be assigned
+        <br />• Enter a new number - it will be auto-created
+      </p>
+    </div>
+  );
+};
 
 const compressImageSmart = async (file) => {
   return new Promise((resolve, reject) => {
@@ -2289,19 +3002,18 @@ const compressImageSmart = async (file) => {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         
-        // MORE AGGRESSIVE compression - target under 300KB
-        let quality = 0.4; // Default 40% quality
+        let quality = 0.4;
         
         if (file.size > 5 * 1024 * 1024) {
-          quality = 0.25; // 25% quality for 5MB+ files
+          quality = 0.25;
         } else if (file.size > 2 * 1024 * 1024) {
-          quality = 0.3; // 30% quality for 2-5MB files
+          quality = 0.3;
         } else if (file.size > 1 * 1024 * 1024) {
-          quality = 0.35; // 35% quality for 1-2MB files
+          quality = 0.35;
         } else if (file.size > 500 * 1024) {
-          quality = 0.45; // 45% quality for 500KB-1MB files
+          quality = 0.45;
         } else {
-          quality = 0.55; // 55% quality for smaller files
+          quality = 0.55;
         }
         
         canvas.toBlob(
@@ -2310,8 +3022,6 @@ const compressImageSmart = async (file) => {
               type: 'image/jpeg',
               lastModified: Date.now(),
             });
-            const reduction = ((file.size - blob.size) / file.size * 100).toFixed(1);
-            console.log(`📸 Compressed: ${(file.size / 1024).toFixed(0)}KB → ${(blob.size / 1024).toFixed(0)}KB (${reduction}% reduction)`);
             resolve(compressedFile);
           },
           'image/jpeg',
@@ -2326,113 +3036,12 @@ const compressImageSmart = async (file) => {
   });
 };
 
-// Add this function for video compression
-const compressVideo = async (file) => {
-  return new Promise((resolve, reject) => {
-    // Create video element
-    const video = document.createElement('video');
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    video.preload = 'metadata';
-    video.src = URL.createObjectURL(file);
-    
-    video.onloadedmetadata = () => {
-      // Set canvas dimensions (can reduce resolution if needed)
-      let width = video.videoWidth;
-      let height = video.videoHeight;
-      
-      // Optional: reduce resolution for smaller size
-      const MAX_WIDTH = 1280;
-      const MAX_HEIGHT = 720;
-      
-      if (width > MAX_WIDTH) {
-        height = (height * MAX_WIDTH) / width;
-        width = MAX_WIDTH;
-      }
-      if (height > MAX_HEIGHT) {
-        width = (width * MAX_HEIGHT) / height;
-        height = MAX_HEIGHT;
-      }
-      
-      canvas.width = width;
-      canvas.height = height;
-      
-      video.currentTime = 0;
-    };
-    
-    video.onseeked = () => {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
-      // Get the first frame as preview
-      canvas.toBlob(
-        (blob) => {
-          console.log(`🎥 Video frame captured: ${(blob.size / 1024).toFixed(0)}KB`);
-          
-          // For actual video compression, we need to use a different approach
-          // Since browser video compression is complex, we'll just log that
-          // and return the original file with a note
-          console.log(`⚠️ Browser video compression limited. Original: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-          
-          // Return original but log recommendation
-          toast.info(`Video size: ${(file.size / 1024 / 1024).toFixed(2)}MB. Consider compressing before upload for faster loading.`);
-          resolve(file);
-        },
-        'image/jpeg',
-        0.7
-      );
-    };
-    
-    video.onerror = () => reject(new Error('Failed to load video'));
-  });
-};
-
-// Update your uploadVideoToCloudinary function
-
-
-// Use in upload function
-
-
-// Cloudinary upload function for images
-// const uploadToCloudinary = async (file) => {
-//    const compressedFile = await compressImageSmart(file);
-//   const formData = new FormData();
-//   formData.append('file', file);
-//   formData.append('upload_preset', 'toys-products');
-  
-//   try {
-//     const response = await fetch(
-//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-//       {
-//         method: 'POST',
-//         body: formData,
-//       }
-//     );
-    
-//     const data = await response.json();
-//     if (data.secure_url) {
-//       return {
-//         url: data.secure_url,
-//         publicId: data.public_id,
-//       };
-//     } else {
-//       throw new Error(data.error?.message || 'Upload failed');
-//     }
-//   } catch (error) {
-//     console.error('Cloudinary upload error:', error);
-//     throw error;
-//   }
-// };
-
 const uploadToCloudinary = async (file) => {
-  // Client-side compression only
   const compressedFile = await compressImageSmart(file);
   
   const formData = new FormData();
   formData.append('file', compressedFile);
   formData.append('upload_preset', 'toys-products');
-  
-  // Remove the transformation line completely
   
   try {
     const response = await fetch(
@@ -2445,7 +3054,6 @@ const uploadToCloudinary = async (file) => {
     
     const data = await response.json();
     if (data.secure_url) {
-      console.log(`✅ Image uploaded successfully`);
       return {
         url: data.secure_url,
         publicId: data.public_id,
@@ -2459,44 +3067,10 @@ const uploadToCloudinary = async (file) => {
   }
 };
 
-// Upload video to Cloudinary
-// const uploadVideoToCloudinary = async (file) => {
-//   const formData = new FormData();
-//   formData.append('file', file);
-//   formData.append('upload_preset', 'toys-products');
-//   formData.append('resource_type', 'video');
-  
-//   try {
-//     const response = await fetch(
-//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
-//       {
-//         method: 'POST',
-//         body: formData,
-//       }
-//     );
-    
-//     const data = await response.json();
-//     if (data.secure_url) {
-//       return {
-//         url: data.secure_url,
-//         publicId: data.public_id,
-//       };
-//     } else {
-//       throw new Error(data.error?.message || 'Upload failed');
-//     }
-//   } catch (error) {
-//     console.error('Cloudinary video upload error:', error);
-//     throw error;
-//   }
-// };
-
-
-
 const uploadVideoToCloudinary = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', 'toys-products');
-  // Do NOT include resource_type: 'video'
   
   try {
     const response = await fetch(
@@ -2523,7 +3097,7 @@ const uploadVideoToCloudinary = async (file) => {
     throw error;
   }
 };
-// Extract YouTube video ID from URL
+
 const getYouTubeVideoId = (url) => {
   const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
   const match = url.match(regex);
@@ -2587,7 +3161,6 @@ const RestoreDraftModal = ({ isOpen, onConfirm, onCancel, draftData }) => {
   );
 };
 
-// Save to localStorage key
 const DRAFT_KEY = 'toy_product_draft';
 
 export default function AdminCreateToyProduct() {
@@ -2603,6 +3176,7 @@ export default function AdminCreateToyProduct() {
   const [showMeta, setShowMeta] = useState(false);
   const [generatedSku, setGeneratedSku] = useState('');
   const [lastSaved, setLastSaved] = useState(null);
+  const [barcodeValidation, setBarcodeValidation] = useState(null);
   
   // Restore modal state
   const [showRestoreModal, setShowRestoreModal] = useState(false);
@@ -2630,7 +3204,6 @@ export default function AdminCreateToyProduct() {
     brand: '',
     ageGroup: '',
     stockQuantity: '',
-
     regularPrice: 0,
     discountPrice: 0,
     deliveryInfo: '',
@@ -2643,6 +3216,7 @@ export default function AdminCreateToyProduct() {
     videoUrl: '',
     videoPublicId: '',
     videoType: 'upload',
+    barcode: '',  // <-- ADD BARCODE FIELD
     metaSettings: {
       metaTitle: '',
       metaDescription: '',
@@ -2671,112 +3245,180 @@ export default function AdminCreateToyProduct() {
   });
 
   const [keywordInput, setKeywordInput] = useState('');
-  // Add these state variables near your other useState declarations
-const [isEditorReady, setIsEditorReady] = useState(false);
-const [isInstructionEditorReady, setIsInstructionEditorReady] = useState(false);
-const [isDeliveryEditorReady, setIsDeliveryEditorReady] = useState(false);
-
+  const [isEditorReady, setIsEditorReady] = useState(false);
+  const [isInstructionEditorReady, setIsInstructionEditorReady] = useState(false);
+  const [isDeliveryEditorReady, setIsDeliveryEditorReady] = useState(false);
   const [additionalInfoInput, setAdditionalInfoInput] = useState({ fieldName: '', fieldValue: '' });
   const [ratingHover, setRatingHover] = useState(0);
-
   const [errors, setErrors] = useState({});
 
   const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
   const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
   const maxFileSize = 5 * 1024 * 1024;
-  const maxVideoSize = 100 * 1024 * 1024; // 100MB
+  const maxVideoSize = 100 * 1024 * 1024;
 
   // Editor setup
-// Editor setup with onReady callback
-const shortDescEditor = useEditor({
-  extensions: [
-    StarterKit,
-    TiptapLink.configure({ openOnClick: false }),
-    TextAlign.configure({ types: ['heading', 'paragraph'] }),
-  ],
-  content: formData.shortDescription,
-  onUpdate: ({ editor }) => {
-    setFormData(prev => ({ ...prev, shortDescription: editor.getHTML() }));
-  },
-  onReady: () => {
-    setIsEditorReady(true);
-  },
-  immediatelyRender: false,
-});
+  const shortDescEditor = useEditor({
+    extensions: [
+      StarterKit,
+      TiptapLink.configure({ openOnClick: false }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ],
+    content: formData.shortDescription,
+    onUpdate: ({ editor }) => {
+      setFormData(prev => ({ ...prev, shortDescription: editor.getHTML() }));
+    },
+    onReady: () => {
+      setIsEditorReady(true);
+    },
+    immediatelyRender: false,
+  });
 
-const fullDescEditor = useEditor({
-  extensions: [
-    StarterKit,
-    TiptapLink.configure({ openOnClick: false }),
-    TextAlign.configure({ types: ['heading', 'paragraph'] }),
-  ],
-  content: formData.fullDescription,
-  onUpdate: ({ editor }) => {
-    setFormData(prev => ({ ...prev, fullDescription: editor.getHTML() }));
-  },
-  onReady: () => {
-    setIsInstructionEditorReady(true);
-  },
-  immediatelyRender: false,
-});
-const deliveryInfoEditor = useEditor({
-  extensions: [
-    StarterKit,
-    TiptapLink.configure({ openOnClick: false }),
-    TextAlign.configure({ types: ['heading', 'paragraph'] }),
-  ],
-  content: formData.deliveryInfo,
-  onUpdate: ({ editor }) => {
-    setFormData(prev => ({ ...prev, deliveryInfo: editor.getHTML() }));
-  },
-  onReady: () => {
-    setIsDeliveryEditorReady(true);
-  },
-  immediatelyRender: false,
-});
-
+  const fullDescEditor = useEditor({
+    extensions: [
+      StarterKit,
+      TiptapLink.configure({ openOnClick: false }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ],
+    content: formData.fullDescription,
+    onUpdate: ({ editor }) => {
+      setFormData(prev => ({ ...prev, fullDescription: editor.getHTML() }));
+    },
+    onReady: () => {
+      setIsInstructionEditorReady(true);
+    },
+    immediatelyRender: false,
+  });
+  
+  const deliveryInfoEditor = useEditor({
+    extensions: [
+      StarterKit,
+      TiptapLink.configure({ openOnClick: false }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ],
+    content: formData.deliveryInfo,
+    onUpdate: ({ editor }) => {
+      setFormData(prev => ({ ...prev, deliveryInfo: editor.getHTML() }));
+    },
+    onReady: () => {
+      setIsDeliveryEditorReady(true);
+    },
+    immediatelyRender: false,
+  });
 
   // Load draft from localStorage on mount
-// Load draft from localStorage on mount
-useEffect(() => {
-  const loadDraft = () => {
-    try {
-      const savedDraft = localStorage.getItem(DRAFT_KEY);
-      if (savedDraft) {
-        const draft = JSON.parse(savedDraft);
-        
-        // Check if draft has any meaningful data - MORE LENIENT
-        const hasData = (draft.formData?.productName && draft.formData.productName.trim() !== '') || 
-                       (draft.formData?.shortDescription && draft.formData.shortDescription !== '<p></p>') ||
-                       (draft.formData?.fullDescription && draft.formData.fullDescription !== '<p></p>') ||
-                       (draft.productImages && draft.productImages.some(img => img.url)) ||
-                       (draft.videoUpload?.url);
-        
-        if (!hasData) {
-          console.log('No meaningful data in draft');
-          localStorage.removeItem(DRAFT_KEY);
-          sessionStorage.removeItem('draft_discarded');
-          return;
+  useEffect(() => {
+    const loadDraft = () => {
+      try {
+        const savedDraft = localStorage.getItem(DRAFT_KEY);
+        if (savedDraft) {
+          const draft = JSON.parse(savedDraft);
+          
+          const hasData = (draft.formData?.productName && draft.formData.productName.trim() !== '') || 
+                         (draft.formData?.shortDescription && draft.formData.shortDescription !== '<p></p>') ||
+                         (draft.formData?.fullDescription && draft.formData.fullDescription !== '<p></p>') ||
+                         (draft.productImages && draft.productImages.some(img => img.url)) ||
+                         (draft.videoUpload?.url);
+          
+          if (!hasData) {
+            localStorage.removeItem(DRAFT_KEY);
+            sessionStorage.removeItem('draft_discarded');
+            return;
+          }
+          
+          const draftDiscarded = sessionStorage.getItem('draft_discarded');
+          if (draftDiscarded === 'true') {
+            sessionStorage.removeItem('draft_discarded');
+            return;
+          }
+          
+          if (draft.formData) {
+            setFormData(draft.formData);
+            setVideoType(draft.formData.videoType || 'upload');
+            setYoutubeUrl(draft.formData.videoUrl || '');
+          }
+          if (draft.productImages) {
+            const restoredImages = productImages.map((img, idx) => {
+              const savedImg = draft.productImages[idx];
+              if (savedImg && savedImg.url) {
+                return {
+                  ...img,
+                  url: savedImg.url,
+                  publicId: savedImg.publicId,
+                  preview: savedImg.url,
+                  uploading: false,
+                  uploadAborted: false
+                };
+              }
+              return img;
+            });
+            setProductImages(restoredImages);
+          }
+          if (draft.videoUpload) {
+            setVideoUpload(draft.videoUpload);
+          }
+          if (draft.lastSaved) {
+            setLastSaved(new Date(draft.lastSaved));
+          }
+          
+          setPendingDraft(draft);
+          setShowRestoreModal(true);
+        }
+      } catch (error) {
+        console.error('Error loading draft:', error);
+      }
+    };
+    loadDraft();
+  }, []);
+
+  // Handle restore draft confirmation
+  const handleRestoreDraft = () => {
+    if (pendingDraft) {
+      try {
+        if (pendingDraft.formData) {
+          const restoredData = {
+            ...pendingDraft.formData,
+            quantityBasedPricing: pendingDraft.formData.quantityBasedPricing && pendingDraft.formData.quantityBasedPricing.length > 0 
+              ? pendingDraft.formData.quantityBasedPricing 
+              : [{ range: '100-299', price: '' }],
+            sizes: pendingDraft.formData.sizes && pendingDraft.formData.sizes.length > 0 
+              ? pendingDraft.formData.sizes 
+              : ['S', 'M', 'L', 'XL', 'XXL'],
+            colors: pendingDraft.formData.colors && pendingDraft.formData.colors.length > 0 
+              ? pendingDraft.formData.colors 
+              : [{ code: '#FF0000' }, { code: '#0000FF' }, { code: '#000000' }],
+            tags: Array.isArray(pendingDraft.formData.tags) ? pendingDraft.formData.tags : [],
+            additionalInfo: Array.isArray(pendingDraft.formData.additionalInfo) ? pendingDraft.formData.additionalInfo : [],
+            codAvailable: pendingDraft.formData.codAvailable || false,
+            barcode: pendingDraft.formData.barcode || '',
+            metaSettings: pendingDraft.formData.metaSettings || {
+              metaTitle: '',
+              metaDescription: '',
+              metaKeywords: []
+            }
+          };
+          
+          setFormData(restoredData);
+          
+          setTimeout(() => {
+            if (shortDescEditor && pendingDraft.formData.shortDescription) {
+              shortDescEditor.commands.setContent(pendingDraft.formData.shortDescription);
+            }
+            if (fullDescEditor && pendingDraft.formData.fullDescription) {
+              fullDescEditor.commands.setContent(pendingDraft.formData.fullDescription);
+            }
+            if (deliveryInfoEditor && pendingDraft.formData.deliveryInfo) {
+              deliveryInfoEditor.commands.setContent(pendingDraft.formData.deliveryInfo);
+            }
+          }, 200);
+          
+          setVideoType(pendingDraft.formData.videoType || 'upload');
+          setYoutubeUrl(pendingDraft.formData.videoUrl || '');
         }
         
-        // Check if draft was discarded in this session
-        const draftDiscarded = sessionStorage.getItem('draft_discarded');
-        if (draftDiscarded === 'true') {
-          console.log('Draft was discarded in this session, not showing modal');
-          sessionStorage.removeItem('draft_discarded');
-          return;
-        }
-        
-        console.log('Found draft with data, showing restore modal');
-        
-        if (draft.formData) {
-          setFormData(draft.formData);
-          setVideoType(draft.formData.videoType || 'upload');
-          setYoutubeUrl(draft.formData.videoUrl || '');
-        }
-        if (draft.productImages) {
+        if (pendingDraft.productImages && pendingDraft.productImages.length > 0) {
           const restoredImages = productImages.map((img, idx) => {
-            const savedImg = draft.productImages[idx];
+            const savedImg = pendingDraft.productImages[idx];
             if (savedImg && savedImg.url) {
               return {
                 ...img,
@@ -2791,224 +3433,124 @@ useEffect(() => {
           });
           setProductImages(restoredImages);
         }
-        if (draft.videoUpload) {
-          setVideoUpload(draft.videoUpload);
-        }
-        if (draft.lastSaved) {
-          setLastSaved(new Date(draft.lastSaved));
+        
+        if (pendingDraft.videoUpload) {
+          setVideoUpload(pendingDraft.videoUpload);
         }
         
-        setPendingDraft(draft);
-        setShowRestoreModal(true);
-      } else {
-        console.log('No draft found in localStorage');
-        sessionStorage.removeItem('draft_discarded');
+        toast.success('Draft restored successfully');
+        
+        setTimeout(() => {
+          saveToLocalStorage();
+        }, 500);
+        
+      } catch (error) {
+        console.error('Error restoring draft:', error);
+        toast.error('Failed to restore draft');
       }
+    }
+    setShowRestoreModal(false);
+    setPendingDraft(null);
+  };
+
+  const handleDiscardDraft = () => {
+    localStorage.removeItem(DRAFT_KEY);
+    sessionStorage.setItem('draft_discarded', 'true');
+    setPendingDraft(null);
+    setShowRestoreModal(false);
+    
+    setFormData({
+      productName: '',
+      shortDescription: '',
+      fullDescription: '',
+      category: '',
+      subcategory: '',
+      childSubcategory: '',
+      brand: '',
+      ageGroup: '',
+      stockQuantity: '',
+      regularPrice: 0,
+      discountPrice: 0,
+      deliveryInfo: '',
+      codAvailable: false,
+      tags: [],
+      promotion: '',
+      isFeatured: false,
+      rating: 0,
+      additionalInfo: [],
+      videoUrl: '',
+      videoPublicId: '',
+      videoType: 'upload',
+      barcode: '',
+      metaSettings: {
+        metaTitle: '',
+        metaDescription: '',
+        metaKeywords: []
+      }
+    });
+    
+    setProductImages([
+      { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+      { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+      { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+      { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+      { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
+      { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null }
+    ]);
+    
+    setVideoUpload({ file: null, preview: null, uploading: false, error: '', url: null, publicId: null });
+    setYoutubeUrl('');
+    setLastSaved(null);
+    
+    toast.success('Draft discarded');
+  };
+
+  const saveToLocalStorage = () => {
+    try {
+      let currentShortDesc = formData.shortDescription;
+      let currentFullDesc = formData.fullDescription;
+      
+      if (shortDescEditor && !shortDescEditor.isDestroyed) {
+        const editorContent = shortDescEditor.getHTML();
+        if (editorContent && editorContent !== '<p></p>') {
+          currentShortDesc = editorContent;
+        }
+      }
+      if (fullDescEditor && !fullDescEditor.isDestroyed) {
+        const editorContent = fullDescEditor.getHTML();
+        if (editorContent && editorContent !== '<p></p>') {
+          currentFullDesc = editorContent;
+        }
+      }
+      
+      const draft = {
+        formData: {
+          ...formData,
+          shortDescription: currentShortDesc,
+          fullDescription: currentFullDesc,
+          videoType,
+          videoUrl: youtubeUrl
+        },
+        productImages: productImages.map(img => ({
+          ...img,
+          preview: img.url || null,
+          file: null,
+          uploading: false
+        })),
+        videoUpload: {
+          ...videoUpload,
+          preview: videoUpload.url || null,
+          file: null,
+          uploading: false
+        },
+        lastSaved: new Date().toISOString()
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      setLastSaved(new Date());
     } catch (error) {
-      console.error('Error loading draft:', error);
+      console.error('Error saving draft:', error);
     }
   };
-  loadDraft();
-}, []);
-
-  // Handle restore draft confirmation
-const handleRestoreDraft = () => {
-  if (pendingDraft) {
-    try {
-      // Restore form data
-      if (pendingDraft.formData) {
-        const restoredData = {
-          ...pendingDraft.formData,
-          // Ensure arrays are properly restored
-          quantityBasedPricing: pendingDraft.formData.quantityBasedPricing && pendingDraft.formData.quantityBasedPricing.length > 0 
-            ? pendingDraft.formData.quantityBasedPricing 
-            : [{ range: '100-299', price: '' }],
-          sizes: pendingDraft.formData.sizes && pendingDraft.formData.sizes.length > 0 
-            ? pendingDraft.formData.sizes 
-            : ['S', 'M', 'L', 'XL', 'XXL'],
-          colors: pendingDraft.formData.colors && pendingDraft.formData.colors.length > 0 
-            ? pendingDraft.formData.colors 
-            : [{ code: '#FF0000' }, { code: '#0000FF' }, { code: '#000000' }],
-          tags: Array.isArray(pendingDraft.formData.tags) ? pendingDraft.formData.tags : [],
-          additionalInfo: Array.isArray(pendingDraft.formData.additionalInfo) ? pendingDraft.formData.additionalInfo : [],
-          codAvailable: pendingDraft.formData.codAvailable || false,
-          metaSettings: pendingDraft.formData.metaSettings || {
-            metaTitle: '',
-            metaDescription: '',
-            metaKeywords: []
-          }
-        };
-        
-        setFormData(restoredData);
-        
-        // Restore editor content after a short delay to ensure editors are ready
-        setTimeout(() => {
-          if (shortDescEditor && pendingDraft.formData.shortDescription) {
-            shortDescEditor.commands.setContent(pendingDraft.formData.shortDescription);
-          }
-          if (fullDescEditor && pendingDraft.formData.fullDescription) {
-            fullDescEditor.commands.setContent(pendingDraft.formData.fullDescription);
-          }
-          if (deliveryInfoEditor && pendingDraft.formData.deliveryInfo) {
-    deliveryInfoEditor.commands.setContent(pendingDraft.formData.deliveryInfo);
-  }
-        }, 200);
-        
-        // Restore video type and URL
-        setVideoType(pendingDraft.formData.videoType || 'upload');
-        setYoutubeUrl(pendingDraft.formData.videoUrl || '');
-      }
-      
-      // Restore product images
-      if (pendingDraft.productImages && pendingDraft.productImages.length > 0) {
-        const restoredImages = productImages.map((img, idx) => {
-          const savedImg = pendingDraft.productImages[idx];
-          if (savedImg && savedImg.url) {
-            return {
-              ...img,
-              url: savedImg.url,
-              publicId: savedImg.publicId,
-              preview: savedImg.url,
-              uploading: false,
-              uploadAborted: false
-            };
-          }
-          return img;
-        });
-        setProductImages(restoredImages);
-      }
-      
-      // Restore video upload
-      if (pendingDraft.videoUpload) {
-        setVideoUpload(pendingDraft.videoUpload);
-      }
-      
-      toast.success('Draft restored successfully');
-      
-      // Force a re-save after restoration
-      setTimeout(() => {
-        saveToLocalStorage();
-      }, 500);
-      
-    } catch (error) {
-      console.error('Error restoring draft:', error);
-      toast.error('Failed to restore draft');
-    }
-  }
-  setShowRestoreModal(false);
-  setPendingDraft(null);
-};
-
-const handleDiscardDraft = () => {
-  // Remove draft from localStorage
-  localStorage.removeItem(DRAFT_KEY);
-  
-  // Set session flag to prevent showing modal again for this session
-  sessionStorage.setItem('draft_discarded', 'true');
-  
-  // Clear the pending draft data
-  setPendingDraft(null);
-  
-  // Close the modal
-  setShowRestoreModal(false);
-  
-  // Reset form data
-  setFormData({
-    productName: '',
-    shortDescription: '',
-    fullDescription: '',
-    category: '',
-    subcategory: '',
-    childSubcategory: '',
-    brand: '',
-    ageGroup: '',
-   stockQuantity: '',
-    skuCode: generatedSku,
-    regularPrice: 0,
-    discountPrice: 0,
-    deliveryInfo: '',
-    codAvailable: false,
-    tags: [],
-    promotion: '',
-    isFeatured: false,
-    rating: 0,
-    additionalInfo: [],
-    videoUrl: '',
-    videoPublicId: '',
-    videoType: 'upload',
-    metaSettings: {
-      metaTitle: '',
-      metaDescription: '',
-      metaKeywords: []
-    }
-  });
-  
-  // Clear product images
-  setProductImages([
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null }
-  ]);
-  
-  // Clear video upload
-  setVideoUpload({ file: null, preview: null, uploading: false, error: '', url: null, publicId: null });
-  setYoutubeUrl('');
-  setLastSaved(null);
-  
-  // Show success message
-  toast.success('Draft discarded');
-};
-
- const saveToLocalStorage = () => {
-  try {
-    // Get current content directly from editors
-    let currentShortDesc = formData.shortDescription;
-    let currentFullDesc = formData.fullDescription;
-    
-    if (shortDescEditor && !shortDescEditor.isDestroyed) {
-      const editorContent = shortDescEditor.getHTML();
-      if (editorContent && editorContent !== '<p></p>') {
-        currentShortDesc = editorContent;
-      }
-    }
-    if (fullDescEditor && !fullDescEditor.isDestroyed) {
-      const editorContent = fullDescEditor.getHTML();
-      if (editorContent && editorContent !== '<p></p>') {
-        currentFullDesc = editorContent;
-      }
-    }
-    
-    const draft = {
-      formData: {
-        ...formData,
-        shortDescription: currentShortDesc,
-        fullDescription: currentFullDesc,
-        videoType,
-        videoUrl: youtubeUrl
-      },
-      productImages: productImages.map(img => ({
-        ...img,
-        preview: img.url || null,
-        file: null,
-        uploading: false
-      })),
-      videoUpload: {
-        ...videoUpload,
-        preview: videoUpload.url || null,
-        file: null,
-        uploading: false
-      },
-      lastSaved: new Date().toISOString()
-    };
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    setLastSaved(new Date());
-  } catch (error) {
-    console.error('Error saving draft:', error);
-  }
-};
 
   // Auto-save on form changes
   useEffect(() => {
@@ -3027,7 +3569,6 @@ const handleDiscardDraft = () => {
 
   useEffect(() => {
     setIsMounted(true);
-
     fetchCategories();
   }, []);
 
@@ -3050,34 +3591,23 @@ const handleDiscardDraft = () => {
     }
   }, [formData.subcategory]);
 
-  // Sync short description editor content when formData changes
-useEffect(() => {
-  if (shortDescEditor && isEditorReady && formData.shortDescription) {
-    const currentContent = shortDescEditor.getHTML();
-    if (currentContent !== formData.shortDescription && formData.shortDescription !== '<p></p>') {
-      shortDescEditor.commands.setContent(formData.shortDescription);
+  useEffect(() => {
+    if (shortDescEditor && isEditorReady && formData.shortDescription) {
+      const currentContent = shortDescEditor.getHTML();
+      if (currentContent !== formData.shortDescription && formData.shortDescription !== '<p></p>') {
+        shortDescEditor.commands.setContent(formData.shortDescription);
+      }
     }
-  }
-}, [shortDescEditor, isEditorReady, formData.shortDescription]);
+  }, [shortDescEditor, isEditorReady, formData.shortDescription]);
 
-// Sync full description editor content when formData changes
-useEffect(() => {
-  if (fullDescEditor && isInstructionEditorReady && formData.fullDescription) {
-    const currentContent = fullDescEditor.getHTML();
-    if (currentContent !== formData.fullDescription && formData.fullDescription !== '<p></p>') {
-      fullDescEditor.commands.setContent(formData.fullDescription);
+  useEffect(() => {
+    if (fullDescEditor && isInstructionEditorReady && formData.fullDescription) {
+      const currentContent = fullDescEditor.getHTML();
+      if (currentContent !== formData.fullDescription && formData.fullDescription !== '<p></p>') {
+        fullDescEditor.commands.setContent(formData.fullDescription);
+      }
     }
-  }
-}, [fullDescEditor, isInstructionEditorReady, formData.fullDescription]);
-
-  const generateSKU = () => {
-    const prefix = 'TOY';
-    const timestamp = Date.now().toString().slice(-8);
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    const sku = `${prefix}-${timestamp}-${random}`;
-    setGeneratedSku(sku);
-    setFormData(prev => ({ ...prev, skuCode: sku }));
-  };
+  }, [fullDescEditor, isInstructionEditorReady, formData.fullDescription]);
 
   const fetchCategories = async () => {
     try {
@@ -3141,7 +3671,6 @@ useEffect(() => {
     return { valid: true };
   };
 
-  // Single image upload
   const handleImageChange = async (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -3211,7 +3740,6 @@ useEffect(() => {
     }
   };
 
-  // Multiple image upload
   const handleMultipleImageSelect = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -3327,7 +3855,6 @@ useEffect(() => {
     }
   };
 
-  // Drag and drop functions for image reordering
   const moveImage = (fromIndex, toIndex) => {
     const updatedImages = [...productImages];
     const [movedImage] = updatedImages.splice(fromIndex, 1);
@@ -3373,13 +3900,6 @@ useEffect(() => {
     setDragOverIndex(null);
   };
 
-  const addImageSlot = () => {
-    if (productImages.length < 6) {
-      setProductImages([...productImages, { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null }]);
-      saveToLocalStorage();
-    }
-  };
-
   const removeImage = (index) => {
     const imageToRemove = productImages[index];
     
@@ -3416,7 +3936,6 @@ useEffect(() => {
     saveToLocalStorage();
   };
 
-  // Video upload handlers
   const handleVideoFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -3505,24 +4024,17 @@ useEffect(() => {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
   };
 
-  // const handleNumberChange = (e) => {
-  //   const { name, value } = e.target;
-  //   const numValue = value === '' ? 0 : parseFloat(value);
-  //   setFormData(prev => ({ ...prev, [name]: numValue }));
-  //   if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
-  // };
-
   const handleNumberChange = (e) => {
-  const { name, value } = e.target;
-  // Allow empty string for stockQuantity
-  if (name === 'stockQuantity' && value === '') {
-    setFormData(prev => ({ ...prev, [name]: '' }));
-  } else {
-    const numValue = value === '' ? 0 : parseFloat(value);
-    setFormData(prev => ({ ...prev, [name]: numValue }));
-  }
-  if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
-};
+    const { name, value } = e.target;
+    if (name === 'stockQuantity' && value === '') {
+      setFormData(prev => ({ ...prev, [name]: '' }));
+    } else {
+      const numValue = value === '' ? 0 : parseFloat(value);
+      setFormData(prev => ({ ...prev, [name]: numValue }));
+    }
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+  };
+
   const handleTagToggle = (tag) => {
     setFormData(prev => ({
       ...prev,
@@ -3543,35 +4055,25 @@ useEffect(() => {
     saveToLocalStorage();
   };
 
-const addAdditionalInfo = () => {
-  console.log('=== ADDING ADDITIONAL INFO ===');
-  console.log('Current additionalInfoInput:', additionalInfoInput);
-  
-  if (additionalInfoInput.fieldName.trim() && additionalInfoInput.fieldValue.trim()) {
-    const newInfo = { 
-      fieldName: additionalInfoInput.fieldName.trim(), 
-      fieldValue: additionalInfoInput.fieldValue.trim() 
-    };
-    
-    console.log('New info to add:', newInfo);
-    console.log('Current additionalInfo array:', formData.additionalInfo);
-    
-    setFormData(prev => {
-      const updated = {
+  const addAdditionalInfo = () => {
+    if (additionalInfoInput.fieldName.trim() && additionalInfoInput.fieldValue.trim()) {
+      const newInfo = { 
+        fieldName: additionalInfoInput.fieldName.trim(), 
+        fieldValue: additionalInfoInput.fieldValue.trim() 
+      };
+      
+      setFormData(prev => ({
         ...prev,
         additionalInfo: [...prev.additionalInfo, newInfo]
-      };
-      console.log('Updated formData:', updated.additionalInfo);
-      return updated;
-    });
-    
-    setAdditionalInfoInput({ fieldName: '', fieldValue: '' });
-    saveToLocalStorage();
-    toast.success('Additional info added');
-  } else {
-    toast.error('Please fill both field name and value');
-  }
-};
+      }));
+      
+      setAdditionalInfoInput({ fieldName: '', fieldValue: '' });
+      saveToLocalStorage();
+      toast.success('Additional info added');
+    } else {
+      toast.error('Please fill both field name and value');
+    }
+  };
 
   const removeAdditionalInfo = (index) => {
     const updatedInfo = formData.additionalInfo.filter((_, i) => i !== index);
@@ -3592,7 +4094,6 @@ const addAdditionalInfo = () => {
         brand: '',
         ageGroup: '',
         stockQuantity: '',
-       
         regularPrice: 0,
         discountPrice: 0,
         deliveryInfo: '',
@@ -3605,11 +4106,12 @@ const addAdditionalInfo = () => {
         videoUrl: '',
         videoPublicId: '',
         videoType: 'upload',
-       metaSettings: {
-  metaTitle: '',
-  metaDescription: '',
-  metaKeywords: []
-}
+        barcode: '',
+        metaSettings: {
+          metaTitle: '',
+          metaDescription: '',
+          metaKeywords: []
+        }
       });
       setProductImages([
         { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false, uploadBatchId: null },
@@ -3664,6 +4166,15 @@ const addAdditionalInfo = () => {
     saveToLocalStorage();
   };
 
+  const handleBarcodeValidation = (result) => {
+    setBarcodeValidation(result);
+    if (result && !result.isValid) {
+      setErrors(prev => ({ ...prev, barcode: result.message }));
+    } else {
+      setErrors(prev => ({ ...prev, barcode: null }));
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -3672,22 +4183,28 @@ const addAdditionalInfo = () => {
     if (!formData.fullDescription || formData.fullDescription === '<p></p>') newErrors.fullDescription = 'Full description is required';
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
-    // if (!formData.ageGroup) newErrors.ageGroup = 'Age group is required';
-    // if (formData.stockQuantity < 0) newErrors.stockQuantity = 'Stock quantity cannot be negative';
-    // Only validate if stockQuantity has a value (not empty)
-if (formData.stockQuantity !== '' && formData.stockQuantity < 0) {
-  newErrors.stockQuantity = 'Stock quantity cannot be negative';
-}
-// Optional: Add validation for required field
-if (formData.stockQuantity === '') {
-  newErrors.stockQuantity = 'Stock quantity is required';
-}
+    if (formData.stockQuantity !== '' && formData.stockQuantity < 0) {
+      newErrors.stockQuantity = 'Stock quantity cannot be negative';
+    }
+    if (formData.stockQuantity === '') {
+      newErrors.stockQuantity = 'Stock quantity is required';
+    }
     if (formData.regularPrice <= 0) newErrors.regularPrice = 'Regular price must be greater than 0';
     if (formData.discountPrice > formData.regularPrice) newErrors.discountPrice = 'Discount price cannot exceed regular price';
     if (!formData.deliveryInfo.trim()) newErrors.deliveryInfo = 'Delivery information is required';
 
     const hasImages = productImages.some(img => img.url !== null);
     if (!hasImages) newErrors.images = 'At least one product image is required';
+
+    // Barcode validation
+    if (formData.barcode) {
+      if (!/^[0-9]{8,13}$/.test(formData.barcode)) {
+        newErrors.barcode = 'Barcode must be 8-13 digits only';
+      }
+      if (barcodeValidation && barcodeValidation.isValid === false) {
+        newErrors.barcode = barcodeValidation.message;
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -3702,95 +4219,101 @@ if (formData.stockQuantity === '') {
     }, 500);
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const uploading = productImages.some(img => img.uploading) || videoUpload.uploading;
-  if (uploading) {
-    toast.error('Please wait for all uploads to complete');
-    return;
-  }
-
-  if (!validateForm()) {
-    toast.error('Please fix the errors in the form');
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    const token = localStorage.getItem('token');
-    const imageUrls = productImages.filter(img => img.url).map(img => img.url);
-    
-    const finalVideoUrl = videoUpload.url || (youtubeUrl ? `https://www.youtube.com/embed/${getYouTubeVideoId(youtubeUrl)}` : '');
-    
-    const payload = {
-      productName: formData.productName,
-      shortDescription: formData.shortDescription,
-      fullDescription: formData.fullDescription,
-      category: formData.category,
-      subcategory: formData.subcategory,
-      childSubcategory: formData.childSubcategory,
-      brand: formData.brand,
-      ageGroup: formData.ageGroup,
-stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity),      regularPrice: Number(formData.regularPrice),
-      discountPrice: Number(formData.discountPrice),
-      deliveryInfo: formData.deliveryInfo,
-      codAvailable: formData.codAvailable,
-      tags: formData.tags,
-      promotion: formData.promotion,
-      isFeatured: formData.isFeatured,
-      rating: Number(formData.rating),
-      additionalInfo: formData.additionalInfo,
-      videoUrl: finalVideoUrl,
-      videoPublicId: videoUpload.publicId || '',
-      videoType: formData.videoType,
-      metaSettings: {
-        metaTitle: formData.metaSettings.metaTitle,
-        metaDescription: formData.metaSettings.metaDescription,
-        metaKeywords: formData.metaSettings.metaKeywords || []
-      },
-      images: imageUrls
-    };
-
-    const response = await fetch('http://localhost:5000/api/products', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      const generatedSku = data.data.skuCode;
-      toast.success(`✅ Product created successfully! SKU: ${generatedSku}`);
-      localStorage.removeItem(DRAFT_KEY);
-      router.push('/admin/all-products');
-    } else {
-      // Display the error message from backend
-      const errorMessage = data.error || 'Failed to create product';
-      toast.error(errorMessage);
-      
-      // If it's a duplicate product name error, focus on the product name field
-      if (errorMessage.includes('already exists')) {
-        setErrors(prev => ({ ...prev, productName: errorMessage }));
-        // Scroll to product name field
-        document.querySelector('input[name="productName"]')?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }
+    const uploading = productImages.some(img => img.uploading) || videoUpload.uploading;
+    if (uploading) {
+      toast.error('Please wait for all uploads to complete');
+      return;
     }
-  } catch (error) {
-    console.error('Error creating product:', error);
-    toast.error('Network error. Please try again.');
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+
+    if (!validateForm()) {
+      toast.error('Please fix the errors in the form');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      const imageUrls = productImages.filter(img => img.url).map(img => img.url);
+      
+      const finalVideoUrl = videoUpload.url || (youtubeUrl ? `https://www.youtube.com/embed/${getYouTubeVideoId(youtubeUrl)}` : '');
+      
+      const payload = {
+        productName: formData.productName,
+        shortDescription: formData.shortDescription,
+        fullDescription: formData.fullDescription,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        childSubcategory: formData.childSubcategory,
+        brand: formData.brand,
+        ageGroup: formData.ageGroup,
+        stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity),
+        regularPrice: Number(formData.regularPrice),
+        discountPrice: Number(formData.discountPrice),
+        deliveryInfo: formData.deliveryInfo,
+        codAvailable: formData.codAvailable,
+        tags: formData.tags,
+        promotion: formData.promotion,
+        isFeatured: formData.isFeatured,
+        rating: Number(formData.rating),
+        additionalInfo: formData.additionalInfo,
+        videoUrl: finalVideoUrl,
+        videoPublicId: videoUpload.publicId || '',
+        videoType: formData.videoType,
+        barcode: formData.barcode || undefined,  // <-- ADD BARCODE TO PAYLOAD
+        metaSettings: {
+          metaTitle: formData.metaSettings.metaTitle,
+          metaDescription: formData.metaSettings.metaDescription,
+          metaKeywords: formData.metaSettings.metaKeywords || []
+        },
+        images: imageUrls
+      };
+
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const generatedSku = data.data.skuCode;
+        toast.success(`✅ Product created successfully! SKU: ${generatedSku}`);
+        if (formData.barcode) {
+          toast.success(`📦 Barcode: ${formData.barcode} assigned to product`);
+        }
+        localStorage.removeItem(DRAFT_KEY);
+        router.push('/admin/all-products');
+      } else {
+        const errorMessage = data.error || 'Failed to create product';
+        toast.error(errorMessage);
+        
+        if (errorMessage.includes('already exists')) {
+          setErrors(prev => ({ ...prev, productName: errorMessage }));
+          document.querySelector('input[name="productName"]')?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+        
+        if (errorMessage.includes('barcode')) {
+          setErrors(prev => ({ ...prev, barcode: errorMessage }));
+        }
+      }
+    } catch (error) {
+      console.error('Error creating product:', error);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const discountPercentage = formData.regularPrice && formData.discountPrice 
     ? Math.round(((formData.regularPrice - formData.discountPrice) / formData.regularPrice) * 100)
@@ -3899,7 +4422,7 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - Main Info */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Basic Information Card - Same as before */}
+                {/* Basic Information Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
@@ -3924,6 +4447,17 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                       />
                       {errors.productName && <p className="text-xs text-red-600 mt-1">{errors.productName}</p>}
                     </div>
+
+                    {/* Barcode Field - ADDED HERE */}
+                    <BarcodeInput
+                      value={formData.barcode}
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, barcode: e.target.value }));
+                        setErrors(prev => ({ ...prev, barcode: null }));
+                      }}
+                      onValidate={handleBarcodeValidation}
+                      error={errors.barcode}
+                    />
 
                     {/* Short Description */}
                     <div>
@@ -3989,7 +4523,7 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                   </div>
                 </div>
 
-                {/* Categories Card - Same as before */}
+                {/* Categories Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
@@ -4073,11 +4607,11 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                         {errors.brand && <p className="text-xs text-red-600 mt-1">{errors.brand}</p>}
                       </div>
 
-                      {/* <div>
+                      <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Age Group <span className="text-red-500">*</span>
+                          Age Group <span className="text-gray-400 text-xs">(Optional)</span>
                         </label>
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-5 gap-2">
                           {AGE_GROUPS.map(age => (
                             <button
                               key={age.value}
@@ -4094,38 +4628,12 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                             </button>
                           ))}
                         </div>
-                        {errors.ageGroup && <p className="text-xs text-red-600 mt-1">{errors.ageGroup}</p>}
-                      </div> */}
-                      {/* Age Group Section - Remove the red asterisk */}
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">
-    Age Group <span className="text-gray-400 text-xs">(Optional)</span>
-  </label>
-  <div className="grid grid-cols-5 gap-2">
-    {AGE_GROUPS.map(age => (
-      <button
-        key={age.value}
-        type="button"
-        onClick={() => setFormData(prev => ({ ...prev, ageGroup: age.value }))}
-        className={`p-2 rounded-lg border-2 transition-all text-center ${
-          formData.ageGroup === age.value
-            ? 'border-[#4A8A90] bg-[#D4EDEE]'
-            : 'border-gray-200 hover:border-[#FFB6C1]'
-        }`}
-      >
-        <span className="text-lg">{age.icon}</span>
-        <p className="text-[10px] font-medium mt-1">{age.label}</p>
-      </button>
-    ))}
-  </div>
-  {/* Remove the error display for ageGroup */}
-  {/* {errors.ageGroup && <p className="text-xs text-red-600 mt-1">{errors.ageGroup}</p>} */}
-</div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Pricing Card - Same as before */}
+                {/* Pricing Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
@@ -4135,47 +4643,22 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                   </div>
                   <div className="p-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* SKU Code Field - Read-only, will be filled by backend after creation */}
-{/* <div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">SKU Code</label>
-  <div className="flex items-center gap-2">
-    <input
-      type="text"
-      name="skuCode"
-      value={formData.skuCode || 'Will be auto-generated'}
-      disabled
-      className="flex-1 px-3 py-2 text-sm bg-gray-100 border border-gray-200 rounded-lg font-mono text-gray-500 cursor-not-allowed"
-    />
-    <button
-      type="button"
-      onClick={() => toast.info('SKU will be automatically generated when product is created')}
-      className="px-3 py-2 text-sm rounded-lg transition-colors cursor-help"
-      style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}
-    >
-      Auto
-    </button>
-  </div>
-  <p className="text-xs text-gray-500 mt-1">
-    SKU will be automatically generated by the system in format: TOY-XXXXX-XXX
-  </p>
-</div> */}
-
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Stock Quantity <span className="text-red-500">*</span>
                         </label>
-                       <input
-  type="number"
-  name="stockQuantity"
-  value={formData.stockQuantity}
-  onChange={handleNumberChange}
-  onWheel={(e) => e.target.blur()}
-  min="0"
-  placeholder="0"
-  className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
-    errors.stockQuantity ? 'border-red-500' : 'border-gray-300'
-  }`}
-/>
+                        <input
+                          type="number"
+                          name="stockQuantity"
+                          value={formData.stockQuantity}
+                          onChange={handleNumberChange}
+                          onWheel={(e) => e.target.blur()}
+                          min="0"
+                          placeholder="0"
+                          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition ${
+                            errors.stockQuantity ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
                       </div>
 
                       <div>
@@ -4224,55 +4707,55 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                       </div>
                     </div>
 
-                   {/* Delivery Details - Rich Text Editor */}
-<div className="mt-4">
-  <label className="block text-sm font-medium text-gray-700 mb-1">
-    Delivery Details <span className="text-red-500">*</span>
-  </label>
-  {isMounted && deliveryInfoEditor && (
-    <div className={`border rounded-lg overflow-hidden ${errors.deliveryInfo ? 'border-red-500' : 'border-gray-300'}`}>
-      <RichTextEditor editor={deliveryInfoEditor}>
-        <RichTextEditor.Toolbar>
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.Bold />
-            <RichTextEditor.Italic />
-            <RichTextEditor.Underline />
-          </RichTextEditor.ControlsGroup>
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.BulletList />
-            <RichTextEditor.OrderedList />
-          </RichTextEditor.ControlsGroup>
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.AlignLeft />
-            <RichTextEditor.AlignCenter />
-            <RichTextEditor.AlignRight />
-          </RichTextEditor.ControlsGroup>
-        </RichTextEditor.Toolbar>
-        <RichTextEditor.Content />
-      </RichTextEditor>
-    </div>
-  )}
-  <p className="text-xs text-gray-500 mt-1">
-    Include shipping information, delivery time, and other delivery-related details
-  </p>
-</div>
+                    {/* Delivery Details - Rich Text Editor */}
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Delivery Details <span className="text-red-500">*</span>
+                      </label>
+                      {isMounted && deliveryInfoEditor && (
+                        <div className={`border rounded-lg overflow-hidden ${errors.deliveryInfo ? 'border-red-500' : 'border-gray-300'}`}>
+                          <RichTextEditor editor={deliveryInfoEditor}>
+                            <RichTextEditor.Toolbar>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.Bold />
+                                <RichTextEditor.Italic />
+                                <RichTextEditor.Underline />
+                              </RichTextEditor.ControlsGroup>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.BulletList />
+                                <RichTextEditor.OrderedList />
+                              </RichTextEditor.ControlsGroup>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.AlignLeft />
+                                <RichTextEditor.AlignCenter />
+                                <RichTextEditor.AlignRight />
+                              </RichTextEditor.ControlsGroup>
+                            </RichTextEditor.Toolbar>
+                            <RichTextEditor.Content />
+                          </RichTextEditor>
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Include shipping information, delivery time, and other delivery-related details
+                      </p>
+                    </div>
 
-{/* Cash on Delivery Checkbox */}
-<div className="mt-4">
-  <label className="flex items-center gap-3 cursor-pointer">
-    <input
-      type="checkbox"
-      checked={formData.codAvailable}
-      onChange={(e) => setFormData(prev => ({ ...prev, codAvailable: e.target.checked }))}
-      className="w-5 h-5 rounded border-gray-300 text-[#4A8A90] focus:ring-[#4A8A90]"
-      style={{ accentColor: '#4A8A90' }}
-    />
-    <div>
-      <span className="text-sm font-medium text-gray-700">Cash on Delivery Available</span>
-      <p className="text-xs text-gray-500">Enable COD payment option for this product</p>
-    </div>
-  </label>
-</div>
+                    {/* Cash on Delivery Checkbox */}
+                    <div className="mt-4">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.codAvailable}
+                          onChange={(e) => setFormData(prev => ({ ...prev, codAvailable: e.target.checked }))}
+                          className="w-5 h-5 rounded border-gray-300 text-[#4A8A90] focus:ring-[#4A8A90]"
+                          style={{ accentColor: '#4A8A90' }}
+                        />
+                        <div>
+                          <span className="text-sm font-medium text-gray-700">Cash on Delivery Available</span>
+                          <p className="text-xs text-gray-500">Enable COD payment option for this product</p>
+                        </div>
+                      </label>
+                    </div>
                   </div>
                 </div>
 
@@ -4331,150 +4814,142 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                 </div>
 
                 {/* Meta Settings for SEO */}
-<div className="bg-white rounded-xl shadow-sm border border-gray-200">
-  <div className="p-5 border-b border-gray-200">
-    <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowMeta(!showMeta)}>
-      <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
-        <Hash className="w-5 h-5" style={{ color: '#4A8A90' }} />
-        SEO & Meta Settings
-      </h2>
-      <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
-    </div>
-    <p className="text-xs text-gray-500 mt-1">Optimize your product for search engines</p>
-  </div>
-  
-  {showMeta && (
-    <div className="p-5">
-      <div className="space-y-4">
-        {/* Meta Title */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Meta Title
-            <span className="text-xs text-gray-400 ml-2">(70 characters max)</span>
-          </label>
-          <input
-            type="text"
-            value={formData.metaSettings.metaTitle}
-            onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
-            maxLength="70"
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition"
-            placeholder="e.g., Buy Educational STEM Toys for Kids | Toy Store Bangladesh"
-          />
-          <div className="flex justify-end mt-1">
-            <span className={`text-xs ${formData.metaSettings.metaTitle?.length > 70 ? 'text-red-500' : 'text-gray-400'}`}>
-              {formData.metaSettings.metaTitle?.length || 0}/70
-            </span>
-          </div>
-        </div>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                  <div className="p-5 border-b border-gray-200">
+                    <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowMeta(!showMeta)}>
+                      <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
+                        <Hash className="w-5 h-5" style={{ color: '#4A8A90' }} />
+                        SEO & Meta Settings
+                      </h2>
+                      <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Optimize your product for search engines</p>
+                  </div>
+                  
+                  {showMeta && (
+                    <div className="p-5">
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Meta Title
+                            <span className="text-xs text-gray-400 ml-2">(70 characters max)</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.metaSettings.metaTitle}
+                            onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
+                            maxLength="70"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition"
+                            placeholder="e.g., Buy Educational STEM Toys for Kids | Toy Store Bangladesh"
+                          />
+                          <div className="flex justify-end mt-1">
+                            <span className={`text-xs ${formData.metaSettings.metaTitle?.length > 70 ? 'text-red-500' : 'text-gray-400'}`}>
+                              {formData.metaSettings.metaTitle?.length || 0}/70
+                            </span>
+                          </div>
+                        </div>
 
-        {/* Meta Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Meta Description
-            <span className="text-xs text-gray-400 ml-2">(160 characters max)</span>
-          </label>
-          <textarea
-            value={formData.metaSettings.metaDescription}
-            onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
-            maxLength="160"
-            rows="3"
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition resize-none"
-            placeholder="Write a compelling description that appears in search engine results..."
-          />
-          <div className="flex justify-end mt-1">
-            <span className={`text-xs ${formData.metaSettings.metaDescription?.length > 160 ? 'text-red-500' : 'text-gray-400'}`}>
-              {formData.metaSettings.metaDescription?.length || 0}/160
-            </span>
-          </div>
-        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Meta Description
+                            <span className="text-xs text-gray-400 ml-2">(160 characters max)</span>
+                          </label>
+                          <textarea
+                            value={formData.metaSettings.metaDescription}
+                            onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
+                            maxLength="160"
+                            rows="3"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition resize-none"
+                            placeholder="Write a compelling description that appears in search engine results..."
+                          />
+                          <div className="flex justify-end mt-1">
+                            <span className={`text-xs ${formData.metaSettings.metaDescription?.length > 160 ? 'text-red-500' : 'text-gray-400'}`}>
+                              {formData.metaSettings.metaDescription?.length || 0}/160
+                            </span>
+                          </div>
+                        </div>
 
-        {/* Meta Keywords */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Meta Keywords
-            <span className="text-xs text-gray-400 ml-2">(Comma separated)</span>
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={keywordInput}
-              onChange={(e) => setKeywordInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addKeyword();
-                }
-              }}
-              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition"
-              placeholder="e.g., educational toys, STEM kit, learning games"
-            />
-            <button
-              type="button"
-              onClick={addKeyword}
-              className="px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2"
-              style={{ backgroundColor: '#4A8A90' }}
-            >
-              <Plus className="w-4 h-4" />
-              Add
-            </button>
-          </div>
-          
-          {/* Display Keywords */}
-          {formData.metaSettings.metaKeywords && formData.metaSettings.metaKeywords.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {formData.metaSettings.metaKeywords.map((keyword, index) => (
-                <div
-                  key={index}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full"
-                  style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}
-                >
-                  <span>{keyword}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeKeyword(index)}
-                    className="hover:text-red-500 transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Meta Keywords
+                            <span className="text-xs text-gray-400 ml-2">(Comma separated)</span>
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={keywordInput}
+                              onChange={(e) => setKeywordInput(e.target.value)}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  addKeyword();
+                                }
+                              }}
+                              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4A8A90] focus:border-transparent outline-none transition"
+                              placeholder="e.g., educational toys, STEM kit, learning games"
+                            />
+                            <button
+                              type="button"
+                              onClick={addKeyword}
+                              className="px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2"
+                              style={{ backgroundColor: '#4A8A90' }}
+                            >
+                              <Plus className="w-4 h-4" />
+                              Add
+                            </button>
+                          </div>
+                          
+                          {formData.metaSettings.metaKeywords && formData.metaSettings.metaKeywords.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {formData.metaSettings.metaKeywords.map((keyword, index) => (
+                                <div
+                                  key={index}
+                                  className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full"
+                                  style={{ backgroundColor: '#D4EDEE', color: '#4A8A90' }}
+                                >
+                                  <span>{keyword}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeKeyword(index)}
+                                    className="hover:text-red-500 transition-colors"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <p className="text-xs text-gray-500 mt-2">
+                            Keywords help search engines understand your product. Add relevant terms separated by commas.
+                          </p>
+                        </div>
+
+                        {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (
+                          <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50">
+                            <p className="text-xs font-medium text-gray-500 mb-2">Search Engine Preview:</p>
+                            <div className="space-y-1">
+                              {formData.metaSettings.metaTitle && (
+                                <p className="text-base font-medium text-blue-700 line-clamp-1">
+                                  {formData.metaSettings.metaTitle}
+                                </p>
+                              )}
+                              {formData.metaSettings.metaTitle && (
+                                <p className="text-xs text-green-700">
+                                  https://yourstore.com/product/{formData.productName?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'product-slug'}
+                                </p>
+                              )}
+                              {formData.metaSettings.metaDescription && (
+                                <p className="text-xs text-gray-600 line-clamp-2">
+                                  {formData.metaSettings.metaDescription}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
-          <p className="text-xs text-gray-500 mt-2">
-            Keywords help search engines understand your product. Add relevant terms separated by commas.
-          </p>
-        </div>
-
-        {/* SEO Preview */}
-        {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (
-          <div className="mt-4 p-3 rounded-lg border border-gray-200 bg-gray-50">
-            <p className="text-xs font-medium text-gray-500 mb-2">Search Engine Preview:</p>
-            <div className="space-y-1">
-              {formData.metaSettings.metaTitle && (
-                <p className="text-base font-medium text-blue-700 line-clamp-1">
-                  {formData.metaSettings.metaTitle}
-                </p>
-              )}
-              {formData.metaSettings.metaTitle && (
-                <p className="text-xs text-green-700">
-                  https://yourstore.com/product/{formData.productName?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'product-slug'}
-                </p>
-              )}
-              {formData.metaSettings.metaDescription && (
-                <p className="text-xs text-gray-600 line-clamp-2">
-                  {formData.metaSettings.metaDescription}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )}
-</div>
-                
-
-                
               </div>
 
               {/* Right Column */}
@@ -4617,7 +5092,7 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                   </div>
                 </div>
 
-                {/* Video Upload Card - NEW */}
+                {/* Video Upload Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2" style={{ fontFamily: "'Fredoka One', 'Comic Neue', cursive" }}>
@@ -4627,7 +5102,6 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                     <p className="text-xs text-gray-500 mt-1">Upload a video or add a YouTube link to showcase your toy</p>
                   </div>
                   <div className="p-5">
-                    {/* Video Type Toggle */}
                     <div className="flex gap-2 mb-4">
                       <button
                         type="button"
@@ -4657,10 +5131,8 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                       </button>
                     </div>
 
-                    {/* Video Preview */}
                     {getVideoPreview()}
 
-                    {/* Upload Section */}
                     {videoType === 'upload' && !videoUpload.url && !videoUpload.preview && (
                       <div
                         className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-[#4A8A90] transition-colors"
@@ -4679,7 +5151,6 @@ stockQuantity: formData.stockQuantity === '' ? 0 : Number(formData.stockQuantity
                       </div>
                     )}
 
-                    {/* YouTube URL Input */}
                     {videoType === 'youtube' && !formData.videoUrl && (
                       <div className="space-y-3">
                         <div className="relative">

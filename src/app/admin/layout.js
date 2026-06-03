@@ -1089,6 +1089,8 @@ import {
   Home,
   ChevronRight,
   Truck,
+  ScanBarcode,
+  QrCode,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -1187,6 +1189,15 @@ export default function AdminLayout({ children }) {
     // Create Coupon
     if (href === '/admin/coupon') {
       if (currentPath === '/admin/coupon') return true;
+      return false;
+    } 
+    if (href === '/admin/barcodes') {
+      if (currentPath === '/admin/barcodes') return true;
+      return false;
+    } 
+    
+    if (href === '/admin/barcode-scanner') {
+      if (currentPath === '/admin/barcode-scanner') return true;
       return false;
     }
 
@@ -1308,6 +1319,9 @@ export default function AdminLayout({ children }) {
     { name: 'All Orders', href: '/admin/orders', icon: MessageSquare, color: '#4A8A90' },
     { name: 'Create Products', href: '/admin/create-products', icon: Gift, color: '#4A8A90' },
     { name: 'All Products', href: '/admin/all-products', icon: ShoppingBag, color: '#4A8A90' },
+    { name: 'All Barcodes', href: '/admin/barcodes', icon: QrCode, color: '#4A8A90' },
+    { name: ' Barcodes Scan', href: '/admin/barcode-scanner', icon: ScanBarcode, color: '#4A8A90' },
+
     { name: 'Create Category', href: '/admin/create-categories', icon: FolderPlus, color: '#4A8A90' },
     { name: 'Create Coupon', href: '/admin/coupon', icon: Ticket, color: '#4A8A90' },
     { name: 'Delivery Settings', href: '/admin/delivery-settings', icon: Truck, color: '#4A8A90' }, 

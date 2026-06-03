@@ -1,24 +1,23 @@
+# Enable rewrite engine
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
   
-  # If the request is for an existing file or directory, serve it
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  
-  # For directories, try to serve index.html
+  # If the request is for a real file or directory, serve it directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
-  RewriteRule ^(.*)$ $1/index.html [L]
+  RewriteRule ^ - [L]
   
-  # For all other requests, try to find the file with .html extension
-  RewriteCond %{REQUEST_FILENAME}.html -f
-  RewriteRule ^(.*)$ $1.html [L]
+  # Handle static assets
+  RewriteCond %{REQUEST_URI} \.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot|map|txt|xml)$ [NC]
+  RewriteRule ^ - [L]
   
-  # If file doesn't exist, redirect to index.html (fallback for client-side routing)
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^(.*)$ /index.html [L,QSA]
+  # CRITICAL: Route all other requests to index.html for client-side routing
+  RewriteRule ^ index.html [L]
 </IfModule>
+
+# Handle 404 errors by redirecting to index.html
+ErrorDocument 404 /index.html
 
 # Disable directory browsing
 Options -Indexes
@@ -26,17 +25,4 @@ Options -Indexes
 # Enable compression
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
-</IfModule>
-
-# Browser caching
-<IfModule mod_expires.c>
-  ExpiresActive On
-  ExpiresByType image/jpg "access plus 1 year"
-  ExpiresByType image/jpeg "access plus 1 year"
-  ExpiresByType image/gif "access plus 1 year"
-  ExpiresByType image/png "access plus 1 year"
-  ExpiresByType image/svg+xml "access plus 1 year"
-  ExpiresByType text/css "access plus 1 month"
-  ExpiresByType application/javascript "access plus 1 month"
-  ExpiresByType text/javascript "access plus 1 month"
 </IfModule>

@@ -1143,162 +1143,368 @@ export default function BarcodeManagement() {
     toast.success('Barcode copied to clipboard');
   };
 
-  const handlePrintBarcode = (barcode) => {
-    const printWindow = window.open('', '_blank');
-    const barcodeNumber = barcode.barcodeNumber;
-    const barcodeImageUrl = barcode.barcodeImageUrl;
+  // const handlePrintBarcode = (barcode) => {
+  //   const printWindow = window.open('', '_blank');
+  //   const barcodeNumber = barcode.barcodeNumber;
+  //   const barcodeImageUrl = barcode.barcodeImageUrl;
     
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Barcode - ${barcodeNumber}</title>
-          <style>
-            @page {
-              size: 80mm 40mm;
-              margin: 5mm;
-            }
+  //   printWindow.document.write(`
+  //     <!DOCTYPE html>
+  //     <html>
+  //       <head>
+  //         <title>Barcode - ${barcodeNumber}</title>
+  //         <style>
+  //           @page {
+  //             size: 80mm 40mm;
+  //             margin: 5mm;
+  //           }
+  //           body {
+  //             font-family: 'Courier New', monospace;
+  //             margin: 0;
+  //             padding: 10px;
+  //             display: flex;
+  //             justify-content: center;
+  //             align-items: center;
+  //             min-height: 100vh;
+  //             background: white;
+  //           }
+  //           .barcode-container {
+  //             text-align: center;
+  //             padding: 15px;
+  //             border: 1px solid #ddd;
+  //             border-radius: 8px;
+  //             background: white;
+  //           }
+  //           .barcode-image {
+  //             max-width: 250px;
+  //             height: auto;
+  //           }
+  //           .barcode-number {
+  //             font-size: 14px;
+  //             font-family: 'Courier New', monospace;
+  //             letter-spacing: 1px;
+  //             margin-top: 10px;
+  //             color: #333;
+  //           }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         <div class="barcode-container">
+  //           ${barcodeImageUrl ? 
+  //             `<img src="${barcodeImageUrl}" class="barcode-image" alt="Barcode" />` :
+  //             `<div id="barcode-print"></div>`
+  //           }
+  //           <div class="barcode-number">${barcodeNumber}</div>
+  //         </div>
+  //         ${!barcodeImageUrl ? `
+  //           <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
+  //           <script>
+  //             JsBarcode("#barcode-print", "${barcodeNumber}", {
+  //               format: "CODE128",
+  //               lineColor: "#000000",
+  //               width: 2,
+  //               height: 60,
+  //               displayValue: false,
+  //               fontSize: 14,
+  //               margin: 10
+  //             });
+  //             setTimeout(() => { window.print(); }, 500);
+  //           <\/script>
+  //         ` : '<script>setTimeout(() => { window.print(); }, 500);<\/script>'}
+  //       </body>
+  //     </html>
+  //   `);
+  //   printWindow.document.close();
+  // };
+
+const handlePrintBarcode = (barcode) => {
+  const printWindow = window.open('', '_blank');
+  const barcodeNumber = barcode.barcodeNumber;
+  const barcodeImageUrl = barcode.barcodeImageUrl;
+  
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Barcode - ${barcodeNumber}</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          @page {
+            size: auto;
+            margin: 10mm;
+          }
+          
+          body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: white;
+          }
+          
+          .barcode-container {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            width: 300px;
+            margin: 0 auto;
+          }
+          
+          .barcode-image {
+            max-width: 280px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+          }
+          
+          .barcode-number {
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            color: #333;
+            text-align: center;
+          }
+          
+          .format {
+            font-size: 10px;
+            color: #999;
+            margin-top: 8px;
+            text-align: center;
+          }
+          
+          @media print {
             body {
-              font-family: 'Courier New', monospace;
               margin: 0;
-              padding: 10px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              min-height: 100vh;
-              background: white;
+              padding: 0;
             }
             .barcode-container {
-              text-align: center;
-              padding: 15px;
-              border: 1px solid #ddd;
-              border-radius: 8px;
-              background: white;
+              border: none;
+              padding: 10px;
+              page-break-inside: avoid;
+              break-inside: avoid;
             }
-            .barcode-image {
-              max-width: 250px;
-              height: auto;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="barcode-container">
+          ${barcodeImageUrl ? 
+            `<img src="${barcodeImageUrl}" class="barcode-image" alt="Barcode" />` :
+            `<div id="barcode-print" style="margin: 0 auto;"></div>`
+          }
+          <div class="barcode-number">${barcodeNumber}</div>
+          <div class="format">CODE-128</div>
+        </div>
+        ${!barcodeImageUrl ? `
+          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
+          <script>
+            JsBarcode("#barcode-print", "${barcodeNumber}", {
+              format: "CODE128",
+              lineColor: "#000000",
+              width: 2,
+              height: 60,
+              displayValue: false,
+              fontSize: 14,
+              margin: 10
+            });
+            setTimeout(() => {
+              window.print();
+              setTimeout(() => window.close(), 500);
+            }, 500);
+          <\/script>
+        ` : `
+          <script>
+            setTimeout(() => {
+              window.print();
+              setTimeout(() => window.close(), 500);
+            }, 500);
+          <\/script>
+        `}
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
+
+  // const handlePrintMultiple = () => {
+  //   const selectedBarcodes = barcodes.filter(b => selectedProducts.includes(b._id));
+  //   const printWindow = window.open('', '_blank');
+    
+  //   printWindow.document.write(`
+  //     <!DOCTYPE html>
+  //     <html>
+  //       <head>
+  //         <title>Multiple Barcodes</title>
+  //         <style>
+  //           @page {
+  //             size: A4;
+  //             margin: 10mm;
+  //           }
+  //           body {
+  //             font-family: 'Courier New', monospace;
+  //             margin: 0;
+  //             padding: 20px;
+  //             background: white;
+  //           }
+  //           .barcode-grid {
+  //             display: grid;
+  //             grid-template-columns: repeat(3, 1fr);
+  //             gap: 20px;
+  //           }
+  //           .barcode-item {
+  //             text-align: center;
+  //             border: 1px solid #ddd;
+  //             padding: 15px;
+  //             border-radius: 8px;
+  //             break-inside: avoid;
+  //             background: white;
+  //           }
+  //           .barcode-number {
+  //             font-size: 11px;
+  //             font-family: 'Courier New', monospace;
+  //             margin-top: 8px;
+  //             color: #666;
+  //           }
+  //           @media print {
+  //             .barcode-item {
+  //               break-inside: avoid;
+  //             }
+  //           }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         <div class="barcode-grid">
+  //           ${selectedBarcodes.map(barcode => {
+  //             return `
+  //               <div class="barcode-item">
+  //                 <svg id="barcode-${barcode._id}-print" width="200" height="70"></svg>
+  //                 <div class="barcode-number">${barcode.barcodeNumber}</div>
+  //               </div>
+  //             `;
+  //           }).join('')}
+  //         </div>
+  //         <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
+  //         <script>
+  //           ${selectedBarcodes.map(barcode => {
+  //             return `
+  //               JsBarcode("#barcode-${barcode._id}-print", "${barcode.barcodeNumber}", {
+  //                 format: "CODE128",
+  //                 lineColor: "#000000",
+  //                 width: 2,
+  //                 height: 60,
+  //                 displayValue: false,
+  //                 fontSize: 12,
+  //                 margin: 8
+  //               });
+  //             `;
+  //           }).join('')}
+  //           setTimeout(() => {
+  //             window.print();
+  //           }, 500);
+  //         <\/script>
+  //       </body>
+  //     </html>
+  //   `);
+  //   printWindow.document.close();
+  // };
+
+  const handlePrintMultiple = () => {
+  const selectedBarcodes = barcodes.filter(b => selectedProducts.includes(b._id));
+  const printWindow = window.open('', '_blank');
+  
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Multiple Barcodes</title>
+        <style>
+          @page {
+            size: A4;
+            margin: 10mm;
+          }
+          body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            background: white;
+          }
+          .barcode-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+          }
+          .barcode-item {
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            background: white;
+          }
+          .barcode-number {
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            margin-top: 8px;
+            color: #666;
+          }
+          @media print {
+            .barcode-item {
+              break-inside: avoid;
+              page-break-inside: avoid;
             }
-            .barcode-number {
-              font-size: 14px;
-              font-family: 'Courier New', monospace;
-              letter-spacing: 1px;
-              margin-top: 10px;
-              color: #333;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="barcode-container">
-            ${barcodeImageUrl ? 
-              `<img src="${barcodeImageUrl}" class="barcode-image" alt="Barcode" />` :
-              `<div id="barcode-print"></div>`
-            }
-            <div class="barcode-number">${barcodeNumber}</div>
-          </div>
-          ${!barcodeImageUrl ? `
-            <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
-            <script>
-              JsBarcode("#barcode-print", "${barcodeNumber}", {
+          }
+        </style>
+      </head>
+      <body>
+        <div class="barcode-grid">
+          ${selectedBarcodes.map(barcode => {
+            return `
+              <div class="barcode-item">
+                <svg id="barcode-${barcode._id}-print" width="200" height="70"></svg>
+                <div class="barcode-number">${barcode.barcodeNumber}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
+        <script>
+          ${selectedBarcodes.map(barcode => {
+            return `
+              JsBarcode("#barcode-${barcode._id}-print", "${barcode.barcodeNumber}", {
                 format: "CODE128",
                 lineColor: "#000000",
                 width: 2,
                 height: 60,
                 displayValue: false,
-                fontSize: 14,
-                margin: 10
+                fontSize: 12,
+                margin: 8
               });
-              setTimeout(() => { window.print(); }, 500);
-            <\/script>
-          ` : '<script>setTimeout(() => { window.print(); }, 500);<\/script>'}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
-
-  const handlePrintMultiple = () => {
-    const selectedBarcodes = barcodes.filter(b => selectedProducts.includes(b._id));
-    const printWindow = window.open('', '_blank');
-    
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Multiple Barcodes</title>
-          <style>
-            @page {
-              size: A4;
-              margin: 10mm;
-            }
-            body {
-              font-family: 'Courier New', monospace;
-              margin: 0;
-              padding: 20px;
-              background: white;
-            }
-            .barcode-grid {
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 20px;
-            }
-            .barcode-item {
-              text-align: center;
-              border: 1px solid #ddd;
-              padding: 15px;
-              border-radius: 8px;
-              break-inside: avoid;
-              background: white;
-            }
-            .barcode-number {
-              font-size: 11px;
-              font-family: 'Courier New', monospace;
-              margin-top: 8px;
-              color: #666;
-            }
-            @media print {
-              .barcode-item {
-                break-inside: avoid;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="barcode-grid">
-            ${selectedBarcodes.map(barcode => {
-              return `
-                <div class="barcode-item">
-                  <svg id="barcode-${barcode._id}-print" width="200" height="70"></svg>
-                  <div class="barcode-number">${barcode.barcodeNumber}</div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
-          <script>
-            ${selectedBarcodes.map(barcode => {
-              return `
-                JsBarcode("#barcode-${barcode._id}-print", "${barcode.barcodeNumber}", {
-                  format: "CODE128",
-                  lineColor: "#000000",
-                  width: 2,
-                  height: 60,
-                  displayValue: false,
-                  fontSize: 12,
-                  margin: 8
-                });
-              `;
-            }).join('')}
-            setTimeout(() => {
-              window.print();
-            }, 500);
-          <\/script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
-
+            `;
+          }).join('')}
+          setTimeout(() => {
+            window.print();
+            setTimeout(() => window.close(), 500);
+          }, 500);
+        <\/script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
   const toggleProductSelection = (barcodeId) => {
     setSelectedProducts(prev => 
       prev.includes(barcodeId) 

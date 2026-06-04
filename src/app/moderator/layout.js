@@ -577,7 +577,9 @@ import {
   Rocket,
   Award,
   Ticket,
-  Truck
+  Truck,
+  QrCode,
+  ScanBarcode
 } from 'lucide-react';
 
 export default function ModeratorLayout({ children }) {
@@ -633,12 +635,24 @@ export default function ModeratorLayout({ children }) {
       return currentPath === '/moderator/orders' || 
              currentPath.startsWith('/moderator/orders/');
     }
+    
+    if (href === '/moderator/barcodes') {
+      return currentPath === '/moderator/barcodes' || 
+             currentPath.startsWith('/moderator/barcodes/');
+    } 
+    
+    if (href === '/moderator/barcode-scanner') {
+      return currentPath === '/moderator/barcode-scanner' || 
+             currentPath.startsWith('/moderator/barcode-scanner/');
+    }
 
     if (href === '/moderator/coupon') {
       const matches = ['/moderator/coupon', '/moderator/coupon'].some(route => currentPath === route);
       if (matches) return true;
       return false;
-    }
+    } 
+    
+   
 
    // Popup Settings
     if (href === '/moderator/delivery-settings') {
@@ -723,7 +737,10 @@ export default function ModeratorLayout({ children }) {
     { name: 'Create Categories', href: '/moderator/create-categories', icon: FolderPlus, color: '#4A8A90' },
     { name: 'Create Products', href: '/moderator/create-products', icon: PackagePlus, color: '#4A8A90' },
     { name: 'All Products', href: '/moderator/all-products', icon: ShoppingBag, color: '#4A8A90' },
+
     { name: 'All Orders', href: '/moderator/orders', icon: MessageSquare, color: '#4A8A90' },
+        { name: 'All Barcodes', href: '/moderator/barcodes', icon: QrCode, color: '#4A8A90' },
+        { name: ' Barcodes Scan', href: '/moderator/barcode-scanner', icon: ScanBarcode, color: '#4A8A90' },
     { name: 'Manage Coupon', href: '/moderator/coupon', icon: Ticket, color: '#4A8A90' },
     { name: 'Delivery Settings', href: '/moderator/delivery-settings', icon: Truck, color: '#4A8A90' }, 
     // { name: 'Popup Settings', href: '/moderator/popup-settings', icon: Star, color: '#4A8A90' },

@@ -481,6 +481,7 @@ export default function RootLayout({ children }) {
       lang="en" 
       data-scroll-behavior="smooth" 
       data-theme="light" 
+      suppressHydrationWarning
       style={{ colorScheme: 'light' }}
       dir="ltr"
     >

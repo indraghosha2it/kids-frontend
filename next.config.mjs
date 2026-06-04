@@ -7,9 +7,6 @@ const nextConfig = {
      unoptimized: true,
   },
    trailingSlash: true,
-    experimental: {
-    turbopackFileSystemCacheForDev: false,
-  },
 };
 
 export default nextConfig;

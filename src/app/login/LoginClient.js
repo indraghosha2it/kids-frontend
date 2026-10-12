@@ -60,7 +60,7 @@
 //     const loadingToast = toast.loading('🎈 Logging in...');
 
 //     try {
-//       const response = await fetch('http://localhost:5000/api/auth/login', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/auth/login', {
 //         method: 'POST',
 //         headers: { 'Content-Type': 'application/json' },
 //         body: JSON.stringify({
@@ -492,7 +492,7 @@ export default function LoginClient() {
 //   const loadingToast = toast.loading('🎈 Logging in...');
 
 //   try {
-//     const response = await fetch('http://localhost:5000/api/auth/login', {
+//     const response = await fetch('https://kids-backend.vercel.app/api/auth/login', {
 //       method: 'POST',
 //       headers: { 'Content-Type': 'application/json' },
 //       body: JSON.stringify({
@@ -540,7 +540,7 @@ export default function LoginClient() {
 //     const guestSessionId = localStorage.getItem('cartSessionId');
 //     if (guestSessionId && data.token) {
 //       try {
-//         const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
+//         const mergeResponse = await fetch('https://kids-backend.vercel.app/api/cart/merge', {
 //           method: 'POST',
 //           headers: {
 //             'Authorization': `Bearer ${data.token}`,
@@ -564,7 +564,7 @@ export default function LoginClient() {
 //     const guestWishlistSessionId = localStorage.getItem('wishlistSessionId');
 // if (guestWishlistSessionId && data.token) {
 //   try {
-//     const mergeResponse = await fetch('http://localhost:5000/api/wishlist/merge', {
+//     const mergeResponse = await fetch('https://kids-backend.vercel.app/api/wishlist/merge', {
 //       method: 'POST',
 //       headers: {
 //         'Authorization': `Bearer ${data.token}`,
@@ -643,7 +643,7 @@ const handleSubmit = async (e) => {
   const loadingToast = toast.loading('🎈 Logging in...');
 
   try {
-    const response = await fetch('http://localhost:5000/api/auth/login', {
+    const response = await fetch('https://kids-backend.vercel.app/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -691,7 +691,7 @@ const handleSubmit = async (e) => {
     const guestCartSessionId = localStorage.getItem('cartSessionId');
     if (guestCartSessionId && data.token) {
       try {
-        const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
+        const mergeResponse = await fetch('https://kids-backend.vercel.app/api/cart/merge', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${data.token}`,
@@ -715,7 +715,7 @@ const handleSubmit = async (e) => {
     const guestWishlistSessionId = localStorage.getItem('wishlistSessionId');
     if (guestWishlistSessionId && data.token) {
       try {
-        const mergeResponse = await fetch('http://localhost:5000/api/wishlist/merge', {
+        const mergeResponse = await fetch('https://kids-backend.vercel.app/api/wishlist/merge', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${data.token}`,
@@ -774,7 +774,7 @@ const handleSubmit = async (e) => {
 //     const guestSessionId = localStorage.getItem('cartSessionId');
 //     if (guestSessionId && data.token) {
 //       try {
-//         const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
+//         const mergeResponse = await fetch('https://kids-backend.vercel.app/api/cart/merge', {
 //           method: 'POST',
 //           headers: {
 //             'Authorization': `Bearer ${data.token}`,
@@ -822,7 +822,7 @@ const handleGoogleSuccess = async (data) => {
     const guestCartSessionId = localStorage.getItem('cartSessionId');
     if (guestCartSessionId && data.token) {
       try {
-        const mergeResponse = await fetch('http://localhost:5000/api/cart/merge', {
+        const mergeResponse = await fetch('https://kids-backend.vercel.app/api/cart/merge', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${data.token}`,
@@ -846,7 +846,7 @@ const handleGoogleSuccess = async (data) => {
     const guestWishlistSessionId = localStorage.getItem('wishlistSessionId');
     if (guestWishlistSessionId && data.token) {
       try {
-        const mergeResponse = await fetch('http://localhost:5000/api/wishlist/merge', {
+        const mergeResponse = await fetch('https://kids-backend.vercel.app/api/wishlist/merge', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${data.token}`,

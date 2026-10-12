@@ -81,7 +81,7 @@
 //   const fetchProductsStats = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/products`, {
+//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/products`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //         params: { limit: 999 }
 //       });
@@ -133,7 +133,7 @@
 //   const fetchOrderStats = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/admin/stats`, {
+//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders/admin/stats`, {
 //         headers: { Authorization: `Bearer ${token}` }
 //       });
       
@@ -181,7 +181,7 @@
 //         endDate: endDate.toISOString()
 //       };
       
-//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/admin/all`, {
+//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders/admin/all`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //         params
 //       });
@@ -236,7 +236,7 @@
 //   const fetchTotalRevenue = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/admin/all`, {
+//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders/admin/all`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //         params: { limit: 999 }
 //       });
@@ -905,7 +905,7 @@ export default function AdminDashboard() {
   const fetchProductsStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/products`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/products`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { limit: 999 }
       });
@@ -978,7 +978,7 @@ export default function AdminDashboard() {
         endDate: endDate.toISOString()
       };
       
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/admin/all`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders/admin/all`, {
         headers: { Authorization: `Bearer ${token}` },
         params
       });
@@ -1055,7 +1055,7 @@ export default function AdminDashboard() {
   const fetchTotalRevenue = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders/admin/all`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders/admin/all`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { limit: 999 }
       });

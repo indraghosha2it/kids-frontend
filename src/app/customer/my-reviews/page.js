@@ -120,7 +120,7 @@
 //         params.append('search', searchTerm.trim());
 //       }
 
-//       const response = await fetch(`http://localhost:5000/api/reviews/user/me?${params.toString()}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/reviews/user/me?${params.toString()}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -229,7 +229,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/reviews/${editModal.review._id}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1840,7 +1840,7 @@ export default function CustomerMyReviews() {
         return;
       }
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/my-reviews`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/my-reviews`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -1910,7 +1910,7 @@ const handleUpdateReview = async (saveData) => {
     
     console.log('Sending update data:', saveData); // Debug log
     
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${selectedReview._id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${selectedReview._id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,

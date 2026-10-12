@@ -872,7 +872,7 @@ const removeThumbnailImage = (imageId) => {
           }))
       };
 
-      const response = await fetch('http://localhost:5000/api/blogs', {
+      const response = await fetch('https://kids-backend.vercel.app/api/blogs', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

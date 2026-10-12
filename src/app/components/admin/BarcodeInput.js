@@ -20,7 +20,7 @@ const BarcodeInput = ({ value, onChange, onValidate, disabled = false, error = '
 
     setIsValidating(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/barcodes/validate/${barcodeValue}`);
+      const response = await fetch(`https://kids-backend.vercel.app/api/barcodes/validate/${barcodeValue}`);
       const data = await response.json();
       
       if (data.success) {

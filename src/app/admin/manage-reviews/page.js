@@ -77,7 +77,7 @@
 //         return;
 //       }
       
-//       let url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews?page=${currentPage}&limit=${itemsPerPage}`;
+//       let url = `${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews?page=${currentPage}&limit=${itemsPerPage}`;
       
 //       if (statusFilter !== 'all') {
 //         url += `&status=${statusFilter}`;
@@ -138,7 +138,7 @@
 //         ? `/api/reviews/${reviewId}/approve`
 //         : `/api/reviews/${reviewId}/reject`;
       
-//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
+//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}${endpoint}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -167,7 +167,7 @@
     
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${selectedReview._id}`, {
+//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${selectedReview._id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -200,7 +200,7 @@
 //     setIsReplying(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${selectedReview._id}/reply`, {
+//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${selectedReview._id}/reply`, {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -256,7 +256,7 @@
 //       } : null
 //     };
     
-//     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${selectedReview._id}`, {
+//     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${selectedReview._id}`, {
 //       method: 'PUT',
 //       headers: {
 //         'Authorization': `Bearer ${token}`,
@@ -2186,7 +2186,7 @@ export default function ManageReviews() {
         return;
       }
       
-      let url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews?page=${currentPage}&limit=${itemsPerPage}`;
+      let url = `${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews?page=${currentPage}&limit=${itemsPerPage}`;
       
       if (statusFilter !== 'all') {
         url += `&status=${statusFilter}`;
@@ -2247,7 +2247,7 @@ export default function ManageReviews() {
         ? `/api/reviews/${reviewId}/approve`
         : `/api/reviews/${reviewId}/reject`;
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}${endpoint}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -2272,7 +2272,7 @@ export default function ManageReviews() {
   const toggleFeatured = async (reviewId, currentStatus) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${reviewId}/featured`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${reviewId}/featured`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -2300,7 +2300,7 @@ export default function ManageReviews() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${selectedReview._id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${selectedReview._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -2333,7 +2333,7 @@ export default function ManageReviews() {
     setIsReplying(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${selectedReview._id}/reply`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${selectedReview._id}/reply`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -2394,7 +2394,7 @@ const handleSaveEdit = async (editForm) => {
       } : null
     };
     
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/${selectedReview._id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/${selectedReview._id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,

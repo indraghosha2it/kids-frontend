@@ -118,7 +118,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch('http://localhost:5000/api/wishlist', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/wishlist', {
 //         method: 'POST',
 //         headers: headers,
 //         body: JSON.stringify({ productId: product._id })
@@ -167,7 +167,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch('http://localhost:5000/api/cart', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/cart', {
 //         method: 'POST',
 //         headers: headers,
 //         body: JSON.stringify({
@@ -508,7 +508,7 @@
 //   const fetchFlashSaleProducts = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch('http://localhost:5000/api/products/flash-sale?limit=20');
+//       const response = await fetch('https://kids-backend.vercel.app/api/products/flash-sale?limit=20');
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -541,7 +541,7 @@
 //       }
       
 //       try {
-//         const response = await fetch('http://localhost:5000/api/cart/check-status', {
+//         const response = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
 //           method: 'POST',
 //           headers: { ...headers, 'Content-Type': 'application/json' },
 //           body: JSON.stringify({ productIds })
@@ -576,7 +576,7 @@
 //       }
       
 //       try {
-//         const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+//         const response = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
 //           method: 'POST',
 //           headers: { ...headers, 'Content-Type': 'application/json' },
 //           body: JSON.stringify({ productIds })
@@ -611,7 +611,7 @@
 //       }
       
 //       try {
-//         const response = await fetch('http://localhost:5000/api/cart/check-status', {
+//         const response = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
 //           method: 'POST',
 //           headers: { ...headers, 'Content-Type': 'application/json' },
 //           body: JSON.stringify({ productIds })
@@ -636,7 +636,7 @@
 //       else if (sessionId) headers['x-session-id'] = sessionId;
       
 //       try {
-//         const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+//         const response = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
 //           method: 'POST',
 //           headers: { ...headers, 'Content-Type': 'application/json' },
 //           body: JSON.stringify({ productIds })
@@ -868,7 +868,7 @@ const FlashSaleProductCard = ({ product, router, isInCart: propIsInCart, isInWis
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('http://localhost:5000/api/wishlist', {
+      const response = await fetch('https://kids-backend.vercel.app/api/wishlist', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ productId: product._id })
@@ -917,7 +917,7 @@ const FlashSaleProductCard = ({ product, router, isInCart: propIsInCart, isInWis
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('http://localhost:5000/api/cart', {
+      const response = await fetch('https://kids-backend.vercel.app/api/cart', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
@@ -1262,7 +1262,7 @@ export default function FlashSaleClient() {
   const fetchFlashSaleProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/products/flash-sale?limit=20');
+      const response = await fetch('https://kids-backend.vercel.app/api/products/flash-sale?limit=20');
       const data = await response.json();
       
       if (data.success) {
@@ -1295,7 +1295,7 @@ export default function FlashSaleClient() {
       }
       
       try {
-        const response = await fetch('http://localhost:5000/api/cart/check-status', {
+        const response = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({ productIds })
@@ -1330,7 +1330,7 @@ export default function FlashSaleClient() {
       }
       
       try {
-        const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+        const response = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({ productIds })
@@ -1365,7 +1365,7 @@ export default function FlashSaleClient() {
       }
       
       try {
-        const response = await fetch('http://localhost:5000/api/cart/check-status', {
+        const response = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({ productIds })
@@ -1390,7 +1390,7 @@ export default function FlashSaleClient() {
       else if (sessionId) headers['x-session-id'] = sessionId;
       
       try {
-        const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+        const response = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({ productIds })

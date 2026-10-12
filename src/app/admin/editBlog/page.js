@@ -424,7 +424,7 @@ export default function AdminEditBlog() {
       setIsLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/blogs/admin/${blogId}`, {
+        const response = await fetch(`https://kids-backend.vercel.app/api/blogs/admin/${blogId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -1015,7 +1015,7 @@ export default function AdminEditBlog() {
         imagesToDelete: thumbnailsToDelete
       };
 
-      const response = await fetch(`http://localhost:5000/api/blogs/admin/${blogId}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/blogs/admin/${blogId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

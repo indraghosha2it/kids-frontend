@@ -179,7 +179,7 @@
 //   const fetchCategories = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/categories', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -194,7 +194,7 @@
 //   const fetchSingleCoupon = async (couponId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/coupons/${couponId}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${couponId}`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -252,7 +252,7 @@
     
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/coupons/check-code?code=${encodeURIComponent(code)}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/coupons/check-code?code=${encodeURIComponent(code)}`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -414,7 +414,7 @@
 //         autoApply: formData.autoApply
 //       };
       
-//       const response = await fetch('http://localhost:5000/api/coupons', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/coupons', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -501,7 +501,7 @@
 //         autoApply: editFormData.autoApply
 //       };
       
-//       const response = await fetch(`http://localhost:5000/api/coupons/${selectedCouponId}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${selectedCouponId}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -532,7 +532,7 @@
 //     setIsLoadingCoupons(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       let url = `http://localhost:5000/api/coupons?page=${currentPage}&limit=${itemsPerPage}`;
+//       let url = `https://kids-backend.vercel.app/api/coupons?page=${currentPage}&limit=${itemsPerPage}`;
       
 //       if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
 //       if (filterStatus !== 'all') {
@@ -572,7 +572,7 @@
 //     setIsDeleting(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/coupons/${selectedCoupon._id}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${selectedCoupon._id}`, {
 //         method: 'DELETE',
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
@@ -598,7 +598,7 @@
 //   const handleToggleStatus = async (coupon) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/coupons/${coupon._id}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${coupon._id}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -647,7 +647,7 @@
 //         autoApply: coupon.autoApply
 //       };
       
-//       const response = await fetch('http://localhost:5000/api/coupons', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/coupons', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -2306,7 +2306,7 @@ export default function AdminCouponManager() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('https://kids-backend.vercel.app/api/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2321,7 +2321,7 @@ export default function AdminCouponManager() {
   const fetchSingleCoupon = async (couponId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/coupons/${couponId}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${couponId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2379,7 +2379,7 @@ export default function AdminCouponManager() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/coupons/check-code?code=${encodeURIComponent(code)}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/check-code?code=${encodeURIComponent(code)}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2541,7 +2541,7 @@ export default function AdminCouponManager() {
         autoApply: formData.autoApply
       };
       
-      const response = await fetch('http://localhost:5000/api/coupons', {
+      const response = await fetch('https://kids-backend.vercel.app/api/coupons', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -2628,7 +2628,7 @@ export default function AdminCouponManager() {
         autoApply: editFormData.autoApply
       };
       
-      const response = await fetch(`http://localhost:5000/api/coupons/${selectedCouponId}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${selectedCouponId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -2659,7 +2659,7 @@ export default function AdminCouponManager() {
     setIsLoadingCoupons(true);
     try {
       const token = localStorage.getItem('token');
-      let url = `http://localhost:5000/api/coupons?page=${currentPage}&limit=${itemsPerPage}`;
+      let url = `https://kids-backend.vercel.app/api/coupons?page=${currentPage}&limit=${itemsPerPage}`;
       
       if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
       if (filterStatus !== 'all') {
@@ -2699,7 +2699,7 @@ export default function AdminCouponManager() {
     setIsDeleting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/coupons/${selectedCoupon._id}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${selectedCoupon._id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -2725,7 +2725,7 @@ export default function AdminCouponManager() {
   const handleToggleStatus = async (coupon) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/coupons/${coupon._id}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/coupons/${coupon._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -2774,7 +2774,7 @@ export default function AdminCouponManager() {
         autoApply: coupon.autoApply
       };
       
-      const response = await fetch('http://localhost:5000/api/coupons', {
+      const response = await fetch('https://kids-backend.vercel.app/api/coupons', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -3291,7 +3291,7 @@ export default function AdminCouponManager() {
             </div>
           </label>
           
-          <label className="flex items-center gap-3 cursor-pointer">
+          {/* <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               name="isFirstPurchaseOnly"
@@ -3303,7 +3303,7 @@ export default function AdminCouponManager() {
               <span className="text-sm font-medium text-gray-700">First Purchase Only</span>
               <p className="text-xs text-gray-500">Applicable only for customers making their first purchase</p>
             </div>
-          </label>
+          </label> */}
           
           {/* <label className="flex items-center gap-3 cursor-pointer">
             <input

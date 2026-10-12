@@ -233,7 +233,7 @@ const compressVideo = async (file) => {
   const fetchProducts = async () => {
     setLoadingProducts(true);
     try {
-      const response = await fetch('http://localhost:5000/api/products?limit=100');
+      const response = await fetch('https://kids-backend.vercel.app/api/products?limit=100');
       const data = await response.json();
       let productsList = [];
       if (data.success) {
@@ -653,7 +653,7 @@ const uploadToCloudinary = async (file, type, fileId) => {
         requestBody.productName = formData.productName;
       }
 
-      const response = await fetch('http://localhost:5000/api/reviews', {
+      const response = await fetch('https://kids-backend.vercel.app/api/reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

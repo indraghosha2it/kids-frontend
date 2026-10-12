@@ -68,7 +68,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch('http://localhost:5000/api/cart', { headers });
+//       const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
 //       const data = await response.json();
       
 //       console.log('Cart response:', data);
@@ -197,7 +197,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch(`http://localhost:5000/api/cart/${itemId}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/cart/${itemId}`, {
 //         method: 'PUT',
 //         headers,
 //         body: JSON.stringify({ quantity: newQuantity })
@@ -254,7 +254,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch(`http://localhost:5000/api/cart/${itemId}`, {
+//       const response = await fetch(`https://kids-backend.vercel.app/api/cart/${itemId}`, {
 //         method: 'DELETE',
 //         headers
 //       });
@@ -296,7 +296,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch('http://localhost:5000/api/cart', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/cart', {
 //         method: 'DELETE',
 //         headers
 //       });
@@ -667,7 +667,7 @@ export default function CartClient() {
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('http://localhost:5000/api/cart', { headers });
+      const response = await fetch('https://kids-backend.vercel.app/api/cart', { headers });
       const data = await response.json();
       
       console.log('Cart response:', data);
@@ -796,7 +796,7 @@ export default function CartClient() {
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch(`http://localhost:5000/api/cart/${itemId}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/cart/${itemId}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify({ quantity: newQuantity })
@@ -853,7 +853,7 @@ export default function CartClient() {
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch(`http://localhost:5000/api/cart/${itemId}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/cart/${itemId}`, {
         method: 'DELETE',
         headers
       });
@@ -895,7 +895,7 @@ export default function CartClient() {
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('http://localhost:5000/api/cart', {
+      const response = await fetch('https://kids-backend.vercel.app/api/cart', {
         method: 'DELETE',
         headers
       });

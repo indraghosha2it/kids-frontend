@@ -338,7 +338,7 @@
 //         return;
 //       }
       
-//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/me`, {
+//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/auth/me`, {
 //         headers: { Authorization: `Bearer ${token}` }
 //       });
       
@@ -357,7 +357,7 @@
 //   const fetchUserOrders = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders`, {
+//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //         params: { limit: 100 }
 //       });
@@ -397,7 +397,7 @@
 //   const fetchUserReviews = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/my-reviews`, {
+//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/my-reviews`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //         params: { limit: 100 }
 //       });
@@ -467,7 +467,7 @@
 //   const fetchWishlist = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/wishlist`, {
+//       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/wishlist`, {
 //         headers: { Authorization: `Bearer ${token}` }
 //       });
       
@@ -497,7 +497,7 @@
     
 //     try {
 //       const token = localStorage.getItem('token');
-//       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/wishlist/${itemId}`, {
+//       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/wishlist/${itemId}`, {
 //         headers: { Authorization: `Bearer ${token}` }
 //       });
       
@@ -1257,7 +1257,7 @@ export default function CustomerDashboard() {
         return;
       }
       
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/me`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -1276,7 +1276,7 @@ export default function CustomerDashboard() {
   const fetchUserOrders = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/orders`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/orders`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { limit: 100 }
       });
@@ -1320,7 +1320,7 @@ export default function CustomerDashboard() {
   const fetchUserReviews = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/my-reviews`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews/my-reviews`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { limit: 100 }
       });
@@ -1391,7 +1391,7 @@ export default function CustomerDashboard() {
   const fetchWishlist = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/wishlist`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/wishlist`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -1421,7 +1421,7 @@ export default function CustomerDashboard() {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/wishlist/${itemId}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/wishlist/${itemId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

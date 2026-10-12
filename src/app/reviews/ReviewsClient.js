@@ -98,7 +98,7 @@
 //         params.append('search', filters.search);
 //       }
 
-//       const response = await fetch(`http://localhost:5000/api/reviews/public?${params}`);
+//       const response = await fetch(`https://kids-backend.vercel.app/api/reviews/public?${params}`);
 //       const data = await response.json();
 
 //       if (data.success) {
@@ -119,7 +119,7 @@
 
 //   const fetchStats = async () => {
 //     try {
-//       const response = await fetch('http://localhost:5000/api/reviews/public?limit=1000');
+//       const response = await fetch('https://kids-backend.vercel.app/api/reviews/public?limit=1000');
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -876,7 +876,7 @@ export default function AllReviewsPage() {
   const fetchAllReviews = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews?status=approved&limit=100`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://kids-backend.vercel.app'}/api/reviews?status=approved&limit=100`);
       const data = await response.json();
       
       if (data.success) {

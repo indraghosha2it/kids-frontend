@@ -54,7 +54,7 @@ export default function ModeratorBarcodeScannerPage() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:5000/api/products/barcode/${barcodeValue}`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/products/barcode/${barcodeValue}`, {
         headers: {
           'Authorization': token ? `Bearer ${token}` : '',
           'Content-Type': 'application/json'

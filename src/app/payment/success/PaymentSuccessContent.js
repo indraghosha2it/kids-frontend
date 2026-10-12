@@ -23,7 +23,7 @@ export default function PaymentSuccessContent() {
       
       if (tran_id && val_id) {
         try {
-          const response = await fetch(`http://localhost:5000/api/payments/validate?tran_id=${tran_id}&val_id=${val_id}&status=${status}`);
+          const response = await fetch(`https://kids-backend.vercel.app/api/payments/validate?tran_id=${tran_id}&val_id=${val_id}&status=${status}`);
           const result = await response.json();
           
           if (result.success && result.status === 'success') {
@@ -35,7 +35,7 @@ export default function PaymentSuccessContent() {
             const headers = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
             if (sessionId) headers['x-session-id'] = sessionId;
-            await fetch('http://localhost:5000/api/cart', { method: 'DELETE', headers });
+            await fetch('https://kids-backend.vercel.app/api/cart', { method: 'DELETE', headers });
             window.dispatchEvent(new Event('cart-update'));
           } else {
             setPaymentStatus('failed');

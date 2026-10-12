@@ -41,8 +41,8 @@ export default function ModeratorBarcodeManagement() {
     try {
       const token = localStorage.getItem('token');
       const endpoint = activeTab === 'available' 
-        ? 'http://localhost:5000/api/barcodes/available'
-        : 'http://localhost:5000/api/barcodes/assigned';
+        ? 'https://kids-backend.vercel.app/api/barcodes/available'
+        : 'https://kids-backend.vercel.app/api/barcodes/assigned';
       
       const url = searchTerm 
         ? `${endpoint}?search=${searchTerm}&limit=100`
@@ -67,7 +67,7 @@ export default function ModeratorBarcodeManagement() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/barcodes/stats', {
+      const response = await fetch('https://kids-backend.vercel.app/api/barcodes/stats', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -139,7 +139,7 @@ export default function ModeratorBarcodeManagement() {
         return;
       }
       
-      const response = await fetch(`http://localhost:5000/api/products/barcode/${encodeURIComponent(barcode)}`);
+      const response = await fetch(`https://kids-backend.vercel.app/api/products/barcode/${encodeURIComponent(barcode)}`);
       const data = await response.json();
       
       if (data.success && data.data) {
@@ -182,7 +182,7 @@ export default function ModeratorBarcodeManagement() {
         return;
       }
       
-      const response = await fetch('http://localhost:5000/api/barcodes/generate', {
+      const response = await fetch('https://kids-backend.vercel.app/api/barcodes/generate', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -216,7 +216,7 @@ export default function ModeratorBarcodeManagement() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/barcodes/${barcodeNumber}/release`, {
+      const response = await fetch(`https://kids-backend.vercel.app/api/barcodes/${barcodeNumber}/release`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });

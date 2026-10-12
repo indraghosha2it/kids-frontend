@@ -94,7 +94,7 @@ export default function RegisterClient() {
     const loadingToast = toast.loading('🎈 Creating your toy account...');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('https://kids-backend.vercel.app/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ export default function RegisterClient() {
     const verifyingToast = toast.loading('Verifying OTP...');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+      const response = await fetch('https://kids-backend.vercel.app/api/auth/verify-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ setTimeout(() => {
     const resendToast = toast.loading('Resending OTP...');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/resend-otp', {
+      const response = await fetch('https://kids-backend.vercel.app/api/auth/resend-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

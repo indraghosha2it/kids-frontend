@@ -195,7 +195,7 @@
 // //       console.log('Using session-id header for guest');
 // //     }
     
-// //     const response = await fetch('http://localhost:5000/api/cart', {
+// //     const response = await fetch('https://kids-backend.vercel.app/api/cart', {
 // //       method: 'POST',
 // //       headers: headers,
 // //       body: JSON.stringify({
@@ -259,7 +259,7 @@
 //         headers['x-session-id'] = sessionId;
 //       }
       
-//       const response = await fetch('http://localhost:5000/api/cart', {
+//       const response = await fetch('https://kids-backend.vercel.app/api/cart', {
 //         method: 'POST',
 //         headers: headers,
 //         body: JSON.stringify({
@@ -1284,7 +1284,7 @@
 
 //   const fetchCategories = async () => {
 //     try {
-//       const response = await fetch('http://localhost:5000/api/categories');
+//       const response = await fetch('https://kids-backend.vercel.app/api/categories');
 //       const data = await response.json();
 //       if (data.success) {
 //         setCategories(data.data);
@@ -1298,7 +1298,7 @@
 
 //   const fetchSubcategories = async (categoryId) => {
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`);
+//       const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}/subcategories`);
 //       const data = await response.json();
 //       if (data.success && Array.isArray(data.data.subcategories)) {
 //         setSubcategories(data.data.subcategories);
@@ -1316,7 +1316,7 @@
 
 //   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`);
+//       const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}/subcategories/${subcategoryId}/children`);
 //       const data = await response.json();
 //       if (data.success && Array.isArray(data.data.children)) {
 //         setChildSubcategories(data.data.children);
@@ -1478,7 +1478,7 @@
 //       }
 //       queryParams.append('sort', sortParam);
 
-//     const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+//     const response = await fetch(`https://kids-backend.vercel.app/api/products?${queryParams.toString()}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -2085,7 +2085,7 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('http://localhost:5000/api/wishlist', {
+      const response = await fetch('https://kids-backend.vercel.app/api/wishlist', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ productId: product._id })
@@ -2136,7 +2136,7 @@ const ProductGridCard = ({ product, router, isInCart: propIsInCart, isInWishlist
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('http://localhost:5000/api/cart', {
+      const response = await fetch('https://kids-backend.vercel.app/api/cart', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
@@ -2507,7 +2507,7 @@ const ProductListCard = ({ product, router, isInCart: propIsInCart, isInWishlist
         headers['x-session-id'] = sessionId;
       }
       
-      const response = await fetch('http://localhost:5000/api/wishlist', {
+      const response = await fetch('https://kids-backend.vercel.app/api/wishlist', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ productId: product._id })
@@ -2558,7 +2558,7 @@ const ProductListCard = ({ product, router, isInCart: propIsInCart, isInWishlist
   //       headers['x-session-id'] = sessionId;
   //     }
       
-  //     const response = await fetch('http://localhost:5000/api/cart', {
+  //     const response = await fetch('https://kids-backend.vercel.app/api/cart', {
   //       method: 'POST',
   //       headers: headers,
   //       body: JSON.stringify({
@@ -2620,7 +2620,7 @@ const ProductListCard = ({ product, router, isInCart: propIsInCart, isInWishlist
       headers['x-session-id'] = sessionId;
     }
     
-    const response = await fetch('http://localhost:5000/api/cart', {
+    const response = await fetch('https://kids-backend.vercel.app/api/cart', {
       method: 'POST',
       headers: headers,
       body: JSON.stringify({
@@ -3452,7 +3452,7 @@ useEffect(() => {
       }
       
       try {
-        const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+        const response = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({ productIds })
@@ -3486,7 +3486,7 @@ useEffect(() => {
       }
       
       try {
-        const response = await fetch('http://localhost:5000/api/wishlist/check-status', {
+        const response = await fetch('https://kids-backend.vercel.app/api/wishlist/check-status', {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({ productIds })
@@ -3526,7 +3526,7 @@ useEffect(() => {
       }
       
       try {
-        const response = await fetch('http://localhost:5000/api/cart/check-status', {
+        const response = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({ productIds })
@@ -3560,7 +3560,7 @@ useEffect(() => {
       }
       
       try {
-        const response = await fetch('http://localhost:5000/api/cart/check-status', {
+        const response = await fetch('https://kids-backend.vercel.app/api/cart/check-status', {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
           body: JSON.stringify({ productIds })
@@ -3657,7 +3657,7 @@ useEffect(() => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/categories');
+      const response = await fetch('https://kids-backend.vercel.app/api/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data);
@@ -3671,7 +3671,7 @@ useEffect(() => {
 
   const fetchSubcategories = async (categoryId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`);
+      const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}/subcategories`);
       const data = await response.json();
       if (data.success && Array.isArray(data.data.subcategories)) {
         setSubcategories(data.data.subcategories);
@@ -3689,7 +3689,7 @@ useEffect(() => {
 
   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`);
+      const response = await fetch(`https://kids-backend.vercel.app/api/categories/${categoryId}/subcategories/${subcategoryId}/children`);
       const data = await response.json();
       if (data.success && Array.isArray(data.data.children)) {
         setChildSubcategories(data.data.children);
@@ -3748,9 +3748,9 @@ useEffect(() => {
       }
       queryParams.append('sort', sortParam);
 
-      console.log('API URL:', `http://localhost:5000/api/products?${queryParams.toString()}`);
+      console.log('API URL:', `https://kids-backend.vercel.app/api/products?${queryParams.toString()}`);
 
-      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+      const response = await fetch(`https://kids-backend.vercel.app/api/products?${queryParams.toString()}`);
       const data = await response.json();
       
       if (data.success) {

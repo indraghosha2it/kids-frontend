@@ -123,7 +123,7 @@ export default function BlogDetailsClient() {
     const fetchBlog = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
+        const response = await fetch(`https://kids-backend.vercel.app/api/blogs/${blogId}`);
         const data = await response.json();
         
         if (data.success) {
@@ -214,7 +214,7 @@ export default function BlogDetailsClient() {
   // Fetch related posts
   const fetchRelatedPosts = async (category, currentId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/blogs?category=${category}&limit=3`);
+      const response = await fetch(`https://kids-backend.vercel.app/api/blogs?category=${category}&limit=3`);
       const data = await response.json();
       if (data.success) {
         setRelatedPosts(data.data.filter(post => post._id !== currentId).slice(0, 3));
